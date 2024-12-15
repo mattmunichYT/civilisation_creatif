@@ -1,0 +1,41 @@
+name: civilisation_creatif
+version: '0.1'
+main: fr.mattmunich.civilisation_creatif.Main
+api-version: '1.21'
+commands:
+  minijeuxentrepotes:
+    description: "§6§lCommande pour retourner sur le serveur principal!"
+    usage: /mjep
+    aliases:
+      - servprincipal
+      - servmain
+      - mjep
+      - lobby
+  spawn:
+    description: "§6§lCommande pour retourner au spawn du serveur !"
+    usage: /spawn [world]
+  xp:
+    description: "§6§lCommande pour gérer l'XP d'un joueur !"
+    usage: /xp <player> <add/remove/reset/get> [xpAmount]
+    aliases:
+      - exp
+      - experience
+  money:
+    description: "§6§lCommande pour gérer l'argent d'un joueur !"
+    usage: /money <player> <add/remove/reset/get> [moneyAmount]
+    aliases:
+      - argent
+  rank:
+    description: "§6§lCommande pour gérer le grade d'un joueur !"
+    usage: /rank <player> <rank>
+    aliases:
+      - grade
+  civilisation:
+    description: "§6§lCommande du plugin !"
+    usage: /civilisation [credits/reload]
+  backup:
+    description: "§6§lCommande pour faire une sauvegarde des mondes immédiatement !"
+    usage: /backup
+  territoire:
+    description: "§6§lCommande pour gérer son territoire !"
+    usage: /territoire
