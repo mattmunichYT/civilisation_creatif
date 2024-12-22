@@ -54,7 +54,7 @@ public class TerritoireCommand implements CommandExecutor {
                         String chunkOwner = territoryData.getChunkOwner(chunk);
 //                        p.sendMessage("chunk owner:" + chunkOwner);
                         if(chunkOwner==null) {
-                            chunksOwners.add("- ");
+                            chunksOwners.add("§r- ");
 //                            p.sendMessage("chunk not owned");
                             continue;
                         }
@@ -62,15 +62,15 @@ public class TerritoireCommand implements CommandExecutor {
                             owners.add(chunkOwner);
                             ownerCount+=1;
                             ownerID.put(chunkOwner,ownerCount);
-                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + String.valueOf(ownerID.get(chunkOwner)) + " ");
 //                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
                         } else {
-                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + String.valueOf(ownerID.get(chunkOwner)) + " ");
 //                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
                         }
                     }
                 }
-                int columsNum = 7;
+                int columsNum = 8;
 //                p.sendMessage(chunksOwners.toString());
                 //MAP EXAMPLE =
                 /*
@@ -90,22 +90,33 @@ public class TerritoireCommand implements CommandExecutor {
                 * X = position //TODO (mark player pos on nearbyTerrClaimsMap)
                 * */
                 chunksOwners.add(0, """
-                            A B C D E F G
-                            - - - - - - -
-                        a |""");
-                chunksOwners.add(columsNum+1, "\nb |");  // V FOR columsNum 6 V
-                chunksOwners.add(columsNum*2+2, "\nc |");// == 12+2 : not 12 bc we added an elements in previous lines
-                chunksOwners.add(columsNum*3+3, "\nd |");// == 18+3
-                chunksOwners.add(columsNum*4+4, "\ne |");// == 24+4
-                chunksOwners.add(columsNum*5+5, "\nf |");// == 30+5
-                chunksOwners.add(columsNum*6+6, "\ng |");// == 36+6
-                chunksOwners.add(columsNum*7+7, "\n\n"); // == 42+7
+                            §eA B C D E F G H
+                            - - - - - - - -
+                        a |\s""");
+                chunksOwners.add(columsNum+1, "\n§eb | ");  // V FOR columsNum 6 V
+                chunksOwners.add(columsNum*2+2, "\n§ec | ");// == 12+2 : not 12 bc we added an elements in previous lines
+                chunksOwners.add(columsNum*3+3, "\n§ed | ");// == 18+3
+                chunksOwners.add(columsNum*4+4, "\n§ee | ");// == 24+4
+                chunksOwners.add(columsNum*5+5, "\n§ef | ");// == 30+5
+                chunksOwners.add(columsNum*6+6, "\n§eg | ");// == 36+6
+                chunksOwners.add(columsNum*7+7, "\n§eh | ");// == 42+7
+                chunksOwners.add(columsNum*8+8, "\n\n\n"); // == 48+8
                 StringBuilder formattedMap = new StringBuilder(chunksOwners.toString().replace("[", "").replace("\"", "").replace(", ", "").replace("]", "") + "\n\n§aLégende:\n");
                 for (String owner : owners) {
                     int id = ownerID.get(owner);
-                    formattedMap.append("§a- ").append(id).append("§2 : ").append(owner).append("\n");
+                    formattedMap.append("§a- §").append(territoryData.getTerritoryTeam(owner).getColor()).append(id).append("§2 : ").append(owner).append("\n");
                 }
                 p.sendMessage(main.prefix + "§6Voici la carte des claims à proximité de vous :\n" + formattedMap);
+                return true;
+            }
+            if(args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("showClaims") || args[0].equalsIgnoreCase("showNearbyClaims")) {
+                if(main.seeTerritoryBorders.contains(p)) {
+                    main.seeTerritoryBorders.remove(p);
+                    p.sendMessage(main.prefix + "§cVous ne pouvez désormais plus voir la délimitation des territoires à proximité de vous !");
+                } else {
+                    main.seeTerritoryBorders.add(p);
+                    p.sendMessage(main.prefix + "§2Vous pouvez désormais voir la délimitation des territoires à proximité de vous !");
+                }
                 return true;
             }
         }
@@ -122,46 +133,7 @@ public class TerritoireCommand implements CommandExecutor {
                     return true;
                 }
             }
-
-            Inventory hasNoTerrMenu = Bukkit.createInventory(p, 27, "§6Menu §7- §a/territoire §7(§8§oAucun§7)");
-            for (int i = 0; i <= 26; i++) {
-                ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-                ItemMeta paneMeta = pane.getItemMeta();
-                assert paneMeta != null;
-                paneMeta.setItemName("");
-                paneMeta.setHideTooltip(true);
-                pane.setItemMeta(paneMeta);
-                hasNoTerrMenu.setItem(i, pane);
-            }
-            ItemStack joinItem = new ItemStack(Material.END_CRYSTAL);
-            ItemMeta joinMeta = joinItem.getItemMeta();
-                assert joinMeta != null;
-                joinMeta.setItemName("§b\uD83D\uDC64➕ Rejoindre un territoire");
-            joinItem.setItemMeta(joinMeta);
-            hasNoTerrMenu.setItem(14, joinItem);
-
-            ItemStack createTerrItem = new ItemStack(Material.CRAFTING_TABLE);
-            ItemMeta createTerrMeta = createTerrItem.getItemMeta();
-                assert createTerrMeta != null;
-                createTerrMeta.setItemName("§2➕ Créer son territoire");
-            createTerrItem.setItemMeta(createTerrMeta);
-            hasNoTerrMenu.setItem(13, createTerrItem);
-
-            ItemStack viewTerrsItem = new ItemStack(Material.SPYGLASS);
-            ItemMeta viewTerrsMeta = viewTerrsItem.getItemMeta();
-                assert viewTerrsMeta != null;
-                viewTerrsMeta.setItemName("§5\uD83D\uDD0E Voir la liste des territoires");
-            viewTerrsItem.setItemMeta(viewTerrsMeta);
-            hasNoTerrMenu.setItem(12, viewTerrsItem);
-
-            ItemStack closeItem = new ItemStack(Material.BARRIER);
-            ItemMeta closeItemMeta = closeItem.getItemMeta();
-                assert closeItemMeta != null;
-                closeItemMeta.setItemName("§4❌ Fermer le menu");
-            closeItem.setItemMeta(closeItemMeta);
-            hasNoTerrMenu.setItem(26, closeItem);
-
-            p.openInventory(hasNoTerrMenu);
+            p.openInventory(hasNoTerritory_Menu(p));
         } else {
             if(args.length==1){
                 if(args[0].equalsIgnoreCase("claim") || args[0].equalsIgnoreCase("claimChunk")) {
@@ -191,46 +163,92 @@ public class TerritoireCommand implements CommandExecutor {
             }
 
 
-            Inventory hasTerrMenu = Bukkit.createInventory(p, 27, "§6Menu §7- §a/territoire §7(" + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName() + "§7)");
-            for (int i = 0; i <= 26; i++) {
-                ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-                ItemMeta paneMeta = pane.getItemMeta();
-                assert paneMeta != null;
-                paneMeta.setHideTooltip(true);
-                pane.setItemMeta(paneMeta);
-                hasTerrMenu.setItem(i, pane);
-            }
-            ItemStack quitTerrItem = new ItemStack(Material.RED_DYE);
-            ItemMeta quitTerrMeta = quitTerrItem.getItemMeta();
-                assert quitTerrMeta != null;
-                quitTerrMeta.setItemName("§c\uD83D\uDC64❌ Quitter son territoire");
-            quitTerrItem.setItemMeta(quitTerrMeta);
-            hasTerrMenu.setItem(14, quitTerrItem);
 
-            ItemStack modifyTerrItem = new ItemStack(Material.PAPER);
-            ItemMeta modifyTerrMeta = modifyTerrItem.getItemMeta();
-                assert modifyTerrMeta != null;
-                modifyTerrMeta.setItemName("§e✎ Voir son territoire");
-            modifyTerrItem.setItemMeta(modifyTerrMeta);
-            hasTerrMenu.setItem(13, modifyTerrItem);
 
-            ItemStack viewTerrsItem2 = new ItemStack(Material.SPYGLASS);
-            ItemMeta viewTerrsMeta2 = viewTerrsItem2.getItemMeta();
-                assert viewTerrsMeta2 != null;
-                viewTerrsMeta2.setItemName("§5\uD83D\uDD0E Voir la liste des territoires");
-            viewTerrsItem2.setItemMeta(viewTerrsMeta2);
-            hasTerrMenu.setItem(12, viewTerrsItem2);
-
-            ItemStack closeItem2 = new ItemStack(Material.BARRIER);
-            ItemMeta closeItemMeta2 = closeItem2.getItemMeta();
-                assert closeItemMeta2 != null;
-                closeItemMeta2.setItemName("§4❌ Fermer le menu");
-            closeItem2.setItemMeta(closeItemMeta2);
-            hasTerrMenu.setItem(26, closeItem2);
-
-            p.openInventory(hasTerrMenu);
+            p.openInventory(hasTerritory_Menu(p));
         }
 
         return true;
+    }
+
+    public Inventory hasNoTerritory_Menu(Player p) {
+        Inventory hasNoTerrMenu = Bukkit.createInventory(p, 27, "§6Menu §7- §a/territoire §7(§8§oAucun§7)");
+        for (int i = 0; i <= 26; i++) {
+            ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+            ItemMeta paneMeta = pane.getItemMeta();
+            assert paneMeta != null;
+            paneMeta.setItemName("");
+            paneMeta.setHideTooltip(true);
+            pane.setItemMeta(paneMeta);
+            hasNoTerrMenu.setItem(i, pane);
+        }
+        ItemStack joinItem = new ItemStack(Material.END_CRYSTAL);
+        ItemMeta joinMeta = joinItem.getItemMeta();
+        assert joinMeta != null;
+        joinMeta.setItemName("§b\uD83D\uDC64➕ Rejoindre un territoire");
+        joinItem.setItemMeta(joinMeta);
+        hasNoTerrMenu.setItem(14, joinItem);
+
+        ItemStack createTerrItem = new ItemStack(Material.CRAFTING_TABLE);
+        ItemMeta createTerrMeta = createTerrItem.getItemMeta();
+        assert createTerrMeta != null;
+        createTerrMeta.setItemName("§2➕ Créer son territoire");
+        createTerrItem.setItemMeta(createTerrMeta);
+        hasNoTerrMenu.setItem(13, createTerrItem);
+
+        ItemStack viewTerrsItem = new ItemStack(Material.SPYGLASS);
+        ItemMeta viewTerrsMeta = viewTerrsItem.getItemMeta();
+        assert viewTerrsMeta != null;
+        viewTerrsMeta.setItemName("§5\uD83D\uDD0E Voir la liste des territoires");
+        viewTerrsItem.setItemMeta(viewTerrsMeta);
+        hasNoTerrMenu.setItem(12, viewTerrsItem);
+
+        ItemStack closeItem = new ItemStack(Material.BARRIER);
+        ItemMeta closeItemMeta = closeItem.getItemMeta();
+        assert closeItemMeta != null;
+        closeItemMeta.setItemName("§4❌ Fermer le menu");
+        closeItem.setItemMeta(closeItemMeta);
+        hasNoTerrMenu.setItem(26, closeItem);
+        return hasNoTerrMenu;
+    }
+
+    public Inventory hasTerritory_Menu(Player p) {
+        Inventory hasTerrMenu = Bukkit.createInventory(p, 27, "§6Menu §7- §a/territoire §7(" + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName() + "§7)");
+        for (int i = 0; i <= 26; i++) {
+            ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+            ItemMeta paneMeta = pane.getItemMeta();
+            assert paneMeta != null;
+            paneMeta.setHideTooltip(true);
+            pane.setItemMeta(paneMeta);
+            hasTerrMenu.setItem(i, pane);
+        }
+        ItemStack quitTerrItem = new ItemStack(Material.RED_DYE);
+        ItemMeta quitTerrMeta = quitTerrItem.getItemMeta();
+        assert quitTerrMeta != null;
+        quitTerrMeta.setItemName("§c\uD83D\uDC64❌ Quitter son territoire");
+        quitTerrItem.setItemMeta(quitTerrMeta);
+        hasTerrMenu.setItem(14, quitTerrItem);
+
+        ItemStack modifyTerrItem = new ItemStack(Material.PAPER);
+        ItemMeta modifyTerrMeta = modifyTerrItem.getItemMeta();
+        assert modifyTerrMeta != null;
+        modifyTerrMeta.setItemName("§e✎ Voir son territoire");
+        modifyTerrItem.setItemMeta(modifyTerrMeta);
+        hasTerrMenu.setItem(13, modifyTerrItem);
+
+        ItemStack viewTerrsItem2 = new ItemStack(Material.SPYGLASS);
+        ItemMeta viewTerrsMeta2 = viewTerrsItem2.getItemMeta();
+        assert viewTerrsMeta2 != null;
+        viewTerrsMeta2.setItemName("§5\uD83D\uDD0E Voir la liste des territoires");
+        viewTerrsItem2.setItemMeta(viewTerrsMeta2);
+        hasTerrMenu.setItem(12, viewTerrsItem2);
+
+        ItemStack closeItem2 = new ItemStack(Material.BARRIER);
+        ItemMeta closeItemMeta2 = closeItem2.getItemMeta();
+        assert closeItemMeta2 != null;
+        closeItemMeta2.setItemName("§4❌ Fermer le menu");
+        closeItem2.setItemMeta(closeItemMeta2);
+        hasTerrMenu.setItem(26, closeItem2);
+        return hasTerrMenu;
     }
 }

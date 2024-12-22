@@ -22,10 +22,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -640,6 +637,37 @@ public class EventListener implements Listener {
                 }
             } catch (Exception ex) {
                 Bukkit.getConsoleSender().sendMessage(ex.getMessage() + Arrays.toString(ex.getStackTrace()).replace(",", ",\n"));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if(main.seeTerritoryBorders.contains(p)) {
+//            p.sendMessage("Hey! Let's show you the nearby claimed chunks...");
+            Location loc = p.getLocation();
+            int x = loc.getBlockX();
+            int y = loc.getBlockY();
+            int z = loc.getBlockZ();
+            Chunk chunk = loc.getChunk();
+            World world = loc.getWorld();
+            int range = 20;
+//            p.sendMessage("Scanning for chunks...");
+            for (int chunkX = chunk.getX() - range; chunkX < chunk.getX() + range; chunkX++) {
+                for (int chunkZ = chunk.getZ() - range; chunkZ < chunk.getZ() + range; chunkZ++) {
+//                    p.sendMessage("Checking chhunk" + chunkX + " ; " + chunkZ);
+                    assert world != null;
+                    Chunk chunkToShow = world.getChunkAt(chunkX,chunkZ);
+                    Map<Integer,Integer> chunkTS = new HashMap<>();
+                    chunkTS.put(chunkX,chunkZ);
+                    if (territoryData.getChunkOwner(chunkTS) != null && !territoryData.getChunkOwner(chunkTS).isEmpty()) {
+//                        p.sendMessage("Rendering chunk...");
+                        ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkTS)).getColor();
+                        territoryData.showChunkBorder(chunkToShow, chatColor, p);
+                    }
+
+                }
             }
         }
     }

@@ -383,7 +383,11 @@ public class TerritoryData {
             List<Map<?,?>> terrClaims = config.getMapList("territories." + territory.getName() + ".claims");
             List<Map<?,?>> globalClaims = config.getMapList("claims");
             if(globalClaims.contains(chunk)) {
-                sender.sendMessage(main.prefix + "§cVous ne pouvez pas claim un chunk §4déjà claim §cpar un §4autre territoire §c!");
+                if(terrClaims.contains(chunk)) {
+                    sender.sendMessage(main.prefix + "§eVous avez déjà claim ce chunk !");
+                } else {
+                    sender.sendMessage(main.prefix + "§cVous ne pouvez pas claim un chunk car il est §4déjà claim §cpar le territoire §4" + getChunkOwner(chunk) + " §c!");
+                }
                 return;
             }
             terrClaims.add(chunk);
@@ -391,7 +395,7 @@ public class TerritoryData {
             config.set("territories." + territory.getName() + ".claims", terrClaims);
             config.set("claims", globalClaims);
             saveConfig();
-            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString() + "§a,§e " + chunk.values().stream().findFirst().toString());
+            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
             return;
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du claim du chunk !");
@@ -411,10 +415,10 @@ public class TerritoryData {
                 globalClaims.remove(chunk);
                 config.set("claims", globalClaims);
                 saveConfig();
-                sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.keySet().stream().findFirst().toString() + "§a,§e " + chunk.values().stream().findFirst().toString());
+                sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
                 return;
             } else {
-                sender.sendMessage(main.prefix + "§cVous n'avez pas claim le chunk §e" + chunk.keySet().stream().findFirst() + "§a,§e " + chunk.values().stream().findFirst());
+                sender.sendMessage(main.prefix + "§cVous n'avez pas claim le chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
             }
 
         } catch (Exception e) {
@@ -486,5 +490,93 @@ public class TerritoryData {
         }
     }
 
+    public Map<Integer,Integer> getChunkMap(Chunk chunk){
+        int x = chunk.getX();
+        int z = chunk.getZ();
+        Map<Integer,Integer> chunkMap = new HashMap<>();
+        chunkMap.put(x,z);
+        return chunkMap;
+    }
 
+    public void showChunkBorder(Chunk chunk, ChatColor chatColor, Player player) {
+        World world = chunk.getWorld();
+        int chunkX = chunk.getX();
+        int chunkZ = chunk.getZ();
+        int minX = chunkX * 16;
+        int minZ = chunkZ * 16;
+
+        Particle.DustOptions dustOptions = getDustOptions(chatColor);
+        Chunk north = world.getChunkAt(chunkX, chunkZ - 1);
+
+
+        if (!Objects.equals(getChunkOwner(getChunkMap(north)), getChunkOwner(getChunkMap(chunk)))) {
+            for (int x = minX; x < minX + 16; x++) {
+                player.spawnParticle(Particle.DUST, x, player.getLocation().getBlockY() + 1, minZ, 1, dustOptions);
+            }
+        }
+
+        Chunk south = world.getChunkAt(chunkX, chunkZ + 1);
+        if (!Objects.equals(getChunkOwner(getChunkMap(south)), getChunkOwner(getChunkMap(chunk)))) {
+            for (int x = minX; x < minX + 16; x++) {
+                player.spawnParticle(Particle.DUST, x, player.getLocation().getBlockY() + 1, minZ + 16, 1, dustOptions);
+            }
+        }
+
+        Chunk west = world.getChunkAt(chunkX - 1, chunkZ);
+        if (!Objects.equals(getChunkOwner(getChunkMap(west)), getChunkOwner(getChunkMap(chunk)))) {
+            for (int z = minZ; z < minZ + 16; z++) {
+                player.spawnParticle(Particle.DUST, minX, player.getLocation().getBlockY() + 1, z, 1, dustOptions);
+            }
+        }
+
+        Chunk east = world.getChunkAt(chunkX + 1, chunkZ);
+        if (!Objects.equals(getChunkOwner(getChunkMap(east)), getChunkOwner(getChunkMap(chunk)))) {
+            for (int z = minZ; z < minZ + 16; z++) {
+                player.spawnParticle(Particle.DUST, minX + 16, player.getLocation().getBlockY() + 1, z, 1, dustOptions);
+            }
+        }
+    }
+
+    private static Particle.DustOptions getDustOptions(ChatColor chatColor) {
+        Color color = Color.WHITE;
+        switch (chatColor) {
+            case AQUA:
+                color = Color.AQUA;
+            case BLACK:
+                 color = Color.BLACK;
+            case BLUE:
+                 color = Color.BLUE;
+            case DARK_AQUA:
+                 color = Color.BLUE;
+            case DARK_BLUE:
+                 color = Color.BLUE;
+            case DARK_GRAY:
+                 color = Color.GRAY;
+            case DARK_GREEN:
+                 color = Color.GREEN;
+            case DARK_PURPLE:
+                 color = Color.PURPLE;
+            case DARK_RED:
+                 color = Color.RED;
+            case GOLD:
+                 color = Color.YELLOW;
+            case GRAY:
+                 color = Color.GRAY;
+            case GREEN:
+                 color = Color.GREEN;
+            case LIGHT_PURPLE:
+                 color = Color.PURPLE;
+            case RED:
+                 color = Color.RED;
+            case WHITE:
+                 color = Color.WHITE;
+            case YELLOW:
+                 color = Color.YELLOW;
+            default:
+                break;
+        }
+
+        Particle.DustOptions dustOptions = new Particle.DustOptions(color, 1);
+        return dustOptions;
+    }
 }

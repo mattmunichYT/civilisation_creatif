@@ -64,6 +64,9 @@ public final class Main extends JavaPlugin {
     Backup backup;
     TerritoryData territoryData;
     //END OF HELPERS GET
+    //OTHER ARRAY LISTS
+    public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
+    //END OF OTHER ARRAY LISTS
     //SCOREBOARDS
 
 
