@@ -406,6 +406,10 @@ public class TerritoryData {
             if(claims.contains(chunk)) {
                 claims.remove(chunk);
                 config.set("territories." + territory.getName() + ".claims", claims);
+
+                List<Map<?,?>> globalClaims = config.getMapList("claims");
+                globalClaims.remove(chunk);
+                config.set("claims", globalClaims);
                 saveConfig();
                 sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.keySet().stream().findFirst().toString() + "§a,§e " + chunk.values().stream().findFirst().toString());
                 return;
@@ -421,13 +425,13 @@ public class TerritoryData {
         }
     }
 
-    public Map<Integer,Integer> getTerritoryChunks(String territoryName) {
+    public List<Map<?, ?>> getTerritoryChunks(String territoryName) {
         try {
             Team territory = getTerritoryTeam(territoryName);
             try {
-                return (Map<Integer, Integer>) config.getMapList("territories." + territory.getName() + ".claims");
+                return config.getMapList("territories." + territory.getName() + ".claims");
             } catch (ClassCastException e) {
-                Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't cast Map<Interger,Integer> for chunks of territory " + territoryName +  " : §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+                Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't cast List<Map<?, ?>> for chunks of territory " + territoryName +  " : §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
                 return null;
             }
         } catch (Exception e) {
@@ -455,10 +459,16 @@ public class TerritoryData {
             }
             try {
                 for(String key : config.getConfigurationSection("territories").getKeys(false)) {
-                    Map<Integer,Integer> territoryClaims = getTerritoryChunks(key);
+//                    Bukkit.getConsoleSender().sendMessage("[DEBUG] Checking territory " + key);
+                    List<Map<?, ?>> territoryClaims = getTerritoryChunks(key);
+//                    Bukkit.getConsoleSender().sendMessage("[DEBUG] Chunks of territory are " + territoryClaims);
                     try {
-                        if(territoryClaims.containsKey(chunk.keySet().stream().findFirst()) && territoryClaims.containsValue(chunk.values().stream().findFirst())){
-                            return key;
+                        for (Map<?, ?> territoryClaim : territoryClaims) {
+//                            Bukkit.getConsoleSender().sendMessage("[DEBUG] Is territoryClaim : " + territoryClaim + " same as asked :" + chunk);
+                            if(territoryClaim.equals(chunk)){
+//                                Bukkit.getConsoleSender().sendMessage("[DEBUG] Found corresponding chunk ; asked : " +chunk + " ; found : " + territoryClaim);
+                                return key;
+                            }
                         }
                     } catch (Exception e) {
                         Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't check chunk owner §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));

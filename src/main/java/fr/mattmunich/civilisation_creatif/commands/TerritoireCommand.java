@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -32,48 +31,57 @@ public class TerritoireCommand implements CommandExecutor {
             return true;
         }
 
-        if(args.length==1) {
+        if(args.length==1 || args.length==2) {
+            int mapRenderRange = 4;
+//            if(args.length==2){
+//                if(args[0].matches("1-9")){
+////                    mapRenderRange = Integer.parseInt(args[0]);
+//                }
+//            }
             if(args[0].equalsIgnoreCase("map") || args[0].equalsIgnoreCase("nearbyClaims")) {
+
                 int x = p.getLocation().getChunk().getX();
                 int z = p.getLocation().getChunk().getZ();
                 int ownerCount = 0;
                 List<String> owners = new ArrayList<>();
                 List<String> chunksOwners = new ArrayList<>();
                 Map<String, Integer> ownerID = new HashMap<>();
-                for (int chunkX = x-3; chunkX < x+3; chunkX++) {
-                    for (int chunkZ = z-3; chunkZ < z+3; chunkZ++) {
-                        p.sendMessage("Checking for chunk " + chunkX + "," + chunkZ);
+                for (int chunkX = x- mapRenderRange; chunkX < x+ mapRenderRange; chunkX++) {
+                    for (int chunkZ = z-mapRenderRange; chunkZ < z+ mapRenderRange; chunkZ++) {
+//                        p.sendMessage("Checking for chunk " + chunkX + "," + chunkZ);
                         Map<Integer,Integer> chunk = new HashMap<>();
                         chunk.put(chunkX,chunkZ);
                         String chunkOwner = territoryData.getChunkOwner(chunk);
-                        p.sendMessage("chunk owner:" + chunkOwner);
+//                        p.sendMessage("chunk owner:" + chunkOwner);
                         if(chunkOwner==null) {
-                            chunksOwners.add("o");
-                            p.sendMessage("chunk not owned");
+                            chunksOwners.add(" o ");
+//                            p.sendMessage("chunk not owned");
                             continue;
                         }
                         if(!owners.contains(chunkOwner)) {
                             owners.add(chunkOwner);
                             ownerCount+=1;
                             ownerID.put(chunkOwner,ownerCount);
-                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)));
-                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
+                            chunksOwners.add(" " + String.valueOf(ownerID.get(chunkOwner)) + " ");
+//                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
                         } else {
-                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)));
-                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
+                            chunksOwners.add(" " + String.valueOf(ownerID.get(chunkOwner)) + " ");
+//                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
                         }
                     }
                 }
-                p.sendMessage(chunksOwners.toString());
+                int columsNum = 7;
+//                p.sendMessage(chunksOwners.toString());
                 //MAP EXAMPLE =
                 /*
-                * 0 o o o 1 1 o
-                * 2 2 o 1 1 1 1
-                * 2 2 2 o 1 1 o
-                * 2 2 2 X o 1 1
-                * 2 2 o 1 1 1 1
-                * 2 o 3 o o o o
-                * o 3 3 3 o o o
+                *     A B C D E F G
+                *     - - - - - - -
+                * a | o o o o 1 1 o
+                * b | 2 2 o 1 1 1 1
+                * c | 2 2 2 o 1 1 o
+                * d | 2 2 2 X o 1 1
+                * e | 2 2 o 1 1 1 1
+                * f | 2 o 3 o o o o
                 *
                 * o=not owned
                 * 1=terrExample1
@@ -81,13 +89,18 @@ public class TerritoireCommand implements CommandExecutor {
                 * 3=terrExample3
                 * X = position //TODO (mark player pos on nearbyTerrClaimsMap)
                 * */
-                chunksOwners.add(6, "\n");
-                chunksOwners.add(13, "\n");// == 12+1 : not 12 bc we added an element in previous line
-                chunksOwners.add(20, "\n");// == 18+2
-                chunksOwners.add(27, "\n");// == 24+3
-                chunksOwners.add(34, "\n");// == 30+4
-                chunksOwners.add(41, "\n");// == 36+5
-                StringBuilder formattedMap = new StringBuilder(chunksOwners.toString().replace("[", "").replace("\"", "").replace(",", "").replace("]", "").replace(" ","") + "\n\n§aLégende:\n");
+                chunksOwners.add(0, """
+                            A  B  C  D  E  F  G
+                            -  -  -  -  -  -  -
+                        a |""");
+                chunksOwners.add(columsNum+1, "\nb |");  // V FOR columsNum 6 V
+                chunksOwners.add(columsNum*2+2, "\nc |");// == 12+2 : not 12 bc we added an elements in previous lines
+                chunksOwners.add(columsNum*3+3, "\nd |");// == 18+3
+                chunksOwners.add(columsNum*4+4, "\ne |");// == 24+4
+                chunksOwners.add(columsNum*5+5, "\nf |");// == 30+5
+                chunksOwners.add(columsNum*6+6, "\ng |");// == 36+6
+                chunksOwners.add(columsNum*7+7, "\n\n"); // == 42+7
+                StringBuilder formattedMap = new StringBuilder(chunksOwners.toString().replace("[", "").replace("\"", "").replace(", ", "").replace("]", "") + "\n\n§aLégende:\n");
                 for (String owner : owners) {
                     int id = ownerID.get(owner);
                     formattedMap.append("§a- ").append(id).append("§2 : ").append(owner).append("\n");
