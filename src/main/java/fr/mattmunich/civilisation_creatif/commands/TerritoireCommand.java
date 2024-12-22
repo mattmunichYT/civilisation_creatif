@@ -54,7 +54,7 @@ public class TerritoireCommand implements CommandExecutor {
                         String chunkOwner = territoryData.getChunkOwner(chunk);
 //                        p.sendMessage("chunk owner:" + chunkOwner);
                         if(chunkOwner==null) {
-                            chunksOwners.add(" o ");
+                            chunksOwners.add("- ");
 //                            p.sendMessage("chunk not owned");
                             continue;
                         }
@@ -62,10 +62,10 @@ public class TerritoireCommand implements CommandExecutor {
                             owners.add(chunkOwner);
                             ownerCount+=1;
                             ownerID.put(chunkOwner,ownerCount);
-                            chunksOwners.add(" " + String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)) + " ");
 //                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
                         } else {
-                            chunksOwners.add(" " + String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add(String.valueOf(ownerID.get(chunkOwner)) + " ");
 //                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
                         }
                     }
@@ -90,8 +90,8 @@ public class TerritoireCommand implements CommandExecutor {
                 * X = position //TODO (mark player pos on nearbyTerrClaimsMap)
                 * */
                 chunksOwners.add(0, """
-                            A  B  C  D  E  F  G
-                            -  -  -  -  -  -  -
+                            A B C D E F G
+                            - - - - - - -
                         a |""");
                 chunksOwners.add(columsNum+1, "\nb |");  // V FOR columsNum 6 V
                 chunksOwners.add(columsNum*2+2, "\nc |");// == 12+2 : not 12 bc we added an elements in previous lines

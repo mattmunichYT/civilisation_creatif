@@ -61,15 +61,18 @@ public class Backup {
                         String backupName = backup.getName();
                         long backupMillis = formatter.parse(backupName).getTime();
                         long difference = System.currentTimeMillis() - backupMillis;
-
-                        if (difference > 6912000) {
+                        //432000000 = 5 days in ms
+                        if (difference > 432000000) {
                             try {
                                 org.apache.commons.io.FileUtils.forceDelete(backup); //main thing
+//                                Bukkit.getConsoleSender().sendMessage("§eBackup name : §6" + backupName + "§e ; difference :§6" + difference + "§e ; deleted : §2" + "YES");
                             } catch (IOException deleteEx) {
                                 Bukkit.getConsoleSender().sendMessage("§4Failed to delete backup: " + backupName);
                                 deleteEx.printStackTrace();
                             }
-                        }
+                        } //else {
+////                            Bukkit.getConsoleSender().sendMessage("§eBackup name : §6" + backupName + "§e ; difference :§6" + difference + "§e ; deleted : §4" + "NO");
+//                        }
                     }
                 }
             }
