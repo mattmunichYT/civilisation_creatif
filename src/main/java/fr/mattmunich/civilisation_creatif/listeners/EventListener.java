@@ -7,9 +7,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -19,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -29,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scoreboard.Team;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -404,6 +401,9 @@ public class EventListener implements Listener {
 
                         inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
                         for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+                            if(all.getUniqueId() == p.getUniqueId()) {
+                                continue;
+                            }
                             //if(territoryData.getTerritoryTeamOfEntry(all.getName()) == null && !territoryData.getTerritoryTeamOfPlayer(p).getName().equals(territoryData.getTerritoryTeamOfEntry(all.getName()).getName())){
                             ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
                             SkullMeta phm = (SkullMeta) pHead.getItemMeta();
@@ -670,5 +670,24 @@ public class EventListener implements Listener {
                 }
             }
         }
+    }
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent e) {
+        Player p = e.getPlayer();
+        try {
+            PlayerData playerData = new PlayerData(p.getUniqueId());
+            playerData.addMoney(1);
+            BaseComponent baseComponent = new ComponentBuilder()
+                    .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
+                    .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
+                    .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .build();
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }

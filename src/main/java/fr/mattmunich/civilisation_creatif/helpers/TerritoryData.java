@@ -90,6 +90,7 @@ public class TerritoryData {
             }
             saveConfig();
             chief.sendMessage(main.prefix + "§2Le territoire §6" + territory.getColor() + territory.getName() + "§2 a été créé avec succès !");
+            Bukkit.broadcastMessage(main.prefix + "§6" + chief.getName() + "§a a créé le territoire " + territory.getColor() + territory.getName() + " §a!");
         } catch (Exception e) {
             chief.sendMessage(main.prefix + "§4Impossible de créer le territoire, §cveuillez signaler cela à un membre du staff.");
             Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't create territory " + territoryName + " from list because of " + e);
@@ -132,12 +133,25 @@ public class TerritoryData {
 
     public void leaveTerritory(Player sender) {
         Team sTeam = getTerritoryTeamOfPlayer(sender);
+        if(Objects.equals(getTerritoryChiefUUID(sTeam.getName()), sender.getUniqueId().toString())) {
+            sender.sendMessage(main.prefix + "§cVous êtes le chef de ce territoire, §esi vous souhaitez le quitter, veuillez\n" +
+                    "§4- §4§lSupprimer le territoire\n" +
+                    "§r§eOU\n" +
+                    "§a- §a§lDonner les permissions de chef à un autre joueur");
+            return;
+        }
+        if(sTeam.getEntries().size() == 1) {
+            sender.sendMessage(main.prefix + "§cVous êtes le seul membre de ce territoire, §eveuillez donc le supprimer pour le quitter !");
+            return;
+        }
+
         sTeam.removeEntry(sender.getName());
         List<String> membersUUID = getTerritoryMembersUUID(sTeam.getName());
         try {
             membersUUID.remove(sender.getUniqueId().toString());
             PlayerData pdata = new PlayerData(sender.getUniqueId());
             pdata.setTerritory(null);
+            sendAnouncementToTerritory(sTeam.getName(), "§c" + sender.getName() + "§4 a quitté le territoire.");
         } catch (Exception ignored) {}
         config.set("territories." + sTeam.getName() + ".membersUUID", membersUUID);
         saveConfig();
@@ -152,6 +166,7 @@ public class TerritoryData {
             PlayerData pdata = new PlayerData(p.getUniqueId());
             pdata.setTerritory(territoryName);
             membersUUID.add(p.getUniqueId().toString());
+            sendAnouncementToTerritory(territoryName, "§a" + p.getName() + "§2 a rejoin le territoire !");
         } catch (Exception ignored) {}
         config.set("territories." + territory.getName() + ".membersUUID", membersUUID);
         saveConfig();
@@ -498,12 +513,19 @@ public class TerritoryData {
         return chunkMap;
     }
 
+    public Chunk getChunkFromMap(Map<Integer,Integer> chunkMap, World world){
+        int x = Integer.parseInt(chunkMap.entrySet().stream().findFirst().toString().replace("Optional[","").replace("]",""));
+        int z = Integer.parseInt(chunkMap.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
+        return world.getChunkAt(x,z);
+    }
+
     public void showChunkBorder(Chunk chunk, ChatColor chatColor, Player player) {
         World world = chunk.getWorld();
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
         int minX = chunkX * 16;
         int minZ = chunkZ * 16;
+        double y = player.getLocation().getBlockY() + 1.5;
 
         Particle.DustOptions dustOptions = getDustOptions(chatColor);
         Chunk north = world.getChunkAt(chunkX, chunkZ - 1);
@@ -511,72 +533,112 @@ public class TerritoryData {
 
         if (!Objects.equals(getChunkOwner(getChunkMap(north)), getChunkOwner(getChunkMap(chunk)))) {
             for (int x = minX; x < minX + 16; x++) {
-                player.spawnParticle(Particle.DUST, x, player.getLocation().getBlockY() + 1, minZ, 1, dustOptions);
+                player.spawnParticle(Particle.DUST, x, y, minZ, 1, dustOptions);
             }
         }
 
         Chunk south = world.getChunkAt(chunkX, chunkZ + 1);
         if (!Objects.equals(getChunkOwner(getChunkMap(south)), getChunkOwner(getChunkMap(chunk)))) {
             for (int x = minX; x < minX + 16; x++) {
-                player.spawnParticle(Particle.DUST, x, player.getLocation().getBlockY() + 1, minZ + 16, 1, dustOptions);
+                player.spawnParticle(Particle.DUST, x, y, minZ + 16, 1, dustOptions);
             }
         }
 
         Chunk west = world.getChunkAt(chunkX - 1, chunkZ);
         if (!Objects.equals(getChunkOwner(getChunkMap(west)), getChunkOwner(getChunkMap(chunk)))) {
             for (int z = minZ; z < minZ + 16; z++) {
-                player.spawnParticle(Particle.DUST, minX, player.getLocation().getBlockY() + 1, z, 1, dustOptions);
+                player.spawnParticle(Particle.DUST, minX, y, z, 1, dustOptions);
             }
         }
 
         Chunk east = world.getChunkAt(chunkX + 1, chunkZ);
         if (!Objects.equals(getChunkOwner(getChunkMap(east)), getChunkOwner(getChunkMap(chunk)))) {
             for (int z = minZ; z < minZ + 16; z++) {
-                player.spawnParticle(Particle.DUST, minX + 16, player.getLocation().getBlockY() + 1, z, 1, dustOptions);
+                player.spawnParticle(Particle.DUST, minX + 16, y, z, 1, dustOptions);
             }
         }
     }
 
     private static Particle.DustOptions getDustOptions(ChatColor chatColor) {
         Color color = Color.WHITE;
-        switch (chatColor) {
-            case AQUA:
-                color = Color.AQUA;
-            case BLACK:
-                 color = Color.BLACK;
-            case BLUE:
-                 color = Color.BLUE;
-            case DARK_AQUA:
-                 color = Color.BLUE;
-            case DARK_BLUE:
-                 color = Color.BLUE;
-            case DARK_GRAY:
-                 color = Color.GRAY;
-            case DARK_GREEN:
-                 color = Color.GREEN;
-            case DARK_PURPLE:
-                 color = Color.PURPLE;
-            case DARK_RED:
-                 color = Color.RED;
-            case GOLD:
-                 color = Color.YELLOW;
-            case GRAY:
-                 color = Color.GRAY;
-            case GREEN:
-                 color = Color.GREEN;
-            case LIGHT_PURPLE:
-                 color = Color.PURPLE;
-            case RED:
-                 color = Color.RED;
-            case WHITE:
-                 color = Color.WHITE;
-            case YELLOW:
-                 color = Color.YELLOW;
-            default:
-                break;
-        }
+        return switch (chatColor) {
+            case AQUA -> {
+                color = Color.fromRGB(84,255,255);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case BLACK -> {
+                color = Color.BLACK;
+                yield new Particle.DustOptions(color, 1);
+            }
+            case BLUE -> {
+                color = Color.fromRGB(85,85,255);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_AQUA -> {
+                color = Color.fromRGB(0,170,170);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_BLUE -> {
+                color = Color.fromRGB(2,0,170);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case GRAY -> {
+                color = Color.fromRGB(170,170,170);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_GRAY -> {
+                color = Color.fromRGB(85,85,85);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_GREEN-> {
+                color = Color.fromRGB(2,170,1);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case GREEN-> {
+                color = Color.fromRGB(86,255,84);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_PURPLE -> {
+                color = Color.fromRGB(170,1,170);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case LIGHT_PURPLE -> {
+                color = Color.fromRGB(255,85,255);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case DARK_RED -> {
+                color = Color.fromRGB(170,0,1);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case RED -> {
+                color = Color.fromRGB(255,85,85);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case YELLOW -> {
+                color = Color.fromRGB(255,255,85);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case GOLD -> {
+                color = Color.fromRGB(255,170,1);
+                yield new Particle.DustOptions(color, 1);
+            }
+            case WHITE -> {
+                color = Color.WHITE;
+                yield new Particle.DustOptions(color, 1);
+            }
+            default -> new Particle.DustOptions(color, 1);
+        };
+    }
 
-        Particle.DustOptions dustOptions = new Particle.DustOptions(color, 1);
-        return dustOptions;
+    public void sendAnouncementToTerritory(String territoryName, String message){
+        Team terr = getTerritoryTeam(territoryName);
+        for(String eName : terr.getEntries()) {
+            if(Bukkit.getPlayer(eName) != null) {
+                Player p = Bukkit.getPlayer(eName);
+                assert p != null;
+                p.sendMessage(main.prefix + " §6-> §" + terr.getColor() + terr.getName() + " §8§l>>> §6" + message);
+            }
+        }
+        return;
     }
 }

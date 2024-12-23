@@ -104,6 +104,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
     }
+
     @Override
     public List<String> onTabComplete(CommandSender s, Command cmd, String l, String[] args) {
         List<String> tabComplete = Lists.newArrayList();

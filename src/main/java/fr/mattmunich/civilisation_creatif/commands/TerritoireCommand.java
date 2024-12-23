@@ -1,5 +1,6 @@
 package fr.mattmunich.civilisation_creatif.commands;
 
+import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import org.bukkit.Bukkit;
@@ -7,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
-public class TerritoireCommand implements CommandExecutor {
+public class TerritoireCommand implements CommandExecutor, TabCompleter {
 
     private final Main main;
 
@@ -38,7 +40,7 @@ public class TerritoireCommand implements CommandExecutor {
 ////                    mapRenderRange = Integer.parseInt(args[0]);
 //                }
 //            }
-            if(args[0].equalsIgnoreCase("map") || args[0].equalsIgnoreCase("nearbyClaims")) {
+            if(args[0].equalsIgnoreCase("map") || args[0].equalsIgnoreCase("showClaimsMap")) {
 
                 int x = p.getLocation().getChunk().getX();
                 int z = p.getLocation().getChunk().getZ();
@@ -76,12 +78,12 @@ public class TerritoireCommand implements CommandExecutor {
                 /*
                 *     A B C D E F G
                 *     - - - - - - -
-                * a | o o o o 1 1 o
+                * a | - - - - 1 1 -
                 * b | 2 2 o 1 1 1 1
-                * c | 2 2 2 o 1 1 o
+                * c | 2 2 2 - 1 1 o
                 * d | 2 2 2 X o 1 1
                 * e | 2 2 o 1 1 1 1
-                * f | 2 o 3 o o o o
+                * f | 2 - 3 - - - -
                 *
                 * o=not owned
                 * 1=terrExample1
@@ -118,6 +120,14 @@ public class TerritoireCommand implements CommandExecutor {
                     p.sendMessage(main.prefix + "§2Vous pouvez désormais voir la délimitation des territoires à proximité de vous !");
                 }
                 return true;
+            }
+
+            if(args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
+                if(territoryData.getTerritoryTeamOfPlayer(p) == null) {
+                    p.openInventory(hasNoTerritory_Menu(p));
+                } else {
+                    p.openInventory(hasTerritory_Menu(p));
+                }
             }
         }
 
@@ -161,9 +171,6 @@ public class TerritoireCommand implements CommandExecutor {
                     return true;
                 }
             }
-
-
-
 
             p.openInventory(hasTerritory_Menu(p));
         }
@@ -250,5 +257,20 @@ public class TerritoireCommand implements CommandExecutor {
         closeItem2.setItemMeta(closeItemMeta2);
         hasTerrMenu.setItem(26, closeItem2);
         return hasTerrMenu;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender s, Command cmd, String l, String[] args) {
+        List<String> tabComplete = Lists.newArrayList();
+
+        if(args.length == 1) {
+            tabComplete.add("gui");
+            tabComplete.add("showClaimsMap");
+            tabComplete.add("showClaims");
+            tabComplete.add("claim");
+            tabComplete.add("unclaim");
+        }
+
+        return tabComplete;
     }
 }
