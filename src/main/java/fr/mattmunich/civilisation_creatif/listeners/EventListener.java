@@ -25,8 +25,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.MaterialData;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.Team;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -401,20 +406,14 @@ public class EventListener implements Listener {
 
                         inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
                         for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
-                            if(all.getUniqueId() == p.getUniqueId()) {
+                            PlayerData playerData = new PlayerData(all.getUniqueId());
+                            PlayerData senderData = new PlayerData(p.getUniqueId());
+
+                            if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
                                 continue;
                             }
-                            //if(territoryData.getTerritoryTeamOfEntry(all.getName()) == null && !territoryData.getTerritoryTeamOfPlayer(p).getName().equals(territoryData.getTerritoryTeamOfEntry(all.getName()).getName())){
-                            ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
-                            SkullMeta phm = (SkullMeta) pHead.getItemMeta();
-                            assert phm != null;
-                            phm.setOwningPlayer(all.getPlayer());
-                            phm.setDisplayName(all.getName());
-                            phm.setLore(Collections.singletonList("§bCliquez pour inviter le joueur §5" + all.getName()));
-                            pHead.setItemMeta(phm);
-                            inviteInv.addItem(pHead);
-                            //}
-                            //DEV
+
+                            inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
                         }
                         p.openInventory(inviteInv);
                         break;

@@ -2,14 +2,25 @@ package fr.mattmunich.civilisation_creatif.helpers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -26,7 +37,7 @@ public final class PlayerData {
 
 
 	File f = new File("plugins/CivilisationCreatif/PlayerData");
-	public PlayerData(UUID uuid) throws Exception {
+	public PlayerData(UUID uuid) throws Exception{
 		if(!f.exists()) {
 			f.mkdirs();
 		}
@@ -354,6 +365,59 @@ public final class PlayerData {
 		} else {
 			return true;
 		}
+	}
+
+	public String getSkin() {
+		try {
+			String name = config.getString("player.name");
+			URL url_0 = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
+			InputStreamReader reader_0 = new InputStreamReader(url_0.openStream());
+			String uuid = new JsonParser().parse(reader_0).getAsJsonObject().get("id").getAsString();
+
+			URL url_1 = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false");
+			InputStreamReader reader_1 = new InputStreamReader(url_1.openStream());
+			JsonObject textureProperty = new JsonParser().parse(reader_1).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+			String texture = textureProperty.get("value").getAsString();
+//			String signature = textureProperty.get("signature").getAsString();
+
+//			return new String[] {texture, signature};
+//			Bukkit.getConsoleSender().sendMessage("texture = " + texture + "\n signature = " + signature);
+			byte[] bytedecoded = Base64.getDecoder().decode(texture);
+			String decoded = new String(bytedecoded);
+			JsonObject jsonObject = new JsonParser().parse(decoded).getAsJsonObject();
+//			Bukkit.getConsoleSender().sendMessage(jsonObject.toString());
+
+			String textureUrl = jsonObject.get("textures").getAsJsonObject().get("SKIN").getAsJsonObject().get("url").getAsString();
+//			String capeUrl = jsonObject.get("textures").getAsJsonObject().get("CAPE").getAsJsonObject().get("url").getAsString();
+
+			return textureUrl;
+
+
+		} catch (Exception e) {
+			Bukkit.getConsoleSender().sendMessage("[AdminCmdsB] §cUne erreur s'est produite : §4" + e + "\nDetails : " + e.getMessage() + e.toString());
+			return "";
+		}
+	}
+
+	public ItemStack getSkull(OfflinePlayer player, String lore) {
+		UUID uuid = player.getUniqueId();
+
+        PlayerProfile playerProfile = null;
+        try {
+            playerProfile = Bukkit.getServer().createPlayerProfile(uuid);
+            PlayerTextures textures = playerProfile.getTextures();
+            textures.setSkin(new URL(getSkin()));
+            playerProfile.setTextures(textures);
+        } catch (MalformedURLException ignored) {}
+
+		ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta phm = (SkullMeta) pHead.getItemMeta();
+		assert phm != null;
+		phm.setOwnerProfile(playerProfile);
+		phm.setDisplayName(player.getName());
+		phm.setLore(Collections.singletonList(lore));
+		pHead.setItemMeta(phm);
+		return  pHead;
 	}
 
 }

@@ -2,6 +2,7 @@ package fr.mattmunich.civilisation_creatif.commands;
 
 import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
+import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -151,11 +152,25 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4claim des chunk §cpour votre territoire !");
                         return true;
                     }
+                    PlayerData data = null;
+                    try {
+                        data = new PlayerData(p.getUniqueId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    int chunkPrice = 300;
+                    if(data.Money() < chunkPrice) {
+                        p.sendMessage(main.prefix + "§4Vous n'avez pas assez d'argent pour claim ce chunk !");
+                        return true;
+                    }
+
                     int x = p.getLocation().getChunk().getX();
                     int z = p.getLocation().getChunk().getZ();
                     Map<Integer,Integer> chunk = new HashMap<>();
                     chunk.put(x,z);
                     territoryData.claimChunk(p, territoryData.getPlayerTerritory(p), chunk);
+                    data.removeMoney(300);
                     return true;
                 }
                 if(args[0].equalsIgnoreCase("unclaim") || args[0].equalsIgnoreCase("unclaimChunk")) {

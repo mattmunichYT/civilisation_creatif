@@ -410,7 +410,7 @@ public class TerritoryData {
             config.set("territories." + territory.getName() + ".claims", terrClaims);
             config.set("claims", globalClaims);
             saveConfig();
-            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
+            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]","") + " §apour §e300¢ §a!");
             return;
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du claim du chunk !");
