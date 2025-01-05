@@ -8,7 +8,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.*;
-import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -26,11 +25,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EventListener implements Listener {
 
@@ -74,33 +76,33 @@ public class EventListener implements Listener {
             }
 
             Inventory chooseColorInv = Bukkit.createInventory(p, 27,"§aCouleur du territoire " + e.getMessage());
-            chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, "","",""));
-            chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, "","",""));
-            chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, "","",""));
-            chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, "","",""));
-            chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, "","",""));
-            chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, "","",""));
-            chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, "","",""));
-            chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, "","",""));
-            chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, "","",""));
-            chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, "","",""));
-            chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-            chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, "","",""));
-            chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, "","",""));
-            chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, "","",""));
-            chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, "","",""));
-            chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, "","",""));
-            chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, "","",""));
-            chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, "","",""));
-            chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
+            chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null,null,null));
+            chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null,null,null));
+            chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null,null,null));
+            chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null,null,null));
+            chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null,null,null));
+            chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null,null,null));
+            chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null,null,null));
+            chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null,null,null));
+            chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null,null,null));
+            chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null,null,null));
+            chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null,null,null));
+            chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null,null,null));
+            chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null,null,null));
+            chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null,null,null));
+            chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null,null,null));
+            chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null,null,null));
+            chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null,null,null));
+            chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
             Bukkit.getScheduler().runTask(main, () -> p.openInventory(chooseColorInv));
             return;
         }
@@ -154,8 +156,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onCristal(EntityExplodeEvent e) {
         for (Entity nEntity : e.getEntity().getNearbyEntities(10, 10, 10)) {
-            if (nEntity instanceof Player) {
-                Player p = (Player) nEntity;
+            if (nEntity instanceof Player p) {
                 p.sendMessage(main.prefix + "§4Les explosions sont désactivées sur le serveur !");
                 Bukkit.getConsoleSender()
                         .sendMessage(main.prefix + "§c" + p.getName()
@@ -172,8 +173,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onExplosion(ExplosionPrimeEvent e) {
         for (Entity nEntity : e.getEntity().getNearbyEntities(10, 10, 10)) {
-            if (nEntity instanceof Player) {
-                Player p = (Player) nEntity;
+            if (nEntity instanceof Player p) {
                 p.sendMessage(main.prefix + "§4Les TNTs sont désactivées sur le serveur !");
                 Bukkit.getConsoleSender()
                         .sendMessage(main.prefix + "§c" + p.getName()
@@ -240,13 +240,13 @@ public class EventListener implements Listener {
                             if(data.getInvitesToTerritory().isEmpty()) {
                                 //NO INVITES
                                 Inventory invitesInv = Bukkit.createInventory(p, 54, "§bInvitations à rejoindre un territoire");
-                                invitesInv.setItem(22, ItemBuilder.getItem(Material.PAPER, "§b§oVous n'avez aucune invitation à rejoindre un territoire...", true, false, "", "", ""));
-                                invitesInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+                                invitesInv.setItem(22, ItemBuilder.getItem(Material.PAPER, "§b§oVous n'avez aucune invitation à rejoindre un territoire...", true, false, null, null, null));
+                                invitesInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
                                 p.openInventory(invitesInv);
                             } else {
                                 //HAS INVITES
                                 Inventory invitesInv = Bukkit.createInventory(p, 54, "§bInvitations à rejoindre un territoire");
-                                invitesInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+                                invitesInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
 
                                 List<Map<?, ?>> invites = data.getInvitesToTerritory();
                                 for (Map<?, ?> invite : invites) {
@@ -273,9 +273,29 @@ public class EventListener implements Listener {
 
                         break;
                     case SPYGLASS:
-                        //TERRITORY LIST
-                        p.sendMessage(main.prefix + "§4En dévelopement !");
-                        p.sendMessage(main.prefix + "§aListe des territoires : §2" + territoryData.getTerritoriesList().toString());
+
+
+//                        int pageNum = territoryData.getTerritoriesList().size()/28;
+//                        Inventory terrListInv_Layout = getTerrListInv_Layout(p,1,pageNum);
+//                        for(String terr : territoryData.getTerritoriesList()) {
+//                            Team territory = territoryData.getTerritoryTeam(terr);
+//                            Player chief = Bukkit.getPlayer(territoryData.getTerritoryChiefUUID(terr));
+//                            String chiefName = "";
+//                            if(chief==null){
+//                                chiefName = "§c§oNon trouvé";
+//                            } else {
+//                                chiefName = chief.getName();
+//                            }
+//                            ItemStack banner = territoryData.getTerritoryBanner(terr);
+//                            ItemMeta bannerMeta = banner.getItemMeta();
+//                            int xp = territoryData.getTerritoryXP(terr);
+//                            int money = territoryData.getTerritoryMoney(terr);
+//                            assert bannerMeta != null;
+//                            bannerMeta.setItemName(territory.getColor() + territory.getName());
+//                            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName,"§2XP:§a" + xp,"§2Argent:§a" + money));
+//                        }
+                        Inventory terrListInv = getTerritoryListInventory(p,1);
+                        p.openInventory(terrListInv);
                         break;
                     case BARRIER:
                         e.getView().close();
@@ -291,9 +311,9 @@ public class EventListener implements Listener {
                         invView.close();
                         //LEAVE TERRITORY
                         Inventory confirmInv = Bukkit.createInventory(p, 9, "§cQuitter votre territoire ?");
-                        confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, "", "", ""));
-                        confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§e§oℹ Êtes-vous sûr de vouloir quitter votre territoire ?", true, false, "", "", ""));
-                        confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, "", "", ""));
+                        confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
+                        confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§e§oℹ Êtes-vous sûr de vouloir quitter votre territoire ?", true, false, null, null, null));
+                        confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
                         p.openInventory(confirmInv);
                         break;
                     case PAPER:
@@ -303,9 +323,8 @@ public class EventListener implements Listener {
                         p.openInventory(terrInv);
                         break;
                     case SPYGLASS:
-                        //TERRITORY LIST
-                        p.sendMessage(main.prefix + "§4En dévelopement !");
-                        p.sendMessage(main.prefix + "§aListe des territoires : §2" + territoryData.getTerritoriesList().toString());
+                        Inventory terrListInv = getTerritoryListInventory(p,1);
+                        p.openInventory(terrListInv);
                         break;
                     case BARRIER:
                         e.getView().close();
@@ -411,7 +430,7 @@ public class EventListener implements Listener {
                         invView.close();
                         Inventory inviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
 
-                        inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+                        inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
                         for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
                             PlayerData playerData = new PlayerData(all.getUniqueId());
                             PlayerData senderData = new PlayerData(p.getUniqueId());
@@ -427,33 +446,33 @@ public class EventListener implements Listener {
                     case CYAN_STAINED_GLASS:
                         //CHANGE COLOR
                         Inventory chooseColorInv = Bukkit.createInventory(p, 27,"§2Couleur du territoire " + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName());
-                        chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, "","",""));
-                        chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, "","",""));
-                        chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, "","",""));
-                        chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, "","",""));
-                        chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, "","",""));
-                        chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, "","",""));
-                        chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, "","",""));
-                        chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, "","",""));
-                        chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, "","",""));
-                        chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, "","",""));
-                        chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
-                        chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, "","",""));
-                        chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, "","",""));
-                        chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, "","",""));
-                        chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, "","",""));
-                        chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, "","",""));
-                        chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, "","",""));
-                        chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, "","",""));
-                        chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
+                        chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null,null,null));
+                        chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null,null,null));
+                        chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null,null,null));
+                        chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null,null,null));
+                        chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null,null,null));
+                        chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null,null,null));
+                        chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null,null,null));
+                        chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null,null,null));
+                        chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null,null,null));
+                        chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null,null,null));
+                        chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null,null,null));
+                        chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null,null,null));
+                        chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null,null,null));
+                        chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null,null,null));
+                        chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null,null,null));
+                        chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null,null,null));
+                        chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null,null,null));
+                        chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
                         p.openInventory(chooseColorInv);
                         break;
                     case RED_DYE:
@@ -462,23 +481,24 @@ public class EventListener implements Listener {
                        try {
                            if(territoryData.getTerritoryChiefUUID(territoryData.getPlayerTerritory(p)).equals(p.getUniqueId().toString())) {
                                Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
-                               confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, "", "", ""));
-                               confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, "", "", ""));
-                               confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, "", "", ""));
+                               confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
+                               confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
+                               confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
                                p.openInventory(confirmInv);
                            } else {
                                p.sendMessage(main.prefix + "§4Vous n'avez pas la permission de supprimer ce territoire !");
                            }
                        } catch(NullPointerException exception) {
                            Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
-                           confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, "", "", ""));
-                           confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, "", "", ""));
-                           confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, "", "", ""));
+                           confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
+                           confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
+                           confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
                            p.openInventory(confirmInv);
                            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get territory chief to verify a player's permission. §cAllowed " + p.getName() + " to delete territory " + territoryData.getTerritoryTeamOfPlayer(p).getName());
                        }
                         return;
                     case WHITE_BANNER,BLACK_BANNER,RED_BANNER,BLUE_BANNER,LIGHT_BLUE_BANNER,BROWN_BANNER,CYAN_BANNER,GRAY_BANNER,GREEN_BANNER,LIGHT_GRAY_BANNER,LIME_BANNER,MAGENTA_BANNER,ORANGE_BANNER,PINK_BANNER,PURPLE_BANNER,YELLOW_BANNER:
+                        Bukkit.getScheduler().runTask(main, p::closeInventory);
                         p.sendTitle("§2Prenez la bannière","§2§ldans votre main",20,100,20);
                         p.sendMessage(main.prefix + "§2Prenez la §5future§2 bannière de territoire §2§ldans votre main§r§2.");
                         Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
@@ -619,23 +639,149 @@ public class EventListener implements Listener {
                     territoryData.removeInvite(name, p);
                     invView.close();
                 }
+            } else if (invView.getTitle().contains("§aListe des territoires")){
+                e.setCancelled(true);
+                if(it==null) {return;}
+                switch (it.getType()) {
+                    case BARRIER -> { invView.close(); break;}
+                    case RED_STAINED_GLASS -> {
+                        invView.close();
+                        int page = extractPageNumber(invView.getTitle());
+                        Inventory terrListInv = getTerritoryListInventory(p,page-1);
+                        p.openInventory(terrListInv);
+                        break;
+                    }
+                    case LIME_STAINED_GLASS -> {
+                        invView.close();
+                        int page = extractPageNumber(invView.getTitle());
+                        Inventory terrListInv = getTerritoryListInventory(p,page+1);
+                        p.openInventory(terrListInv);
+                        break;
+                    }
+                    default -> {
+                        break;
+                    }
+                }
             }
         }
     }
 
+    private Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
+        Inventory terrListInv = Bukkit.createInventory(p,54,"§aListe des territoires §7- §ePage §6" + page);
+        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
+        for (int i = 0; i < 53; i++) {
+            terrListInv.setItem(i, none);
+        }
+        //Borders
+        terrListInv.setItem(0,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(1,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(7,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(8,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(9,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(17,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(36,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(44,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(45,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(46,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(52,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(53,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        //Borders
+        //Inner part
+        int[] ranges = {10, 16, 19, 25, 28, 34, 37, 43};
+
+        for (int i = 0; i < ranges.length; i += 2) {
+            for (int slot = ranges[i]; slot <= ranges[i + 1]; slot++) {
+                terrListInv.setItem(slot, null);
+            }
+        }
+        //Inner part
+        //Navigation bar
+        if(page!=1) {
+            terrListInv.setItem(47,ItemBuilder.getItem(Material.RED_STAINED_GLASS_PANE,"§c§l←",false,false,null,null,null));
+        }
+        terrListInv.setItem(49,ItemBuilder.getItem(Material.BARRIER,"§cFermer le menu",false,false,null,null,null));
+        if(page!=pageNum){
+            terrListInv.setItem(51,ItemBuilder.getItem(Material.LIME_STAINED_GLASS_PANE,"§a§l→",false,false,null,null,null));
+        }
+        //Navigation bar
+        return terrListInv;
+    }
+
+    private int extractPageNumber(String title) {
+        // Regular expression to match the integer at the end of the string
+        Pattern pattern = Pattern.compile("§6(\\d+)$");
+        Matcher matcher = pattern.matcher(title);
+
+        if (matcher.find()) {
+            // Extract and return the integer as a number
+            return Integer.parseInt(matcher.group(1));
+        } else {
+            // Default value if no number is found
+            return -1;
+        }
+    }
+
+    private Inventory getTerritoryListInventory(Player p, int page) {
+        int itemsPerPage = 28; // Number of items per page
+        List<String> territoriesList = territoryData.getTerritoriesList();
+        int totalPages = (int) Math.ceil((double) territoriesList.size() / itemsPerPage);
+
+        // Ensure the page number is within valid range
+        if (page < 1 || page > totalPages) {
+            page = 1; // Default to page 1 if out of bounds
+        }
+
+        // Create the inventory for the specific page
+        Inventory terrListInv_Layout = getTerrListInv_Layout(p, page, totalPages);
+
+        // Calculate start and end index for the items on this page
+        int startIndex = (page - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, territoriesList.size());
+
+        // Populate the inventory with items for the current page
+        for (int i = startIndex; i < endIndex; i++) {
+            String terr = territoriesList.get(i);
+            Team territory = territoryData.getTerritoryTeam(terr);
+            Player chief = Bukkit.getPlayer(UUID.fromString(territoryData.getTerritoryChiefUUID(terr)));
+            String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
+
+            ItemStack banner = territoryData.getTerritoryBanner(terr);
+            ItemMeta bannerMeta = banner.getItemMeta();
+            assert bannerMeta != null;
+            bannerMeta.setDisplayName(territory.getColor() + territory.getName());
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2XP:§a " + territoryData.getTerritoryXP(terr), "§2Argent:§a " + territoryData.getTerritoryMoney(terr)));
+            banner.setItemMeta(bannerMeta);
+
+            // Add the item to the next available slot
+            terrListInv_Layout.addItem(banner);
+        }
+
+        // Return the populated inventory for the specified page
+        return terrListInv_Layout;
+    }
+
+
     private Inventory getTerrInv(Player p, Team territory) {
         Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
-        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "", "", "");
+        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null);
         for (int i = 0; i < 26; i++) {
             terrInv.setItem(i, none);
         }
+        String terr = territory.getName();
+        Player chief = Bukkit.getPlayer(UUID.fromString(territoryData.getTerritoryChiefUUID(terr)));
+        String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
 
-        terrInv.setItem(4, ItemBuilder.getItem(territoryData.getTerritoryBanner(territory.getName()).getType(), "§dDéfinir la bannière du territoire", false, false, "", "", ""));
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "", "", ""));
-        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, "", "", ""));
-        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, "", "", ""));
-        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, "", "", ""));
-        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+        ItemStack banner = territoryData.getTerritoryBanner(terr);
+        BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
+        assert bannerMeta != null;
+        bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
+        banner.setItemMeta(bannerMeta);
+        terrInv.setItem(4, banner);
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2XP:§a " + territoryData.getTerritoryXP(terr), "§2Argent:§a " + territoryData.getTerritoryMoney(terr)));
+        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
+        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
+        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
+        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
         return terrInv;
     }
 
@@ -679,9 +825,6 @@ public class EventListener implements Listener {
         if(main.seeTerritoryBorders.contains(p)) {
 //            p.sendMessage("Hey! Let's show you the nearby claimed chunks...");
             Location loc = p.getLocation();
-            int x = loc.getBlockX();
-            int y = loc.getBlockY();
-            int z = loc.getBlockZ();
             Chunk chunk = loc.getChunk();
             World world = loc.getWorld();
             int range = 20;
@@ -691,8 +834,7 @@ public class EventListener implements Listener {
 //                    p.sendMessage("Checking chhunk" + chunkX + " ; " + chunkZ);
                     assert world != null;
                     Chunk chunkToShow = world.getChunkAt(chunkX,chunkZ);
-                    Map<Integer,Integer> chunkTS = new HashMap<>();
-                    chunkTS.put(chunkX,chunkZ);
+                    Map<Integer,Integer> chunkTS = territoryData.getChunkMap(chunkToShow);
                     if (territoryData.getChunkOwner(chunkTS) != null && !territoryData.getChunkOwner(chunkTS).isEmpty()) {
 //                        p.sendMessage("Rendering chunk...");
                         ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkTS)).getColor();
@@ -709,14 +851,33 @@ public class EventListener implements Listener {
         try {
             PlayerData playerData = new PlayerData(p.getUniqueId());
             playerData.addMoney(1);
-            BaseComponent baseComponent = new ComponentBuilder()
-                    .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
-                    .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
-                    .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
-                    .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                    .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
-                    .build();
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+            if(territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p))) {
+                territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), 1);
+                BaseComponent baseComponent = new ComponentBuilder()
+                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
+                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
+                        .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append(" & ").color(net.md_5.bungee.api.ChatColor.YELLOW)
+                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("XP ").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append("Territoire").color(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE)
+                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
+                        .append("1 XP").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .build();
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+            } else {
+                BaseComponent baseComponent = new ComponentBuilder()
+                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
+                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
+                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
+                        .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .build();
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+            }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

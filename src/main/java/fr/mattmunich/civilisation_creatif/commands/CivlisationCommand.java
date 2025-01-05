@@ -2,6 +2,7 @@ package fr.mattmunich.civilisation_creatif.commands;
 
 import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -34,7 +35,11 @@ public class CivlisationCommand implements CommandExecutor, TabCompleter {
 //          main.onDisable(); -- NOT NEEDED (+ auto tranfer to mjep onDisable)
             main.onLoad();
             main.onEnable();
-            s.sendMessage(main.prefix + "§2Plugin rechargé !");
+            Bukkit.getScheduler().runTaskTimer(main, () -> {
+                if(main.isEnabled()) {
+                    s.sendMessage(main.prefix + "§2Plugin rechargé !");
+                }
+            },1,10);
         } else if(args[0].equalsIgnoreCase("credits") || args[0].equalsIgnoreCase("copyright")) {
             s.sendMessage(main.prefix + "§6§lCrédits : §2Made by §6mattmunich\n§aCopyright ©2024 mattmunich All rights reserved.");
         } else if(args[0].equalsIgnoreCase("version")) {

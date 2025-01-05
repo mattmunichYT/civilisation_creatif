@@ -21,27 +21,37 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender s, Command cmd, String l, String[] args) {
-        if (args.length < 2 || args.length > 3) {
+        if (args.length == 0 || args.length > 3) {
+            if(s instanceof Player p) {
+                if(!main.dev.contains(p)) {
+                    s.sendMessage(main.wrongUsage + "/money <player> [get]");
+                    return true;
+                }
+            }
             s.sendMessage(main.wrongUsage + "/money <player> <add/remove/reset/get> [moneyAmount]");
             return true;
         }
-
-        if(s instanceof Player p) {
-            if(!main.dev.contains(p)) {
-                p.sendMessage(main.noPermToExc);
-                return true;
-            }
-        }
-
         PlayerData data = null;
         try {
             data = new PlayerData(Utility.getUUIDFromName(args[0]));
         } catch (Exception e) {
-            s.sendMessage(main.prefix + "§4Impossible de trouver le joueur §c" + args[0]);
+            s.sendMessage(main.playerNotFound(args[0]));
+            return true;
+        }
+        if(args.length==1) {
+            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.Money() + "¢§2 !");
             return true;
         }
 
+
+
         if(args[1].equalsIgnoreCase("reset")) {
+            if(s instanceof Player p) {
+                if(!main.dev.contains(p)) {
+                    p.sendMessage(main.noPermToExc);
+                    return true;
+                }
+            }
             data.resetMoney();
             s.sendMessage(main.prefix + "§2L'§6argent§2 du joueur §6" + args[0] + "§2 a été remis à zéro !");
 
@@ -55,6 +65,12 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
         if(args[1].equalsIgnoreCase("get")) {
             s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.Money() + "¢§2 !");
             return true;
+        }
+        if(s instanceof Player p) {
+            if(!main.dev.contains(p)) {
+                p.sendMessage(main.noPermToExc);
+                return true;
+            }
         }
 
         if(args.length != 3) {

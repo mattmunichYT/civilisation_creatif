@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public final class Main extends JavaPlugin {
 
-    public String version = "0.1";
+    public String version = "0.5";
 
     public String hex(String message) {
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
@@ -58,6 +58,7 @@ public final class Main extends JavaPlugin {
     public String playerToExc = prefix + "§4Vous devez être un joueur pour éxecuter cette commande !";
     public String noPermToExc = prefix + "§4Vous n'avez pas la permission d'éxecuter cette commande !";
     public String wrongUsage = prefix + "§4Utilisation : §c";
+    public String playerNotFound(String name) {return prefix + "§4Impossible de trouver le joueur §c" + name;}
     //END OF PUBLIC UTILITIES
     //HELPERS GET
     PlayerData pdata;

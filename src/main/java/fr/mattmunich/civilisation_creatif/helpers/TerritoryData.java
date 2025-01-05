@@ -79,6 +79,7 @@ public class TerritoryData {
             config.set("territories." + territoryName + ".created", System.currentTimeMillis());
             config.set("territories." + territoryName + ".color", territoryColor.toString());
             config.set("territories." + territoryName + ".xp", 0);
+            config.set("territories." + territoryName + ".money", 0);
             ItemStack banner = new ItemStack(Material.WHITE_BANNER);
             config.set("territories." + territoryName + ".banner", banner);
 
@@ -656,5 +657,45 @@ public class TerritoryData {
         } else {
             return config.getItemStack("territories." + territoryName + ".banner");
         }
+    }
+
+    public int getTerritoryXP(String territoryName){
+        return config.getInt("territories." + territoryName + ".xp");
+    }
+
+    public void setTerritoryXP(String territoryName, int xp){
+        config.set("territories." + territoryName + ".xp", xp);
+    }
+
+    public void addTerritoryXP(String territoryName, int xp){
+        config.set("territories." + territoryName + ".xp", config.getInt("territories." + territoryName + ".xp") + xp);
+    }
+
+    public void removeTerritoryXP(String territoryName, int xp){
+        config.set("territories." + territoryName + ".xp", config.getInt("territories." + territoryName + ".xp") - xp);
+    }
+
+    public void resetTerritoryXP(String territoryName){
+        config.set("territories." + territoryName + ".xp", 0);
+    }
+
+    public int getTerritoryMoney(String territoryName){
+        return config.getInt("territories." + territoryName + ".money");
+    }
+
+    public void setTerritoryMoney(String territoryName, int money){
+        config.set("territories." + territoryName + ".money", money);
+    }
+
+    public void addTerritoryMoney(String territoryName, int money){
+        config.set("territories." + territoryName + ".money", config.getInt("territories." + territoryName + ".money") + money);
+    }
+
+    public void removeTerritoryMoney(String territoryName, int money){
+        config.set("territories." + territoryName + ".money", config.getInt("territories." + territoryName + ".money") - money);
+    }
+
+    public void resetTerritoryMoney(String territoryName){
+        config.set("territories." + territoryName + ".money", 0);
     }
 }

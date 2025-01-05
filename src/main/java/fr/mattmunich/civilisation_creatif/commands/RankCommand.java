@@ -40,7 +40,7 @@ public class RankCommand implements CommandExecutor, TabCompleter {
         try {
             data = new PlayerData(Utility.getUUIDFromName(args[0]));
         } catch (Exception e) {
-            s.sendMessage(main.prefix + "§4Impossible de trouver le joueur §c" + args[0]);
+            s.sendMessage(main.playerNotFound(args[0]));
             return true;
         }
 
