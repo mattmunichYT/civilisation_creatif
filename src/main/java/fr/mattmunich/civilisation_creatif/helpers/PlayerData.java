@@ -24,6 +24,8 @@ import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import javax.annotation.Nullable;
+
 public final class PlayerData {
 
 	private final Plugin plugin;

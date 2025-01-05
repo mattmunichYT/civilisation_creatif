@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -78,6 +79,8 @@ public class TerritoryData {
             config.set("territories." + territoryName + ".created", System.currentTimeMillis());
             config.set("territories." + territoryName + ".color", territoryColor.toString());
             config.set("territories." + territoryName + ".xp", 0);
+            ItemStack banner = new ItemStack(Material.WHITE_BANNER);
+            config.set("territories." + territoryName + ".banner", banner);
 
             addTerritoryToList(territoryName);
 
@@ -640,5 +643,18 @@ public class TerritoryData {
             }
         }
         return;
+    }
+
+    public void setTerritoryBanner(String territoryName, ItemStack banner){
+        config.set("territories." + territoryName + ".banner", banner);
+        saveConfig();
+    }
+
+    public ItemStack getTerritoryBanner(String territoryName){
+        if(config.get("territories." + territoryName + ".banner") == null) {
+            return new ItemStack(Material.WHITE_BANNER);
+        } else {
+            return config.getItemStack("territories." + territoryName + ".banner");
+        }
     }
 }

@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.*;
+import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -24,14 +25,10 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.MaterialData;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.Team;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -39,9 +36,11 @@ public class EventListener implements Listener {
 
     private final ArrayList<Player> enterTerritoryName = new ArrayList<>();
 
+    private final ArrayList<Player> defTerritoryBanner = new ArrayList<>();
+
     private final Main main;
 
-    private TerritoryData territoryData;
+    private final TerritoryData territoryData;
 
     public EventListener(Main main, TerritoryData territoryData) {
         this.main = main;
@@ -103,6 +102,22 @@ public class EventListener implements Listener {
             chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, "","",""));
             chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "","",""));
             Bukkit.getScheduler().runTask(main, () -> p.openInventory(chooseColorInv));
+            return;
+        }
+        if(defTerritoryBanner.contains(p) && e.getMessage().toLowerCase().contains("go")){
+            e.setMessage("");
+            e.setCancelled(true);
+            if(!(p.getInventory().getItemInMainHand().getItemMeta() instanceof BannerMeta)) {
+                p.sendMessage(main.prefix + "§4Cet objet n'est pas une bannière !");
+                Bukkit.getScheduler().runTask(main, () -> p.openInventory(getTerrInv(p, territoryData.getTerritoryTeamOfPlayer(p))));
+                defTerritoryBanner.remove(p);
+                return;
+            }
+            ItemStack banner = p.getInventory().getItemInMainHand();
+            territoryData.setTerritoryBanner(territoryData.getPlayerTerritory(p), banner);
+            p.sendTitle("§a✅ Succès","§2§oLa bannière de votre territoire a été définie !", 20, 100, 20);
+            p.sendMessage(main.prefix + "§2La bannière de votre territoire a été définie !");
+            defTerritoryBanner.remove(p);
             return;
         }
 
@@ -221,7 +236,8 @@ public class EventListener implements Listener {
                         //JOIN TERRITORY
                         PlayerData data = new PlayerData(p.getUniqueId());
                         try {
-                            if(data.getInvitesToTerritory() == null || data.getInvitesToTerritory().isEmpty()) {
+                            data.getInvitesToTerritory();
+                            if(data.getInvitesToTerritory().isEmpty()) {
                                 //NO INVITES
                                 Inventory invitesInv = Bukkit.createInventory(p, 54, "§bInvitations à rejoindre un territoire");
                                 invitesInv.setItem(22, ItemBuilder.getItem(Material.PAPER, "§b§oVous n'avez aucune invitation à rejoindre un territoire...", true, false, "", "", ""));
@@ -283,16 +299,7 @@ public class EventListener implements Listener {
                     case PAPER:
                         //TERRITORY MENU
                         Team territory = territoryData.getTerritoryTeamOfPlayer(p);
-                        Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
-                        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "", "", "");
-                        for (int i = 0; i < 26; i++) {
-                            terrInv.setItem(i, none);
-                        }
-                        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "", "", ""));
-                        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, "", "", ""));
-                        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, "", "", ""));
-                        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, "", "", ""));
-                        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+                        Inventory terrInv = getTerrInv(p, territory);
                         p.openInventory(terrInv);
                         break;
                     case SPYGLASS:
@@ -471,6 +478,15 @@ public class EventListener implements Listener {
                            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get territory chief to verify a player's permission. §cAllowed " + p.getName() + " to delete territory " + territoryData.getTerritoryTeamOfPlayer(p).getName());
                        }
                         return;
+                    case WHITE_BANNER,BLACK_BANNER,RED_BANNER,BLUE_BANNER,LIGHT_BLUE_BANNER,BROWN_BANNER,CYAN_BANNER,GRAY_BANNER,GREEN_BANNER,LIGHT_GRAY_BANNER,LIME_BANNER,MAGENTA_BANNER,ORANGE_BANNER,PINK_BANNER,PURPLE_BANNER,YELLOW_BANNER:
+                        p.sendTitle("§2Prenez la bannière","§2§ldans votre main",20,100,20);
+                        p.sendMessage(main.prefix + "§2Prenez la §5future§2 bannière de territoire §2§ldans votre main§r§2.");
+                        Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
+                            p.sendTitle("§rQuand c'est fait","§2§lentrez §r§2\"GO\"§2§l dans le tchat",20,60,20);
+                            p.sendMessage(main.prefix + "§2Lorsque c'est fait, entrez \"GO\" dans le tchat.");
+                            defTerritoryBanner.add(p);
+                        }, 100);
+                        break;
                     case BARRIER:
                         invView.close();
                         break;
@@ -606,6 +622,23 @@ public class EventListener implements Listener {
             }
         }
     }
+
+    private Inventory getTerrInv(Player p, Team territory) {
+        Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
+        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, "", false, false, "", "", "");
+        for (int i = 0; i < 26; i++) {
+            terrInv.setItem(i, none);
+        }
+
+        terrInv.setItem(4, ItemBuilder.getItem(territoryData.getTerritoryBanner(territory.getName()).getType(), "§dDéfinir la bannière du territoire", false, false, "", "", ""));
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "", "", ""));
+        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, "", "", ""));
+        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, "", "", ""));
+        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, "", "", ""));
+        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, "", "", ""));
+        return terrInv;
+    }
+
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
         Entity entity = e.getRightClicked();
