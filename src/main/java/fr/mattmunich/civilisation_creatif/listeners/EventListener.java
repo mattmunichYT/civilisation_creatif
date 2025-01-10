@@ -153,7 +153,7 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         p.sendTitle("§4§lVous avez été kick","§e§oTransfert vers §4M.§cJ.§6E.§eP.",20,100,20);
         p.sendMessage("§e(§6!§e) §4Vous avez été kick du serveur Civlisation Créatif avec la raison : §c" + e.getReason());
-        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,255,false,false,false);
+        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS,120,255,false,false,false);
         p.addPotionEffect(blindness);
         Bukkit.getScheduler().runTaskLater(main, () -> {
             p.transfer("91.197.6.60", 25599);

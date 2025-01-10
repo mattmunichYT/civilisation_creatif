@@ -4,6 +4,7 @@ import fr.mattmunich.civilisation_creatif.commands.*;
 import fr.mattmunich.civilisation_creatif.helpers.Backup;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
+import fr.mattmunich.civilisation_creatif.helpers.Warp;
 import fr.mattmunich.civilisation_creatif.listeners.AntiSpeed;
 import fr.mattmunich.civilisation_creatif.listeners.EventListener;
 import fr.mattmunich.civilisation_creatif.listeners.JoinListener;
@@ -64,6 +65,7 @@ public final class Main extends JavaPlugin {
     PlayerData pdata;
     Backup backup;
     TerritoryData territoryData;
+    Warp warp;
     //END OF HELPERS GET
     //OTHER ARRAY LISTS
     public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
@@ -101,6 +103,8 @@ public final class Main extends JavaPlugin {
         backup = new Backup(this);
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
+        warp = new Warp(this);
+        warp.initConfig();
 
         //END OF HELPERS INIT
 
@@ -112,6 +116,12 @@ public final class Main extends JavaPlugin {
         getCommand("civilisation").setExecutor(new CivlisationCommand(this));
         getCommand("backup").setExecutor(new BackupCommand(this, backup));
         getCommand("territoire").setExecutor(new TerritoireCommand(this,territoryData));
+        getCommand("home").setExecutor(new HomeCommand(this));
+        getCommand("sethome").setExecutor(new HomeCommand(this));
+        getCommand("delhome").setExecutor(new HomeCommand(this));
+        getCommand("warp").setExecutor(new WarpCommand(this,warp));
+        getCommand("setwarp").setExecutor(new WarpCommand(this,warp));
+        getCommand("delwarp").setExecutor(new WarpCommand(this,warp));
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(this,territoryData), this);
@@ -181,6 +191,8 @@ public final class Main extends JavaPlugin {
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
         backup = new Backup(this);
+        warp = new Warp(this);
+        warp.initConfig();
         //END OF HELPERS INIT
     }
 

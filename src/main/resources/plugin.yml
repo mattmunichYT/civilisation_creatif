@@ -39,3 +39,27 @@ commands:
   territoire:
     description: "§6§lCommande pour gérer son territoire !"
     usage: /territoire
+  warp:
+    description: §6Commande pour se §5téléporter à un warp§6 :)
+    usage: /warp <warpName>
+  setwarp:
+    description: §6Commande pour §5définir un warp ! §6(§cAdmin§4Cmd§6)
+    usage: /setwarp <warpName> [permission]
+  delwarp:
+    description: §6Commande pour §5suprimer un warp ! §6(§cAdmin§4Cmd§6)
+    usage: /delwarp <warpName>
+  sethome:
+    usage: /sethome <HomeName>
+    description: §6Commande pour §5définir§6 un §5home §6:)
+    aliases:
+      - seth
+  home:
+    usage: /home <HomeName>
+    description: §6Commande pour se §5téléporter §6à un §5home §6:)
+    aliases:
+      - h
+  delhome:
+    usage: /delhome <HomeName>
+    description: §6Commande pour §5supprimer §6un §5home§6 :)
+    aliases:
+      - delh

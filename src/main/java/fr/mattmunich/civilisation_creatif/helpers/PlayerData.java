@@ -343,6 +343,15 @@ public final class PlayerData {
 		}
 	}
 
+	public String getHomes(){
+		if(getConfig().getString("home.list") != null) {
+			String homes = getConfig().get("home.list").toString();
+			return homes;
+		}else {
+			return "";
+		}
+	}
+
 	public void setIP(String ip) {
 		config.set("player.ip", ip);
 		saveConfig();

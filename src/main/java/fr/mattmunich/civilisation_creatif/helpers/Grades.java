@@ -1,6 +1,7 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
 import fr.mattmunich.civilisation_creatif.Main;
+import org.bukkit.entity.Player;
 
 public enum Grades {
     // Grades
@@ -65,6 +66,38 @@ public enum Grades {
 
     public int getId() {
         return id;
+    }
+
+    public static Grades getGradeById(int id) {
+        for(Grades grade : values()) {
+            if(grade.getId() == id) {
+                return grade;
+            }
+        }
+
+        return Grades.MEMBRE;
+    }
+
+    public static boolean isInferior(Player p, int id) {
+        PlayerData data = null;
+        try {
+            data = new PlayerData(p.getUniqueId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        int pId = data.getRank().getId();
+        return pId < id;
+    }
+
+    public static boolean isSuperior(Player p, int id) {
+        PlayerData data = null;
+        try {
+            data = new PlayerData(p.getUniqueId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        int pId = data.getRank().getId();
+        return pId > id;
     }
 
     // end("Methode GETTER")
