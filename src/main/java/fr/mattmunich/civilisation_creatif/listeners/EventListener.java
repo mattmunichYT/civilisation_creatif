@@ -858,7 +858,7 @@ public class EventListener implements Listener {
         try {
             PlayerData playerData = new PlayerData(p.getUniqueId());
             playerData.addMoney(1);
-            if(territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p))) {
+            if(territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())) !=null && territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p))) {
                 territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), 1);
                 BaseComponent baseComponent = new ComponentBuilder()
                         .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
@@ -886,7 +886,7 @@ public class EventListener implements Listener {
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            main.logError("Couldn't give reward to player for placing block",ex);
         }
 
     }

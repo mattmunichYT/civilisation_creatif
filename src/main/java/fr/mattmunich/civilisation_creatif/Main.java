@@ -56,10 +56,14 @@ public final class Main extends JavaPlugin {
     //PUBLIC UTILITIES
     public ArrayList<Player> speeding = new ArrayList<>();
     public String prefix = "§e[§2Civilisation§e] §2";
+    public String makeItSafePrefix = "§1[§b§lMake It Safe§1] §a";
     public String playerToExc = prefix + "§4Vous devez être un joueur pour éxecuter cette commande !";
     public String noPermToExc = prefix + "§4Vous n'avez pas la permission d'éxecuter cette commande !";
     public String wrongUsage = prefix + "§4Utilisation : §c";
     public String playerNotFound(String name) {return prefix + "§4Impossible de trouver le joueur §c" + name;}
+    public void logError(String message,Exception error) {
+        Bukkit.getConsoleSender().sendMessage(prefix + "§4" + hex(message) + " because of §eerror: \n§r" + error + Arrays.toString(error.getStackTrace()).replace(",", ",\n"));
+    }
     //END OF PUBLIC UTILITIES
     //HELPERS GET
     PlayerData pdata;
@@ -99,7 +103,7 @@ public final class Main extends JavaPlugin {
         }
 
 
-        pdata = new PlayerData(this);
+        pdata = new PlayerData(this, this);
         backup = new Backup(this);
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
@@ -187,7 +191,7 @@ public final class Main extends JavaPlugin {
     public void onLoad() {
         super.onLoad();
         //HELPERS INIT
-        pdata = new PlayerData(this);
+        pdata = new PlayerData(this, this);
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
         backup = new Backup(this);

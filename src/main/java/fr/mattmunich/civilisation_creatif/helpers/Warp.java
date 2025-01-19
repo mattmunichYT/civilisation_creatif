@@ -2,17 +2,20 @@ package fr.mattmunich.civilisation_creatif.helpers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import fr.mattmunich.civilisation_creatif.Main;
+
+import javax.annotation.Nullable;
 
 public class Warp {
 
@@ -28,17 +31,13 @@ public class Warp {
 	}
 
 
-	public FileConfiguration getConfig() {
-		return config;
-	}
-
 	public void saveConfig() {
 		try {
 			config.save(file);
 		}catch(IOException ioe) { ioe.printStackTrace();}
 	}
 
-	File f = new File("plugins/AdminCmdsB");
+	File f = new File("plugins/CivilisationCreatif");
 	public void initConfig() {
 		if(!f.exists()) {
 			f.mkdirs();
@@ -53,62 +52,71 @@ public class Warp {
 		config = YamlConfiguration.loadConfiguration(file);
 	}
 
-	public void setWarp(String warpName, Player player , String worldName, int x, int y, int z, float pitch, float yaw, int id) {
-
-		getConfig().createSection("warps");
-		if(!getConfig().isSet("warp.")) {
-
-			MemorySection.createPath(Objects.requireNonNull(getConfig().getConfigurationSection("warps")), "warp");
-
-			MemorySection.createPath(Objects.requireNonNull(getConfig().getConfigurationSection("warps")), "warp.list");
+	public void defineWarp(String warpName, Player player , String worldName, double x, double y, double z, float pitch, float yaw, int minGradeId) {
+		//Remove warp if already defined to redefine it properly
+		if(getWarpList() !=null && getWarpList().contains(warpName)) {
+			player.sendMessage(main.prefix + "§eUn Warp avec ce nom a été détecté. §a§oRedéfinition du Warp en cours...");
+			config.set("warp." + warpName, null);
+			removeWarpFromList(warpName);
 		}
 
-		getConfig().set("warp." + warpName + ".world", worldName);
-		getConfig().set("warp." + warpName + ".x", x);
-		getConfig().set("warp." + warpName + ".y", y);
-		getConfig().set("warp." + warpName + ".z", z);
-		getConfig().set("warp." + warpName + ".pitch", pitch);
-		getConfig().set("warp." + warpName + ".yaw", yaw);
-		getConfig().set("warp." + warpName + ".id", id);
-		if(getConfig().isSet("warp.count")) {
-			getConfig().set("warp.count", getConfig().getInt("warp.count") + 1);
-		}else{
-			getConfig().set("warp.count", 1);
-		}
-
-		if(!getConfig().isSet("warp.list")) {
-			MemorySection.createPath(Objects.requireNonNull(getConfig().getConfigurationSection("warps")), "warp.list");
-
-			getConfig().set("warp.list", warpName + ",");
-			player.sendMessage(main.prefix + "§2Le warp \"§6" + warpName + "§2\" à été défini à votre position !");
-			saveConfig();
-		}else {
-			if(!Objects.requireNonNull(getConfig().get("warp.list")).toString().contains(warpName)) {
-				getConfig().set("warp.list", getConfig().get("warp.list") + warpName + ",");
-				player.sendMessage(main.prefix + "§2Le warp \"§6" + warpName + "§2\" à été défini à votre position !");
-			}else {
-				player.sendMessage(main.prefix + "§2Le warp \"§6" + warpName + "§2\" à été redéfini à votre position !");
-			}
-		}
+		config.set("warp." + warpName + ".world", worldName);
+		config.set("warp." + warpName + ".x", x);
+		config.set("warp." + warpName + ".y", y);
+		config.set("warp." + warpName + ".z", z);
+		config.set("warp." + warpName + ".pitch", pitch);
+		config.set("warp." + warpName + ".yaw", yaw);
+		config.set("warp." + warpName + ".minGradeId", minGradeId);
 		saveConfig();
+		addWarpToList(warpName);
+		player.sendMessage(main.prefix + "§2Le warp \"§6" + warpName + "§2\" à été défini à votre position !");
     }
 
-	public void warp(String warpName, Player player) {
-		if(getConfig().contains("warp." + warpName + ".")) {
+	public @Nullable List<String> getWarpList(){
+		return config.getStringList("warps");
+	}
+
+	private void addWarpToList(String warp) {
+		if(getWarpList()==null) {
+			List<String> warps = new ArrayList<>();
+			warps.add(warp);
+			setWarpList(warps);
+		} else {
+			List<String> warps = getWarpList();
+			warps.add(warp);
+			setWarpList(warps);
+		}
+	}
+
+	private void removeWarpFromList(String warp){
+		if(getWarpList()!=null){
+            try {
+                getWarpList().remove(warp);
+            } catch (Exception ignored) {}
+        }
+	}
+
+	private void setWarpList(List<String> warpList){
+		config.set("warps", warpList);
+		saveConfig();
+	}
+
+	public void tpToWarp(String warpName, Player player) {
+		if(config.contains("warp." + warpName + ".")) {
 			World w = null;
 			try {
-				w = Bukkit.getServer().getWorld(Objects.requireNonNull(getConfig().getString("warp." + warpName + ".world")));
+				w = Bukkit.getServer().getWorld(Objects.requireNonNull(config.getString("warp." + warpName + ".world")));
 			} catch (Exception e) {
 				Bukkit.getConsoleSender().sendMessage("Error while warp");
 			}
-			double x = getConfig().getDouble("warp."  + warpName + ".x");
-			double y = getConfig().getDouble("warp."  + warpName + ".y");
-			double z = getConfig().getDouble("warp."  + warpName + ".z");
-			double pitch = getConfig().getDouble("warp."  + warpName + ".pitch");
-			double yaw = getConfig().getDouble("warp."  + warpName + ".yaw");
-			int id = getConfig().getInt("warp." + warpName + ".id");
+			double x = config.getDouble("warp."  + warpName + ".x");
+			double y = config.getDouble("warp."  + warpName + ".y");
+			double z = config.getDouble("warp."  + warpName + ".z");
+			double pitch = config.getDouble("warp."  + warpName + ".pitch");
+			double yaw = config.getDouble("warp."  + warpName + ".yaw");
+			int minGradeId = config.getInt("warp." + warpName + ".minGradeId");
 
-			if(Grades.isInferior(player, id)) {
+			if(Grades.isInferior(player, minGradeId)) {
 				player.sendMessage(main.prefix + "§4Vous n'avez pas la permission de vous téléporter à ce warp !");
             }else {
 				if(w == null) {
@@ -125,18 +133,9 @@ public class Warp {
 	}
 
 	public void delWarp(String warpName, Player player) {
-		if(getConfig().contains("warp."  + warpName + ".")) {
-			if(Objects.requireNonNull(getConfig().getString("warp.list")).contains(warpName)) {
-				String result = Objects.requireNonNull(getConfig().getString("warp.list")).replace(warpName + ","  , "");
-
-				getConfig().set("warp.list", result);
-				saveConfig();
-			}else {
-				player.sendMessage(main.prefix + "Une erreur s'est produite lors de la suppression du warp. Annulation...");
-				return;
-			}
-			getConfig().set("warp."  + warpName, null);
-			getConfig().set("warp.count", getConfig().getInt("warp.count") - 1);
+		if(getWarpList() !=null && getWarpList().contains(warpName)) {
+			removeWarpFromList(warpName);
+			config.set("warp."  + warpName, null);
 
 			player.sendMessage(main.prefix + "§2Le warp \"§6" + warpName + "§2"+ "§2\" a été supprimé !");
 			saveConfig();
@@ -145,12 +144,12 @@ public class Warp {
         }
 	}
 
-	public void warpListSendMsg(Player player){
-		if(!Objects.equals(Objects.requireNonNull(getConfig().get("warp.list")).toString(), "") || Objects.requireNonNull(getConfig().get("warp.list")).toString() != null) {
-			String warps = Objects.requireNonNull(getConfig().get("warp.list")).toString();
-			player.sendMessage("§e--------§2§lWarps§e--------\n§2Warp(s) défini(s) : §r\n§l§6" + warps.replace(",", ", "));
-        }else {
+	public void sendWarpListMsg(Player player){
+		if(config.get("warp.list")==null){
 			player.sendMessage("§e--------§2§lWarps§e--------\n§8§oAucun warp n'a été défini !\n§8§oUn §4Administrateur §8§o peut en définir un en utilisant la commande /setwarp <warpName>");
-        }
+		} else {
+			String warps = config.getString("warp.list");
+			player.sendMessage("§e--------§2§lWarps§e--------\n§2Warp(s) défini(s) : §r\n§l§6" + warps.replace(",", ", "));
+		}
 	}
 }

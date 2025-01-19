@@ -35,11 +35,7 @@ public class CivlisationCommand implements CommandExecutor, TabCompleter {
 //          main.onDisable(); -- NOT NEEDED (+ auto tranfer to mjep onDisable)
             main.onLoad();
             main.onEnable();
-            Bukkit.getScheduler().runTaskTimer(main, () -> {
-                if(main.isEnabled()) {
-                    s.sendMessage(main.prefix + "§2Plugin rechargé !");
-                }
-            },1,10);
+            s.sendMessage(main.prefix + "§2Plugin rechargé !");
         } else if(args[0].equalsIgnoreCase("credits") || args[0].equalsIgnoreCase("copyright")) {
             s.sendMessage(main.prefix + "§6§lCrédits : §2Made by §6mattmunich\n§aCopyright ©2024 mattmunich All rights reserved.");
         } else if(args[0].equalsIgnoreCase("version")) {

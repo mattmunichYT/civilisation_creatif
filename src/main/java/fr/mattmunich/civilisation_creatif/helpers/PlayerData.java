@@ -1,7 +1,6 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +9,7 @@ import java.util.*;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -24,30 +24,36 @@ import org.bukkit.profile.PlayerTextures;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-import javax.annotation.Nullable;
-
 public final class PlayerData {
 
 	private final Plugin plugin;
 
+	private Main main;
+
 	private FileConfiguration config;
 	private File file;
 
-    public PlayerData(Plugin plugin) {
+    public PlayerData(Plugin plugin, Main main) {
 		this.plugin = plugin;
+		this.main = main;
 	}
+
+	private void logError(String message, Exception error){
+		main.logError(message, error);
+	}
+
 
 
 	File f = new File("plugins/CivilisationCreatif/PlayerData");
 	public PlayerData(UUID uuid) throws Exception{
-		if(!f.exists()) {
+        if(!f.exists()) {
 			f.mkdirs();
 		}
 		file = new File(f, uuid.toString() + ".yml");
 		if(!file.exists()) {
 			try {
 				file.createNewFile();
-			} catch (IOException e) { e.printStackTrace();}
+			} catch (Exception e) { logError("Couldn't create PlayerData file", e); }
 		}
 		new YamlConfiguration();
 		config = YamlConfiguration.loadConfiguration(file);
@@ -66,23 +72,21 @@ public final class PlayerData {
 
 	private void setXPScore(int setXP) {
 		String name = config.getString("player.name");
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Score xp = scoreboard.getObjective("xp").getScore(name);
+		Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+        assert name != null;
+        Score xp = Objects.requireNonNull(scoreboard.getObjective("xp")).getScore(name);
 		xp.setScore(setXP);
 	}
 
 	private void setMoneyScore(int setMoney) {
 		String name = config.getString("player.name");
-		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		Score money = scoreboard.getObjective("money").getScore(name);
+		Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+        assert name != null;
+        Score money = Objects.requireNonNull(scoreboard.getObjective("money")).getScore(name);
 		money.setScore(setMoney);
 	}
 
-	public boolean exist() {
-		return file.exists();
-	}
-
-	public final Plugin getPlugin(){
+	public Plugin getPlugin(){
 		return plugin;
 	}
 
@@ -105,7 +109,8 @@ public final class PlayerData {
 		saveConfig();
 	}
 
-	public int level() {
+	@SuppressWarnings("unused")
+    public int level() {
 		//CHANGE THIS (LEVEL = 1000XP)
 		return config.getInt("civilisation.xp")/1000;
 	}
@@ -172,7 +177,7 @@ public final class PlayerData {
 
 	public void inviteToTerritory(String territoryName, Player sender){
 		List<Map<?, ?>> invites = config.getMapList("civilisation.territories.invites");
-		if(invites != null) {
+		if(config.get("civilisation.territories.invites") != null) {
 			Map <String,String> invite = new HashMap<>();
 			invite.put(territoryName, sender.getUniqueId().toString());
 			invites.add(invite);
@@ -195,7 +200,9 @@ public final class PlayerData {
 		List<Map<?, ?>> invites = config.getMapList("civilisation.territories.invites");
 		try {
 			invites.removeIf(map -> map.containsKey(territoryName));
-		} catch(NullPointerException ignored) {}
+		} catch(NullPointerException e) {
+			logError("Couldn't remove invite to territory in PlayerData", e);
+		}
 		config.set("civilisation.territories.invites", invites);
 		saveConfig();
 	}
@@ -209,7 +216,8 @@ public final class PlayerData {
 		return config.getString("civilisation.territories.territory");
 	}
 
-	public void setTempbanned(String from, String reason, long duration, String sanction) {
+	@SuppressWarnings("unused")
+    public void setTempbanned(String from, String reason, long duration, String sanction) {
 		config.set("player.punishments.tempban.istempbanned", true);
 		config.set("player.punishments.tempban.from", from);
 		config.set("player.punishments.tempban.reason", reason);
@@ -221,23 +229,28 @@ public final class PlayerData {
 		saveConfig();
 	}
 
-	public void setUnTempbanned() {
+	@SuppressWarnings("unused")
+    public void setUnTempbanned() {
 		config.set("player.punishments.tempban", null);
 		saveConfig();
 	}
 
-	public String getTempbannedReason() {
+	@SuppressWarnings("unused")
+    public String getTempbannedReason() {
 		return config.getString("player.punishments.tempban.reason");
 	}
-	public String getTempbannedFrom() {
+	@SuppressWarnings("unused")
+    public String getTempbannedFrom() {
 		return config.getString("player.punishments.tempban.from");
 	}
 
-	public String getTempbanSanction() {
+	@SuppressWarnings("unused")
+    public String getTempbanSanction() {
 		return config.getString("player.punishments.tempban.sanction");
 	}
 
-	public long getTempbanMilliseconds() {
+	@SuppressWarnings("unused")
+    public long getTempbanMilliseconds() {
 		return config.getLong("player.punishments.tempban.duration");
 	}
 
@@ -332,26 +345,20 @@ public final class PlayerData {
 	public void saveConfig() {
 		try {
 			getConfig().save(file);
-		}catch(IOException ioe) { ioe.printStackTrace();}
+		}catch(Exception e) { logError("Couldn't save PlayerData file", e);}
 	}
 
 	public boolean haveHomes(){
-		if(getConfig().getString("home.list") != null) {
-			return true;
-		}else {
-			return false;
-		}
+        return getConfig().getString("home.list") != null;
 	}
 
 	public String getHomes(){
 		if(getConfig().getString("home.list") != null) {
-			String homes = getConfig().get("home.list").toString();
-			return homes;
+            return Objects.requireNonNull(getConfig().get("home.list")).toString();
 		}else {
 			return "";
 		}
 	}
-
 	public void setIP(String ip) {
 		config.set("player.ip", ip);
 		saveConfig();
@@ -364,17 +371,11 @@ public final class PlayerData {
 	public boolean changedIP(String newIP) {
 
 		try {
-			config.get("player.ip");
-		} catch (Exception e) {
+			if(config.get("player.ip") == null) {
+				return false;
+			} else return !Objects.equals(getStoredIP(), newIP);
+		} catch (Exception ignored) {
 			return false;
-		}
-
-		if(config.get("player.ip") == null) {
-			return false;
-		} else if(getStoredIP().equalsIgnoreCase(newIP) || Objects.equals(getStoredIP(), newIP)) {
-			return false;
-		} else {
-			return true;
 		}
 	}
 
@@ -405,7 +406,7 @@ public final class PlayerData {
 
 
 		} catch (Exception e) {
-			Bukkit.getConsoleSender().sendMessage("[AdminCmdsB] §cUne erreur s'est produite : §4" + e + "\nDetails : " + e.getMessage() + e.toString());
+			logError("Couldn't get player skin",e);
 			return "";
 		}
 	}
@@ -419,7 +420,7 @@ public final class PlayerData {
             PlayerTextures textures = playerProfile.getTextures();
             textures.setSkin(new URL(getSkin()));
             playerProfile.setTextures(textures);
-        } catch (MalformedURLException ignored) {}
+        } catch (MalformedURLException e) { logError("Couldn't get player Skull",e);}
 
 		ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta phm = (SkullMeta) pHead.getItemMeta();

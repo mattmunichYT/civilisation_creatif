@@ -97,7 +97,7 @@ public class TerritoryData {
             Bukkit.broadcastMessage(main.prefix + "§6" + chief.getName() + "§a a créé le territoire " + territory.getColor() + territory.getName() + " §a!");
         } catch (Exception e) {
             chief.sendMessage(main.prefix + "§4Impossible de créer le territoire, §cveuillez signaler cela à un membre du staff.");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't create territory " + territoryName + " from list because of " + e);
+            main.logError("Couldn't create territory " + territoryName + " from list",e);
         }
     }
 
@@ -128,7 +128,7 @@ public class TerritoryData {
             saveConfig();
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Impossible de supprimer le territoire, veuillez signaler cela à un membre du staff.");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't delete territory " + territoryName + " from list because of " + e);
+            main.logError("Couldn't remove territory " + territoryName + " from list",e);
         }
 //        } else {
 //            sender.sendMessage(main.prefix + "§4Impossible de supprimer le territoire, §cterritoire non trouvé.");
@@ -288,7 +288,7 @@ public class TerritoryData {
             saveConfig();
             return true;
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Update territory members in config from team for " + territoryName + " from list because of " + e);
+            main.logError("Couldn't update territory members in config from team for " + territoryName + " from list",e);
             return false;
         }
 
@@ -315,7 +315,7 @@ public class TerritoryData {
         try {
             territories.remove(territoryName);
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't remove territory " + territoryName + " from list because of " + e);
+            main.logError("Couldn't remove territory " + territoryName + " from list",e);
         }
         setTerritoriesList(territories);
         saveConfig();
@@ -357,7 +357,8 @@ public class TerritoryData {
             sender.sendMessage(main.prefix + "§2Le joueur a été invité à rejoindre votre territoire !");
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors de l'invitation du joueur !");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't invite player to territory because of §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't invite player to territory",e);
+            
         }
 
     }
@@ -372,7 +373,7 @@ public class TerritoryData {
             PlayerData tdata = new PlayerData(target.getUniqueId());
             tdata.removeInviteToTerritory(territory.getName());
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't remove invite player to territory because of §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't remove invite to territory",e);
         }
     }
 
@@ -392,7 +393,7 @@ public class TerritoryData {
             sender.sendMessage(main.prefix + "§2L'invitation à rejoindre votre territoire a été supprimée !");
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors de la suppression de l'invitation du joueur !");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't remove invite player to territory because of §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't remove invite to territory",e);
         }
     }
 
@@ -418,7 +419,7 @@ public class TerritoryData {
             return;
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du claim du chunk !");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't claim chunk for territory " + territoryName +  "§r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't claim chunk for territory " + territoryName,e);
             return;
         }
     }
@@ -441,8 +442,8 @@ public class TerritoryData {
             }
 
         } catch (Exception e) {
-            sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du UNclaim du chunk !");
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't UNclaim chunk for territory " + territoryName +  "§r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors de l'unclaim du chunk !");
+            main.logError("Couldn't UNclaim chunk for territory " + territoryName,e);
             return;
 
         }
@@ -454,11 +455,11 @@ public class TerritoryData {
             try {
                 return config.getMapList("territories." + territory.getName() + ".claims");
             } catch (ClassCastException e) {
-                Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't cast List<Map<?, ?>> for chunks of territory " + territoryName +  " : §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+                main.logError("Couldn't cast List<Map<?, ?>> for chunks of territory " + territoryName,e);
                 return null;
             }
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get claimed chunks for territory " + territoryName +  " : §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't get claimed chunks for territory " + territoryName,e);
             return null;
 
         }
@@ -469,7 +470,7 @@ public class TerritoryData {
             List<Map<?,?>> globalClaims = config.getMapList("claims");
             return globalClaims.contains(chunk);
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't check if chunk was claimed §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't check if chunk §c was claimed",e);
             return false;
 
         }
@@ -494,16 +495,16 @@ public class TerritoryData {
                             }
                         }
                     } catch (Exception e) {
-                        Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't check chunk owner §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+                        main.logError("Couldn't check chunk owner",e);
                     }
                 }
                 return null;
             } catch (NullPointerException e) {
-                Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't check chunk owner §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+                main.logError("Couldn't check chunk owner",e);
                 return null;
             }
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't check chunk owner §r" + e + Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
+            main.logError("Couldn't check chunk owner",e);
             return null;
 
         }

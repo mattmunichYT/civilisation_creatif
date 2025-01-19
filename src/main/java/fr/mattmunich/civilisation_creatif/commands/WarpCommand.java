@@ -1,9 +1,6 @@
 package fr.mattmunich.civilisation_creatif.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import org.bukkit.command.BlockCommandSender;
@@ -21,9 +18,9 @@ import fr.mattmunich.civilisation_creatif.helpers.Warp;
 
 public class WarpCommand implements CommandExecutor, TabCompleter {
 
-	private Main main;
+	private final Main main;
 
-	private Warp warp;
+	private final Warp warp;
 
 	public WarpCommand(Main main, Warp warp) {
 		this.main = main;
@@ -67,9 +64,9 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 			//Définir les variables
 			String warpName = args[0];
 			String worldName = p.getLocation().getWorld().getName();
-			int x = p.getLocation().getBlockX();
-			int y = p.getLocation().getBlockY();
-			int z = p.getLocation().getBlockZ();
+			double x = p.getLocation().getBlockX();
+			double y = p.getLocation().getBlockY();
+			double z = p.getLocation().getBlockZ();
 			float pitch = p.getLocation().getPitch();
 			float yaw = p .getLocation().getYaw();
 
@@ -87,13 +84,13 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 						return true;
 					}
 					int id = grades.getId();
-					warp.setWarp(warpName, p, worldName, x, y, z, pitch, yaw, id);
+					warp.defineWarp(warpName, p, worldName, x, y, z, pitch, yaw, id);
 				}
 
 
 			}else {
-				//Utiliser la fonction setWarp()
-				warp.setWarp(warpName, p, worldName, x, y, z, pitch, yaw, 1);
+				//Utiliser la fonction defineWarp()
+				warp.defineWarp(warpName, p, worldName, x, y, z, pitch, yaw, 1);
 			}
 
 
@@ -101,14 +98,14 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 			return true;
 		}else if (l.equalsIgnoreCase("warp")) {
 			if(args.length != 1) {
-				warp.warpListSendMsg(p);
+				warp.sendWarpListMsg(p);
 				p.sendMessage("§cSintax : /warp <warpName>");
 				return true;
 			}
 			String warpName = args[0];
 
 			//Utiliser la fonction warp()
-			warp.warp(warpName, p);
+			warp.tpToWarp(warpName, p);
 
 			return true;
 		}else if(l.equalsIgnoreCase("delwarp")) {
@@ -138,34 +135,25 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-		List<String> tabComplete = Lists.newArrayList();
-		if(label.equalsIgnoreCase("setwarp")) {
-			if(args.length == 2) {
-				for(Grades grades : Grades.values()) {
-					if(grades.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+
+
+		if (label.equalsIgnoreCase("setwarp")) {
+			List<String> tabComplete = Lists.newArrayList();
+
+			if (args.length == 2) {
+				for (Grades grades : Grades.values()) {
+					if (grades.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
 						tabComplete.add(grades.getName().toLowerCase());
 					}
 				}
+				return tabComplete;
 			}
 		}
 
-		if(label.equalsIgnoreCase("warp")) {
-            String warps = Objects.requireNonNull(warp.getConfig().get("warp.list")).toString();
-            if (!warps.isEmpty()) {
-                tabComplete = Arrays.asList(warps.split(","));
-            }
-
-			if (args.length == 1) {
-				for (String a : tabComplete) {
-					if (a.toLowerCase().startsWith(args[0].toLowerCase())) {
-						tabComplete.add(a);
-					}
-				}
-			}
+		if (label.equalsIgnoreCase("warp")) {
+			return warp.getWarpList();
 		}
 
-
-		return tabComplete;
-	}
-
+        return null;
+    }
 }

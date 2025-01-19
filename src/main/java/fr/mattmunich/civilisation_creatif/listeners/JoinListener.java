@@ -5,13 +5,14 @@ import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class JoinListener implements Listener {
 
@@ -31,7 +32,7 @@ public class JoinListener implements Listener {
         try {
             data = new PlayerData(p.getUniqueId());
         } catch (Exception err) {
-            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Coudln't get PlayerData of player §c" + p.getName());
+            main.logError("Coudln't get PlayerData of player",err);
         }
 
         if(data != null) {
@@ -41,7 +42,7 @@ public class JoinListener implements Listener {
             try {
                 territoryData.setPlayerTerritoryTeam(p);
             } catch (Exception ex) {
-                Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Coulnd't add player to his territory team because of §r" + ex.getMessage() + Arrays.toString(ex.getStackTrace()).replace(",", ",\n"));
+                main.logError("Coulnd't add player to his territory team because of ",ex);
             }
 
             if(pGrade == null) {
@@ -97,7 +98,7 @@ public class JoinListener implements Listener {
             p.kickPlayer("§cAccès au serveur refusé !\n§eLe serveur est en développement.");
             return;
         }
-
+        Bukkit.getConsoleSender().sendMessage(main.makeItSafePrefix + "§a --> §e[§6§lJoin Logger§r§e] §ePlayer §c" + p.getName() + "§e with UUID §c" + p.getUniqueId() + "§e and IP-Adress §c" + p.getAddress() + "§e§l successfully connected to the server§r§e.");
         e.setJoinMessage("§7[§a+§7] §e" + p.getDisplayName());
 
         p.sendMessage("\n\n\n§e----------------------------------");
