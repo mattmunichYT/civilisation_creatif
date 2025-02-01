@@ -130,8 +130,20 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     p.openInventory(hasTerritory_Menu(p));
                 }
             }
-        }
 
+            if (args[0].equalsIgnoreCase("territory-menu") || args[0].equalsIgnoreCase("terrMenu")) {
+                if(territoryData.getTerritoryTeamOfPlayer(p) == null){
+                    p.sendMessage(main.prefix + "§4Vous n'avez pas de territoire !");
+                }
+                p.openInventory(territoryData.getTerrInv(p,territoryData.getTerritoryTeamOfPlayer(p)));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("liste")) {
+                p.openInventory(territoryData.getTerritoryListInventory(p,1));
+                return true;
+
+            }
+        }
 
         if(territoryData.getTerritoryTeamOfPlayer(p) == null) {
             if(args.length==1) {
@@ -277,13 +289,14 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender s, Command cmd, String l, String[] args) {
         List<String> tabComplete = Lists.newArrayList();
-
         if(args.length == 1) {
             tabComplete.add("gui");
             tabComplete.add("showClaimsMap");
             tabComplete.add("showClaims");
             tabComplete.add("claim");
             tabComplete.add("unclaim");
+            tabComplete.add("territory-menu");
+            tabComplete.add("list");
         }
 
         return tabComplete;

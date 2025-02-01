@@ -113,7 +113,7 @@ public class EventListener implements Listener {
             e.setCancelled(true);
             if(!(p.getInventory().getItemInMainHand().getItemMeta() instanceof BannerMeta)) {
                 p.sendMessage(main.prefix + "§4Cet objet n'est pas une bannière !");
-                Bukkit.getScheduler().runTask(main, () -> p.openInventory(getTerrInv(p, territoryData.getTerritoryTeamOfPlayer(p))));
+                Bukkit.getScheduler().runTask(main, () -> p.openInventory(territoryData.getTerrInv(p, territoryData.getTerritoryTeamOfPlayer(p))));
                 defTerritoryBanner.remove(p);
                 return;
             }
@@ -301,7 +301,7 @@ public class EventListener implements Listener {
 //                            bannerMeta.setItemName(territory.getColor() + territory.getName());
 //                            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName,"§2XP:§a" + xp,"§2Argent:§a" + money));
 //                        }
-                        Inventory terrListInv = getTerritoryListInventory(p,1);
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p, 1);
                         p.openInventory(terrListInv);
                         break;
                     case BARRIER:
@@ -326,11 +326,11 @@ public class EventListener implements Listener {
                     case PAPER:
                         //TERRITORY MENU
                         Team territory = territoryData.getTerritoryTeamOfPlayer(p);
-                        Inventory terrInv = getTerrInv(p, territory);
+                        Inventory terrInv = territoryData.getTerrInv(p, territory);
                         p.openInventory(terrInv);
                         break;
                     case SPYGLASS:
-                        Inventory terrListInv = getTerritoryListInventory(p,1);
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,1);
                         p.openInventory(terrListInv);
                         break;
                     case BARRIER:
@@ -653,15 +653,15 @@ public class EventListener implements Listener {
                     case BARRIER -> { invView.close(); break;}
                     case RED_STAINED_GLASS -> {
                         invView.close();
-                        int page = extractPageNumber(invView.getTitle());
-                        Inventory terrListInv = getTerritoryListInventory(p,page-1);
+                        int page = territoryData.extractTerrListPageNumber(invView.getTitle());
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,page-1);
                         p.openInventory(terrListInv);
                         break;
                     }
                     case LIME_STAINED_GLASS -> {
                         invView.close();
-                        int page = extractPageNumber(invView.getTitle());
-                        Inventory terrListInv = getTerritoryListInventory(p,page+1);
+                        int page = territoryData.extractTerrListPageNumber(invView.getTitle());
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,page+1);
                         p.openInventory(terrListInv);
                         break;
                     }
@@ -673,124 +673,7 @@ public class EventListener implements Listener {
         }
     }
 
-    private Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
-        Inventory terrListInv = Bukkit.createInventory(p,54,"§aListe des territoires §7- §ePage §6" + page);
-        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
-        for (int i = 0; i < 53; i++) {
-            terrListInv.setItem(i, none);
-        }
-        //Borders
-        terrListInv.setItem(0,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(1,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(7,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(8,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(9,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(17,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(36,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(44,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(45,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(46,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(52,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(53,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        //Borders
-        //Inner part
-        int[] ranges = {10, 16, 19, 25, 28, 34, 37, 43};
 
-        for (int i = 0; i < ranges.length; i += 2) {
-            for (int slot = ranges[i]; slot <= ranges[i + 1]; slot++) {
-                terrListInv.setItem(slot, null);
-            }
-        }
-        //Inner part
-        //Navigation bar
-        if(page!=1) {
-            terrListInv.setItem(47,ItemBuilder.getItem(Material.RED_STAINED_GLASS_PANE,"§c§l←",false,false,null,null,null));
-        }
-        terrListInv.setItem(49,ItemBuilder.getItem(Material.BARRIER,"§cFermer le menu",false,false,null,null,null));
-        if(page!=pageNum){
-            terrListInv.setItem(51,ItemBuilder.getItem(Material.LIME_STAINED_GLASS_PANE,"§a§l→",false,false,null,null,null));
-        }
-        //Navigation bar
-        return terrListInv;
-    }
-
-    private int extractPageNumber(String title) {
-        // Regular expression to match the integer at the end of the string
-        Pattern pattern = Pattern.compile("§6(\\d+)$");
-        Matcher matcher = pattern.matcher(title);
-
-        if (matcher.find()) {
-            // Extract and return the integer as a number
-            return Integer.parseInt(matcher.group(1));
-        } else {
-            // Default value if no number is found
-            return -1;
-        }
-    }
-
-    private Inventory getTerritoryListInventory(Player p, int page) {
-        int itemsPerPage = 28; // Number of items per page
-        List<String> territoriesList = territoryData.getTerritoriesList();
-        int totalPages = (int) Math.ceil((double) territoriesList.size() / itemsPerPage);
-
-        // Ensure the page number is within valid range
-        if (page < 1 || page > totalPages) {
-            page = 1; // Default to page 1 if out of bounds
-        }
-
-        // Create the inventory for the specific page
-        Inventory terrListInv_Layout = getTerrListInv_Layout(p, page, totalPages);
-
-        // Calculate start and end index for the items on this page
-        int startIndex = (page - 1) * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, territoriesList.size());
-
-        // Populate the inventory with items for the current page
-        for (int i = startIndex; i < endIndex; i++) {
-            String terr = territoriesList.get(i);
-            Team territory = territoryData.getTerritoryTeam(terr);
-            Player chief = Bukkit.getPlayer(UUID.fromString(territoryData.getTerritoryChiefUUID(terr)));
-            String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
-
-            ItemStack banner = territoryData.getTerritoryBanner(terr);
-            ItemMeta bannerMeta = banner.getItemMeta();
-            assert bannerMeta != null;
-            bannerMeta.setDisplayName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2XP:§a " + territoryData.getTerritoryXP(terr), "§2Argent:§a " + territoryData.getTerritoryMoney(terr)));
-            banner.setItemMeta(bannerMeta);
-
-            // Add the item to the next available slot
-            terrListInv_Layout.addItem(banner);
-        }
-
-        // Return the populated inventory for the specified page
-        return terrListInv_Layout;
-    }
-
-
-    private Inventory getTerrInv(Player p, Team territory) {
-        Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
-        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null);
-        for (int i = 0; i < 26; i++) {
-            terrInv.setItem(i, none);
-        }
-        String terr = territory.getName();
-        Player chief = Bukkit.getPlayer(UUID.fromString(territoryData.getTerritoryChiefUUID(terr)));
-        String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
-
-        ItemStack banner = territoryData.getTerritoryBanner(terr);
-        BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
-        assert bannerMeta != null;
-        bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
-        banner.setItemMeta(bannerMeta);
-        terrInv.setItem(4, banner);
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2XP:§a " + territoryData.getTerritoryXP(terr), "§2Argent:§a " + territoryData.getTerritoryMoney(terr)));
-        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
-        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
-        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
-        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
-        return terrInv;
-    }
 
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
