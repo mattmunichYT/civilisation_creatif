@@ -47,6 +47,7 @@ public class JoinListener implements Listener {
 
             if(pGrade == null) {
                 Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Impossible de trouver le grade de §c" + p.getName() + "§4 !");
+                data.setRank(Grades.VAGABOND);
             } else {
                 String gradePrefix = main.hex(pGrade.getPrefix());
                 int gradeID = pGrade.getId();
@@ -62,39 +63,28 @@ public class JoinListener implements Listener {
                 p.setCustomName(name);
 
 
-
-                //(gradeID 1 == membre !)
+                if(gradeID >= 0) {
+                    main.juge_builds.add(p);
+                }
+                if(gradeID >= 1) {
+                    main.vagabond.add(p);
+                }
                 if(gradeID >= 2) {
-                    main.testeur.add(p);
+                    main.membre.add(p);
                 }
                 if(gradeID >= 3) {
-                    main.vip.add(p);
+                    main.chef.add(p);
                 }
                 if(gradeID >= 4) {
-                    main.videaste.add(p);
-                }
-                if(gradeID >= 5) {
-                    main.guide.add(p);
-                }
-                if(gradeID >= 6) {
-                    main.animateur.add(p);
-                }
-                if(gradeID >= 7) {
-                    main.buildeur.add(p);
-                }
-                if(gradeID >= 8) {
-                    main.dev.add(p);
-                }
-                if(gradeID >= 9) {
                     main.modo.add(p);
                 }
-                if(gradeID == 10) {
+                if(gradeID == 5) {
                     main.admin.add(p);
                 }
             }
         }
 
-        if(!main.buildeur.contains(p)) {
+        if(!main.modo.contains(p)) {
             p.kickPlayer("§cAccès au serveur refusé !\n§eLe serveur est en développement.");
             return;
         }

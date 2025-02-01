@@ -17,7 +17,7 @@ public class BackupCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender s, Command cmd, String l, String[] args) {
         if(s instanceof Player p) {
-            if(!main.buildeur.contains(p)) {
+            if(!main.modo.contains(p)) {
                 p.sendMessage(main.noPermToExc);
                 return true;
             }

@@ -51,7 +51,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 
 		if(l.equalsIgnoreCase("setwarp")) {
 
-			if(!(main.buildeur.contains(p))) {
+			if(!(main.modo.contains(p))) {
 				p.sendMessage(main.noPermToExc);
 				return true;
 			}
@@ -110,7 +110,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 			return true;
 		}else if(l.equalsIgnoreCase("delwarp")) {
 
-			if(!(main.buildeur.contains(p))) {
+			if(!(main.modo.contains(p))) {
 				p.sendMessage(main.noPermToExc);
 				return true;
 			}

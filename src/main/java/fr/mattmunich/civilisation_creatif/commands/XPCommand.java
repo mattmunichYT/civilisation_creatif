@@ -25,7 +25,7 @@ public class XPCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0 || args.length > 3) {
             if(s instanceof Player p) {
-                if(!main.dev.contains(p)) {
+                if(!main.modo.contains(p)) {
                     s.sendMessage(main.wrongUsage + "/xp <player> [get]");
                     return true;
                 }
@@ -53,7 +53,7 @@ public class XPCommand implements CommandExecutor, TabCompleter {
 
         if(args[1].equalsIgnoreCase("reset")) {
             if(s instanceof Player p) {
-                if(!main.dev.contains(p)) {
+                if(!main.modo.contains(p)) {
                     p.sendMessage(main.noPermToExc);
                     return true;
                 }
@@ -74,7 +74,7 @@ public class XPCommand implements CommandExecutor, TabCompleter {
         }
 
         if(s instanceof Player p) {
-            if(!main.dev.contains(p)) {
+            if(!main.modo.contains(p)) {
                 p.sendMessage(main.noPermToExc);
                 return true;
             }

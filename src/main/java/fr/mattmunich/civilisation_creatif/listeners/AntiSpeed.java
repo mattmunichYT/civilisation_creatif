@@ -22,7 +22,7 @@ public class AntiSpeed implements Listener {
         Player p = e.getPlayer();
         double speed = e.getFrom().distance(Objects.requireNonNull(e.getTo()));
 
-        if (speed > 5.0 && !(p.getWalkSpeed() > 2) && !(p.getFlySpeed() > 1) && !p.isGliding() && !main.dev.contains(p)) {
+        if (speed > 5.0 && !(p.getWalkSpeed() > 2) && !(p.getFlySpeed() > 1) && !p.isGliding() && !main.modo.contains(p)) {
             p.sendMessage(main.prefix + "§eVous allez trop vite !");
             main.speeding.add(p);
             Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {

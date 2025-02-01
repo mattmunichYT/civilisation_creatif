@@ -65,10 +65,9 @@ public class RankCommand implements CommandExecutor, TabCompleter {
         }
 
         Grades grade = Grades.valueOf(gradeName.toUpperCase());
-        gradeName = grade.getName();
         String gradePrefix = main.hex(grade.getPrefix());
 
-        data.setRank(gradeName);
+        data.setRank(grade);
         s.sendMessage(main.prefix + "§2Le grade " + gradePrefix + "§2a été donné à §6" + args[0] + " §2!");
         if(Bukkit.getPlayer(args[0]) != null) {
             Player p = Bukkit.getPlayer(args[0]);

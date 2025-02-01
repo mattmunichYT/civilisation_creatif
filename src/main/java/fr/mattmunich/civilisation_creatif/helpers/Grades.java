@@ -7,25 +7,17 @@ public enum Grades {
     // Grades
     // rgb.birdflop.com - Presets :
 
-    ADMIN(10, "§l#fb0000§lA#fc2727§lD#fc4e4e§lM#fd7474§lI#fd9b9b§lN §6§l", "§6", " §8§l>>§6§l "),
+    ADMIN(5, "§l#fb0000§lA#fc2727§lD#fc4e4e§lM#fd7474§lI#fd9b9b§lN §6§l", "§6", " §8§l>>§6§l "),
 
-    MODO(9, "#fb8f00§lM#fca42b§lO#fcba55§lD#fdcf80§lO §6§l", "§6", " §8§l>>§e "),
+    MODO(4, "#fb8f00§lM#fca42b§lO#fcba55§lD#fdcf80§lO §6§l", "§6", " §8§l>>§e "),
 
-    DEV(8, "#696969§lD#878787§lE#A5A5A5§lV §7§l", "§8", " §8§l>>§7 "),
+    CHEF(3, "#00CF41§lC#00AD2B§lH#018B16§lE#016900§lF §2§l", "§a", " §l§8>>§a "),
 
-    BUILDEUR(7, "#fb00f8B#f812f9U#f524f9I#f236faL#f047fbD#ed59fcE#ea6bfcU#e77dfdR §5", "§6", " §8>>§2 "),
+    MEMBRE(2, "#00CF41M#00BB34E#00A627M#01921AB#017D0DR#016900E §2", "§a", " §8>>§a "),
 
-    ANIMATEUR(6, "#0d00fbA#2116fbN#352dfcI#4943fcM#5d5afcA#7170fcT#8586fdE#999dfdU#adb3fdR §b", "§b", " §8>>§b "),
+    VAGABOND(1, "#D4D4D4V#CBCBCBA#C3C3C3G#BABABAA#B2B2B2B#A9A9A9O#A1A1A1N#989898D §7", "§f", " §8>>§f"),
 
-    GUIDE(5, "#fbcb00G#fcd62bU#fce156I#fdec80D#fdf7abE §e", "§6", "§8§l>> §a "),
-
-    VIDEASTE(4, "#b304fbV#ba18fbI#c12cfcD#c840fcE#cf53fcA#d667fcS#dd7bfdT#e48ffdE §5", "§5", " §8>>§d "),
-
-    VIP(3, "#ffcf00V#ffe55fI#fffabeP §a", "§a", " §8>>§a "),
-
-    TESTEUR(2, "#fbbc00T#e0c70dE#c4d21aS#a9dd27T#8de733E#72f240U#56fd4dR §6", "§6", " §2>>§6 "),
-
-    MEMBRE(1, "#b1b1b1M#c1c1c1E#d0d0d0M#e0e0e0B#efefefR#ffffffE §7", "§1", " §l§8>>§3 ");
+    JUGE_BUILD(0, "#BEFF00J#C5F400U#CBE900G#D2DE00E #DFC800B#E5BD00U#ECB200I#F2A700L#F99C00D#FF9100S §e§l", "§f", " §8>>§e");
 
     // end("Grades")
 

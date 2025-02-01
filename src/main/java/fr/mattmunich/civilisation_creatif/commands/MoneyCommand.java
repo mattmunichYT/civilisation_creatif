@@ -23,7 +23,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender s, Command cmd, String l, String[] args) {
         if (args.length == 0 || args.length > 3) {
             if(s instanceof Player p) {
-                if(!main.dev.contains(p)) {
+                if(!main.modo.contains(p)) {
                     s.sendMessage(main.wrongUsage + "/money <player> [get]");
                     return true;
                 }
@@ -47,7 +47,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
 
         if(args[1].equalsIgnoreCase("reset")) {
             if(s instanceof Player p) {
-                if(!main.dev.contains(p)) {
+                if(!main.modo.contains(p)) {
                     p.sendMessage(main.noPermToExc);
                     return true;
                 }
@@ -67,7 +67,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if(s instanceof Player p) {
-            if(!main.dev.contains(p)) {
+            if(!main.modo.contains(p)) {
                 p.sendMessage(main.noPermToExc);
                 return true;
             }

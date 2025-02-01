@@ -104,8 +104,9 @@ public final class PlayerData {
 		}
 		return null;
 	}
-	public void setRank(String gradeName) {
-		config.set("player.rank", gradeName.toLowerCase());
+
+	public void setRank(Grades grade) {
+		config.set("player.rank", grade.getName().toLowerCase());
 		saveConfig();
 	}
 

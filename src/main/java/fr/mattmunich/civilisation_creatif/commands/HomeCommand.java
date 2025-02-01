@@ -50,7 +50,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 				return true;
 			}
 
-            if(!(main.buildeur.contains(player))) {
+            if(!(main.modo.contains(player))) {
 				player.sendMessage(main.noPermToExc);
 				return true;
 			}

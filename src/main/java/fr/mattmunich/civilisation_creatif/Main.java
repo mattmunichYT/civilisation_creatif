@@ -45,13 +45,10 @@ public final class Main extends JavaPlugin {
     //GRADES
     public ArrayList<Player> admin = new ArrayList<>();
     public ArrayList<Player> modo = new ArrayList<>();
-    public ArrayList<Player> dev = new ArrayList<>();
-    public ArrayList<Player> buildeur = new ArrayList<>();
-    public ArrayList<Player> animateur = new ArrayList<>();
-    public ArrayList<Player> guide = new ArrayList<>();
-    public ArrayList<Player> videaste = new ArrayList<>();
-    public ArrayList<Player> vip = new ArrayList<>();
-    public ArrayList<Player> testeur = new ArrayList<>();
+    public ArrayList<Player> chef = new ArrayList<>();
+    public ArrayList<Player> membre = new ArrayList<>();
+    public ArrayList<Player> vagabond = new ArrayList<>();
+    public ArrayList<Player> juge_builds = new ArrayList<>();
     //END OF GRADES
     //PUBLIC UTILITIES
     public ArrayList<Player> speeding = new ArrayList<>();
