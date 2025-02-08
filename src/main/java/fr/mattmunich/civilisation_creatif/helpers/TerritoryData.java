@@ -784,18 +784,22 @@ public class TerritoryData {
 
     public void setTerritoryXP(String territoryName, int xp){
         config.set("territories." + territoryName + ".xp", xp);
+        saveConfig();
     }
 
     public void addTerritoryXP(String territoryName, int xp){
         config.set("territories." + territoryName + ".xp", config.getInt("territories." + territoryName + ".xp") + xp);
+        saveConfig();
     }
 
     public void removeTerritoryXP(String territoryName, int xp){
         config.set("territories." + territoryName + ".xp", config.getInt("territories." + territoryName + ".xp") - xp);
+        saveConfig();
     }
 
     public void resetTerritoryXP(String territoryName){
         config.set("territories." + territoryName + ".xp", 0);
+        saveConfig();
     }
 
     public int getTerritoryMoney(String territoryName){
@@ -804,18 +808,22 @@ public class TerritoryData {
 
     public void setTerritoryMoney(String territoryName, int money){
         config.set("territories." + territoryName + ".money", money);
+        saveConfig();
     }
 
     public void addTerritoryMoney(String territoryName, int money){
         config.set("territories." + territoryName + ".money", config.getInt("territories." + territoryName + ".money") + money);
+        saveConfig();
     }
 
     public void removeTerritoryMoney(String territoryName, int money){
         config.set("territories." + territoryName + ".money", config.getInt("territories." + territoryName + ".money") - money);
+        saveConfig();
     }
 
     public void resetTerritoryMoney(String territoryName){
         config.set("territories." + territoryName + ".money", 0);
+        saveConfig();
     }
 
     public Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
