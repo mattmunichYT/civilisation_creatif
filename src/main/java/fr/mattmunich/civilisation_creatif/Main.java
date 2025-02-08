@@ -101,7 +101,7 @@ public final class Main extends JavaPlugin {
 
 
         pdata = new PlayerData(this, this);
-        backup = new Backup(this);
+        backup = new Backup(this,this);
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
         warp = new Warp(this);
@@ -191,7 +191,7 @@ public final class Main extends JavaPlugin {
         pdata = new PlayerData(this, this);
         territoryData = new TerritoryData(this, this);
         territoryData.initConfig();
-        backup = new Backup(this);
+        backup = new Backup(this,this);
         warp = new Warp(this);
         warp.initConfig();
         //END OF HELPERS INIT

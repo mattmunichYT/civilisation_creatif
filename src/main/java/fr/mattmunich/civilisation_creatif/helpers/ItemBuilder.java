@@ -37,4 +37,21 @@ public class ItemBuilder {
         return item;
 
     }
+
+    public static ItemStack getItem(Material material, String customName) {
+
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta itemM = item.getItemMeta();
+
+        if(customName != null) {
+            itemM.setDisplayName(customName);
+        } else {
+            itemM.setDisplayName("");
+        }
+
+
+        item.setItemMeta(itemM);
+        return item;
+
+    }
 }

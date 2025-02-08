@@ -1,5 +1,6 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
+import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -9,12 +10,16 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 
 public class Backup {
     private final Plugin plugin;
 
-    public Backup(Plugin plugin) {
+    private final Main main;
+
+    public Backup(Plugin plugin, Main main) {
         this.plugin = plugin;
+        this.main = main;
     }
 
     public void run() {
@@ -80,6 +85,23 @@ public class Backup {
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §4§lUne erreur s'est produite lors de la suppression des anciens backups ! Voir l'erreur ci-dessous.");
             e.printStackTrace();
+        }
+
+        //Plan next backup
+        Calendar cal = Calendar.getInstance();
+        long now = cal.getTimeInMillis();
+        if(cal.get(Calendar.HOUR_OF_DAY) >= 22)
+            cal.add(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 22);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long offset = cal.getTimeInMillis() - now;
+        long ticks = offset / 50L;
+        try {
+            Bukkit.getScheduler().runTaskTimer(plugin, this::run, ticks,1728000);
+        } catch (Exception e) {
+            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Coulnd't schedule backup : §r" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replace(",",",\n"));
         }
     }
 }

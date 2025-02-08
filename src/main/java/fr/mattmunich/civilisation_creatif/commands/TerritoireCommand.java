@@ -160,7 +160,8 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
         } else {
             if(args.length==1){
                 if(args[0].equalsIgnoreCase("claim") || args[0].equalsIgnoreCase("claimChunk")) {
-                    if(!Objects.equals(territoryData.getTerritoryChiefUUID(territoryData.getPlayerTerritory(p)), p.getUniqueId().toString())) {
+                    String territoryName = territoryData.getPlayerTerritory(p);
+                    if(!territoryData.isChief(p,territoryName) && !territoryData.isOfficer(p,territoryName)) {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4claim des chunk §cpour votre territoire !");
                         return true;
                     }
@@ -182,11 +183,12 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     Map<Integer,Integer> chunk = new HashMap<>();
                     chunk.put(x,z);
                     territoryData.claimChunk(p, territoryData.getPlayerTerritory(p), chunk);
-                    data.removeMoney(300);
+
                     return true;
                 }
                 if(args[0].equalsIgnoreCase("unclaim") || args[0].equalsIgnoreCase("unclaimChunk")) {
-                    if(!Objects.equals(territoryData.getTerritoryChiefUUID(territoryData.getPlayerTerritory(p)), p.getUniqueId().toString())) {
+                    String territoryName = territoryData.getPlayerTerritory(p);
+                    if(!territoryData.isChief(p,territoryName) && !territoryData.isOfficer(p,territoryName)) {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4unclaim des chunk §cpour votre territoire !");
                         return true;
                     }

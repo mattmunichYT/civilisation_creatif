@@ -486,7 +486,8 @@ public class EventListener implements Listener {
                         invView.close();
                         //DELETE TERRITORY
                        try {
-                           if(territoryData.getTerritoryChiefUUID(territoryData.getPlayerTerritory(p)).equals(p.getUniqueId().toString())) {
+                           String territoryName = territoryData.getPlayerTerritory(p);
+                           if(territoryData.isChief(p,territoryName)) {
                                Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
                                confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
                                confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
@@ -650,20 +651,34 @@ public class EventListener implements Listener {
                 e.setCancelled(true);
                 if(it==null) {return;}
                 switch (it.getType()) {
-                    case BARRIER -> { invView.close(); break;}
+                    case BARRIER -> {
+                        invView.close();
+                        break;
+                    }
                     case RED_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractTerrListPageNumber(invView.getTitle());
-                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,page-1);
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p, page - 1);
                         p.openInventory(terrListInv);
                         break;
                     }
                     case LIME_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractTerrListPageNumber(invView.getTitle());
-                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,page+1);
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p, page + 1);
                         p.openInventory(terrListInv);
                         break;
+                    }
+                    case WHITE_BANNER, BLACK_BANNER, RED_BANNER, BLUE_BANNER, LIGHT_BLUE_BANNER, BROWN_BANNER,
+                         CYAN_BANNER, GRAY_BANNER, GREEN_BANNER, LIGHT_GRAY_BANNER, LIME_BANNER, MAGENTA_BANNER,
+                         ORANGE_BANNER, PINK_BANNER, PURPLE_BANNER, YELLOW_BANNER -> {
+                        Team territory = territoryData.getTerritoryTeamFromItem(it);
+                        if (territory != null) {
+                            Bukkit.getScheduler().runTask(main, p::closeInventory);
+                            p.openInventory(territoryData.getTerrInv(p,territory));
+                        } else {
+                            p.sendMessage(main.prefix + "§4Une erreur s'est produite - territoire non trouvé !");
+                        }
                     }
                     default -> {
                         break;
@@ -717,7 +732,7 @@ public class EventListener implements Listener {
             Location loc = p.getLocation();
             Chunk chunk = loc.getChunk();
             World world = loc.getWorld();
-            int range = 20;
+            int range = 10;
 //            p.sendMessage("Scanning for chunks...");
             for (int chunkX = chunk.getX() - range; chunkX < chunk.getX() + range; chunkX++) {
                 for (int chunkZ = chunk.getZ() - range; chunkZ < chunk.getZ() + range; chunkZ++) {

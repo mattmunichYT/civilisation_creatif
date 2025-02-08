@@ -14,6 +14,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -29,6 +30,8 @@ public class TerritoryData {
         this.plugin = plugin;
         this.main = main;
     }
+
+    public int chunkPrice = 300;
 
     public final Plugin getPlugin() {
         return plugin;
@@ -81,6 +84,7 @@ public class TerritoryData {
 
             config.set("territories." + territoryName + ".chief.name", chief.getName());
             config.set("territories." + territoryName + ".chief.UUID", chief.getUniqueId().toString());
+            config.set("territories." + territoryName + ".officers", new ArrayList<String>());
             config.set("territories." + territoryName + ".created", System.currentTimeMillis());
             config.set("territories." + territoryName + ".color", territoryColor.toString());
             config.set("territories." + territoryName + ".xp", 0);
@@ -142,7 +146,7 @@ public class TerritoryData {
 
     public void leaveTerritory(Player sender) {
         Team sTeam = getTerritoryTeamOfPlayer(sender);
-        if(Objects.equals(getTerritoryChiefUUID(sTeam.getName()), sender.getUniqueId().toString())) {
+        if(isChief(sender,sTeam.getName())) {
             sender.sendMessage(main.prefix + "§cVous êtes le chef de ce territoire, §esi vous souhaitez le quitter, veuillez\n" +
                     "§4- §4§lSupprimer le territoire\n" +
                     "§r§eOU\n" +
@@ -188,6 +192,73 @@ public class TerritoryData {
 
     public String getTerritoryChiefUUID(String territoryName) {
         return Objects.requireNonNull(config.getString("territories." + territoryName + ".chief.UUID"));
+    }
+
+    public List<String> getTerritoryOfficers(String territoryName){
+        if(config.get("territories." + territoryName + ".officers") == null) {
+            return new ArrayList<String>();
+        } else {
+            return config.getStringList("territories." + territoryName + ".officers");
+        }
+    }
+
+    public void addOfficer(OfflinePlayer target, Player sender) {
+        if(!target.hasPlayedBefore()){
+            sender.sendMessage(main.prefix + "§4Le joueur ne s'est jamais connecté !");
+            return;
+        }
+        if(getPlayerTerritory(sender)==null){
+            sender.sendMessage(main.prefix + "§4Vous devez être dans un territoire pour faire cela !");
+            return;
+        }
+        if(!isChief(sender,getPlayerTerritory(sender))){
+            sender.sendMessage(main.prefix + "§4Vous devez être le chef de votre territoire pour faire cela !");
+            return;
+        }
+        if(!getPlayerTerritory(target).equalsIgnoreCase(getPlayerTerritory(sender))){
+            sender.sendMessage(main.prefix + "§4Vous devez être devez être dans le même territoire que la cible pour faire cela !");
+            return;
+        }
+        List<String> officers = getTerritoryOfficers(getPlayerTerritory(sender));
+        if(officers.contains(target.getUniqueId().toString())){
+            sender.sendMessage(main.prefix + "§4La cible est déjà un officier dans votre territoire !");
+            return;
+        }
+        officers.add(target.getUniqueId().toString());
+        config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
+        saveConfig();
+        sender.sendMessage(main.prefix + "§2Le joueur §a" + target.getName() + "§2 a été ajouté aux officiers de votre territoire !");
+        if(target.isOnline() && target.getPlayer() !=null){
+            target.getPlayer().sendMessage(main.prefix + "§2Vous êtes désormais officier dans le territoire §a" + getPlayerTerritory(sender) + "§2 !");
+        }
+    }
+
+    public void removeOfficer(OfflinePlayer target, String territoryName){
+        List<String> officers = getTerritoryOfficers(territoryName);
+        if(officers.contains(target.getUniqueId().toString())){
+            officers.remove(target.getUniqueId().toString());
+            config.set("territories." + territoryName + ".officers",officers);
+            saveConfig();
+        }
+    }
+
+    public boolean isInTerritory(OfflinePlayer player, String territoryName) {
+        return getPlayerTerritory(player).equals(territoryName);
+    }
+
+    public boolean isOfficer(OfflinePlayer player, String territoryName){
+        if(!isInTerritory(player,territoryName)) {
+            return false;
+        }
+        List<String> officers = getTerritoryOfficers(getPlayerTerritory(player));
+        return officers.contains(player.getUniqueId().toString());
+    }
+
+    public boolean isChief(OfflinePlayer player, String territoryName){
+        if(!isInTerritory(player,territoryName)) {
+            return false;
+        }
+        return getTerritoryChiefUUID(getPlayerTerritory(player)).equals(player.getUniqueId().toString());
     }
 
     public String getPlayerTerritory(OfflinePlayer player) {
@@ -247,6 +318,25 @@ public class TerritoryData {
         }
     }
 
+    public @Nullable Team getTerritoryTeamFromItem(ItemStack it) {
+        try {
+            ScoreboardManager scMan = Bukkit.getScoreboardManager();
+            if(scMan==null) {
+                return null;
+            }
+            Scoreboard sc = scMan.getMainScoreboard();
+            if(it.getItemMeta()==null) {
+                return null;
+            }
+            if(it.getItemMeta().getDisplayName().length()<=2) {
+                return null;
+            }
+            return sc.getTeam(it.getItemMeta().getDisplayName().substring(2));
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
     public Team getTerritoryTeamOfPlayer(Player p) {
         try {
             ScoreboardManager scMan = Bukkit.getScoreboardManager();
@@ -285,7 +375,7 @@ public class TerritoryData {
         try {
             Team territory = getTerritoryTeam(territoryName);
             ArrayList<String> membersUUID = new ArrayList<>();
-            for (String entry : territory.getEntries()){
+            for (String entry : territory.getEntries()) {
                 UUID entryUUID = Utility.getUUIDFromName(entry);
                 membersUUID.add(entryUUID.toString());
             }
@@ -293,10 +383,9 @@ public class TerritoryData {
             saveConfig();
             return true;
         } catch (Exception e) {
-            main.logError("Couldn't update territory members in config from team for " + territoryName + " from list",e);
+            main.logError("Couldn't update territory members in config from team for " + territoryName + " from list", e);
             return false;
         }
-
     }
 
     public List<String> getTerritoriesList() {
@@ -420,6 +509,8 @@ public class TerritoryData {
             config.set("territories." + territory.getName() + ".claims", terrClaims);
             config.set("claims", globalClaims);
             saveConfig();
+            PlayerData data = new PlayerData(sender.getUniqueId());
+            data.removeMoney(chunkPrice);
             sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]","") + " §apour §e300¢ §a!");
             return;
         } catch (Exception e) {
@@ -788,7 +879,7 @@ public class TerritoryData {
             ItemMeta bannerMeta = banner.getItemMeta();
             assert bannerMeta != null;
             bannerMeta.setDisplayName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName + "\n§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
             banner.setItemMeta(bannerMeta);
 
             // Add the item to the next available slot
@@ -813,14 +904,36 @@ public class TerritoryData {
         ItemStack banner = getTerritoryBanner(terr);
         BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
         assert bannerMeta != null;
-        bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
-        banner.setItemMeta(bannerMeta);
+        if (isChief(p,terr)) {
+            bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
+            banner.setItemMeta(bannerMeta);
+        } else {
+            bannerMeta.setItemName(territory.getColor() + territory.getName());
+            banner.setItemMeta(bannerMeta);
+        }
         terrInv.setItem(4, banner);
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-        terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
-        terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
-        terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName + "\n§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+        if (isOfficer(p,terr)) {
+            terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
+        }
+        if (isChief(p,terr)) {
+            terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
+            terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
+        }
         terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
         return terrInv;
+    }
+
+    //WORKERS
+    public void buyWorker(Player p, WorkerType type) {
+        if (getPlayerTerritory(p) == null) {
+            p.sendMessage(main.prefix  + "§4Vous devez être dans un territoire pour faire cela!");
+            return;
+        }
+        if (!isChief(p,getPlayerTerritory(p)) && !isOfficer(p,getPlayerTerritory(p))){
+            p.sendMessage(main.prefix  + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
+            return;
+        }
+
     }
 }
