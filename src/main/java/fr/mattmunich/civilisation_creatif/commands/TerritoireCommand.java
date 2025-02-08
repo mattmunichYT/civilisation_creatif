@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
+import fr.mattmunich.civilisation_creatif.helpers.WorkerType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class TerritoireCommand implements CommandExecutor, TabCompleter {
@@ -122,6 +125,42 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 }
                 return true;
             }
+
+            if (args[0].equalsIgnoreCase("makeOfficer")) {
+                if(args.length!=2) {
+                    p.sendMessage(main.wrongUsage + "/territoire makeOfficer <player>");
+                    return true;
+                }
+                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+                territoryData.addOfficer(target,p);
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("removeOfficer")) {
+                if(args.length!=2) {
+                    p.sendMessage(main.wrongUsage + "/territoire removeOfficer <player>");
+                    return true;
+                }
+                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+                territoryData.removeOfficer(target, p);
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("buyWorker")) {
+                if(args.length!=2) {
+                    p.sendMessage(main.wrongUsage + "/territoire buyWorker <WorkerType>");
+                    return true;
+                }
+                WorkerType type = null;
+                try {
+                    type = WorkerType.valueOf(args[1].toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    p.sendMessage(main.prefix + "§4Type d'employé invalide !");
+                    return true;
+                }
+
+                territoryData.buyWorker(p, type);
+                return true;
+            }
+
 
             if(args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
                 if(territoryData.getTerritoryTeamOfPlayer(p) == null) {
@@ -295,10 +334,21 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
             tabComplete.add("gui");
             tabComplete.add("showClaimsMap");
             tabComplete.add("showClaims");
-            tabComplete.add("claim");
-            tabComplete.add("unclaim");
-            tabComplete.add("territory-menu");
             tabComplete.add("list");
+            if(s instanceof Player && territoryData.getPlayerTerritory((Player)s) !=null){
+                tabComplete.add("territory-menu");
+            }
+            if(s instanceof Player && territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s))){
+                tabComplete.add("claim");
+                tabComplete.add("unclaim");
+            }
+            if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))){
+                tabComplete.add("makeOfficer");
+                tabComplete.add("removeOfficer");
+                tabComplete.add("buyWorker");
+                tabComplete.add("claim");
+                tabComplete.add("unclaim");
+            }
         }
 
         return tabComplete;

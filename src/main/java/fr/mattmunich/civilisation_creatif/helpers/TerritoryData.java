@@ -4,11 +4,15 @@ import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -233,13 +237,31 @@ public class TerritoryData {
         }
     }
 
-    public void removeOfficer(OfflinePlayer target, String territoryName){
-        List<String> officers = getTerritoryOfficers(territoryName);
-        if(officers.contains(target.getUniqueId().toString())){
-            officers.remove(target.getUniqueId().toString());
-            config.set("territories." + territoryName + ".officers",officers);
-            saveConfig();
+    public void removeOfficer(OfflinePlayer target, Player sender){
+        if(!target.hasPlayedBefore()){
+            sender.sendMessage(main.prefix + "§4Le joueur ne s'est jamais connecté !");
+            return;
         }
+        if(getPlayerTerritory(sender)==null){
+            sender.sendMessage(main.prefix + "§4Vous devez être dans un territoire pour faire cela !");
+            return;
+        }
+        if(!isChief(sender,getPlayerTerritory(sender))){
+            sender.sendMessage(main.prefix + "§4Vous devez être le chef de votre territoire pour faire cela !");
+            return;
+        }
+        if(!getPlayerTerritory(target).equalsIgnoreCase(getPlayerTerritory(sender))){
+            sender.sendMessage(main.prefix + "§4Vous devez être devez être dans le même territoire que la cible pour faire cela !");
+            return;
+        }
+        List<String> officers = getTerritoryOfficers(getPlayerTerritory(sender));
+        if(!officers.contains(target.getUniqueId().toString())){
+            sender.sendMessage(main.prefix + "§4La cible n'est pas un officier dans votre territoire !");
+            return;
+        }
+        officers.remove(target.getUniqueId().toString());
+        config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
+        saveConfig();
     }
 
     public boolean isInTerritory(OfflinePlayer player, String territoryName) {
@@ -872,14 +894,19 @@ public class TerritoryData {
         for (int i = startIndex; i < endIndex; i++) {
             String terr = territoriesList.get(i);
             Team territory = getTerritoryTeam(terr);
-            Player chief = Bukkit.getPlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
-            String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
+            String chiefName = null;
+            try {
+                OfflinePlayer chief = Bukkit.getOfflinePlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
+                chiefName = chief.getName();
+            } catch (NullPointerException e) {
+                chiefName = "§c§oNon trouvé";
+            }
 
             ItemStack banner = getTerritoryBanner(terr);
             ItemMeta bannerMeta = banner.getItemMeta();
             assert bannerMeta != null;
             bannerMeta.setDisplayName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName + "\n§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
             banner.setItemMeta(bannerMeta);
 
             // Add the item to the next available slot
@@ -912,8 +939,8 @@ public class TerritoryData {
             banner.setItemMeta(bannerMeta);
         }
         terrInv.setItem(4, banner);
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName + "\n§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-        if (isOfficer(p,terr)) {
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+        if (isOfficer(p,terr) || isChief(p,terr)) {
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
         }
         if (isChief(p,terr)) {
@@ -925,15 +952,102 @@ public class TerritoryData {
     }
 
     //WORKERS
+    public String getRandomWorkerName() {
+        List<String> names = Arrays.asList(
+                "Louise", "Ambre", "Alba", "Jade", "Emma",
+                "Rose", "Alice", "Romy", "Anna", "Lina",
+                "Gabriel", "Léo", "Raphaël", "Maël", "Louis",
+                "Noah", "Jules", "Arthur", "Adam", "Lucas"
+        );
+
+        Random random = new Random();
+        return names.get(random.nextInt(names.size()));
+    }
+
+    public List<String> getWorkerList() {
+        return config.getStringList("workerList");
+    }
+
+    public void setWorkerList(List<String> territories) {
+        config.set("workerList", territories);
+        saveConfig();
+    }
+
+    public void addWorkerToList(UUID workerUUID) {
+        List<String> territories = getTerritoriesList();
+        territories.add(workerUUID.toString());
+        setTerritoriesList(territories);
+        saveConfig();
+    }
+
+    public void removeWorkerFromList(UUID workerUUID) {
+        List<String> territories = getTerritoriesList();
+        try {
+            territories.remove(workerUUID.toString());
+        } catch (Exception e) {
+            main.logError("Couldn't remove worker " + workerUUID + " from workerList",e);
+        }
+        setTerritoriesList(territories);
+        saveConfig();
+    }
+
     public void buyWorker(Player p, WorkerType type) {
+        String territoryName = getPlayerTerritory(p);
         if (getPlayerTerritory(p) == null) {
-            p.sendMessage(main.prefix  + "§4Vous devez être dans un territoire pour faire cela!");
+            p.sendMessage(main.prefix + "§4Vous devez être dans un territoire pour faire cela!");
             return;
         }
-        if (!isChief(p,getPlayerTerritory(p)) && !isOfficer(p,getPlayerTerritory(p))){
-            p.sendMessage(main.prefix  + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
+        if (!isChief(p, getPlayerTerritory(p)) && !isOfficer(p, getPlayerTerritory(p))) {
+            p.sendMessage(main.prefix + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
             return;
         }
 
+        if (getTerritoryMoney(territoryName) < type.getPrice()) {
+            p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans la banque de votre territoire !");
+            return;
+        }
+
+        Villager villager = (Villager) Bukkit.getWorld(p.getWorld().getName()).spawnEntity(p.getLocation(), EntityType.VILLAGER);
+        UUID workerUUID = villager.getUniqueId();
+        String workerName = getRandomWorkerName();
+        villager.setProfession(type.getProfession());
+        villager.setCustomName(workerName);
+        villager.setCustomNameVisible(true);
+        ItemStack spawnEgg = new ItemStack(Material.VILLAGER_SPAWN_EGG);
+        SpawnEggMeta meta = (SpawnEggMeta) spawnEgg.getItemMeta();
+        assert meta != null;
+        meta.setSpawnedEntity(Objects.requireNonNull(villager.createSnapshot()));
+        villager.remove();
+        spawnEgg.setItemMeta(meta);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".bought", System.currentTimeMillis());
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysToLive", type.getLifespan());
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".isSpawned", false);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.toString().toLowerCase());
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".name", workerName);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".spawnEgg", spawnEgg);
+        addWorkerToList(workerUUID);
+        p.getInventory().addItem(spawnEgg);
+        removeTerritoryMoney(territoryName, type.getPrice());
+        p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + type.getPrice() + "¢§2 !");
+    }
+
+    public void spawnWorker(Player p, SpawnEggMeta spawnEggMeta, Location spawnLocation) {
+        try {
+            Villager villager = (Villager) spawnEggMeta.getSpawnedEntity().createEntity(spawnLocation);
+            UUID workerUUID = villager.getUniqueId();
+            if (!getWorkerList().contains(workerUUID)) {
+                return;
+            }
+            if(config.getBoolean("territories." + getPlayerTerritory(p) + ".villagers." + workerUUID + ".isSpawned")) {
+                villager.remove();
+                p.sendMessage(main.prefix + "L'employé existe déjà !");
+                return;
+            }
+            config.set("territories." + getPlayerTerritory(p) + ".villagers." + workerUUID + ".isSpawned", true);
+            p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
+        } catch (Exception e) {
+            p.sendMessage(main.prefix + "§4Une erreur s'est produite lors du spawn de cet employé !");
+            main.logError("An error encourred while spawning a worker",e);
+        }
     }
 }

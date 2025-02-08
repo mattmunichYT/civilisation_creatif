@@ -9,12 +9,10 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -25,16 +23,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EventListener implements Listener {
 
@@ -676,6 +672,7 @@ public class EventListener implements Listener {
                         if (territory != null) {
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
                             p.openInventory(territoryData.getTerrInv(p,territory));
+                            break;
                         } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite - territoire non trouvé !");
                         }
@@ -787,5 +784,18 @@ public class EventListener implements Listener {
             main.logError("Couldn't give reward to player for placing block",ex);
         }
 
+    }
+
+    @EventHandler
+    public void onSpawnVillager(PlayerInteractEvent e) {
+        Player p = e.getPlayer();
+        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getMaterial().equals(Material.VILLAGER_SPAWN_EGG)) {
+            e.setCancelled(true);
+            try {
+                SpawnEggMeta meta = (SpawnEggMeta) e.getItem().getItemMeta();
+                territoryData.spawnWorker(p,meta,e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation());
+                return;
+            } catch (ClassCastException ignored) {}
+        }
     }
 }
