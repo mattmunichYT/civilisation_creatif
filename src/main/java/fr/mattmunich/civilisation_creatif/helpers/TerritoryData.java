@@ -943,7 +943,7 @@ public class TerritoryData {
         ItemStack banner = getTerritoryBanner(terr);
         BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
         assert bannerMeta != null;
-        if (isChief(p,terr)) {
+        if (getPlayerTerritory(p) !=null && (isChief(p,terr))) {
             bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
             banner.setItemMeta(bannerMeta);
         } else {
@@ -952,10 +952,10 @@ public class TerritoryData {
         }
         terrInv.setItem(4, banner);
         terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-        if (isOfficer(p,terr) || isChief(p,terr)) {
+        if (getPlayerTerritory(p) !=null && (isOfficer(p,terr) || isChief(p,terr))) {
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
         }
-        if (isChief(p,terr)) {
+        if (getPlayerTerritory(p) !=null && (isChief(p,terr))) {
             terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
             terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
         }
