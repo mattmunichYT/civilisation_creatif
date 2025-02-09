@@ -182,7 +182,79 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 return true;
 
             }
+            if(args[0].equalsIgnoreCase("withdrawMoney")) {
+                String terr = territoryData.getPlayerTerritory(p);
+                if(!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
+                    p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4récupérer de l'argent §cde la banque de votre territoire !");
+                    return true;
+                }
+                if(args[1]==null) {
+                    p.sendMessage(main.wrongUsage + "/territoire withdrawMoney <moneyAmount>");
+                    return true;
+                }
+                int amount = 0;
+                try {
+                    amount = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    p.sendMessage(main.wrongUsage + "/territoire withdrawMoney <moneyAmount>");
+                    return true;
+                }
+                if(territoryData.getTerritoryMoney(terr) < amount) {
+                    p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans la banque de votre territoire !");
+                    p.sendMessage(main.prefix + "§cIl y a §e" + territoryData.getTerritoryMoney(terr) + main.moneySign + "§c dans la banque de votre territoire.");
+                    return true;
+                }
+                try {
+                    PlayerData playerData = new PlayerData(p.getUniqueId());
+                    territoryData.removeTerritoryMoney(terr,amount);
+                    playerData.addMoney(amount);
+                    p.sendMessage(main.prefix + "§a" + amount + main.moneySign + "§2 ont été transféré de la banque de votre territoire à votre compte !");
+                    return true;
+                } catch (Exception e) {
+                    p.sendMessage(main.prefix + "§4Une erreur s'est produite...");
+                    main.logError("Couldn't withdraw money from territory",e);
+                    return true;
+                }
+            }
+
+            if(args[0].equalsIgnoreCase("depositMoney")) {
+                String terr = territoryData.getPlayerTerritory(p);
+                if(!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
+                    p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4déposer de l'argent §cdans la banque de votre territoire !");
+                    return true;
+                }
+                if(args[1]==null) {
+                    p.sendMessage(main.wrongUsage + "/territoire depositMoney <moneyAmount>");
+                    return true;
+                }
+                int amount = 0;
+                try {
+                    amount = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    p.sendMessage(main.wrongUsage + "/territoire depositMoney <moneyAmount>");
+                    return true;
+                }
+                try {
+                    PlayerData playerData = new PlayerData(p.getUniqueId());
+                    if(playerData.Money() < amount) {
+                        p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans votre compte !");
+                        p.sendMessage(main.prefix + "§cIl y a §e" + playerData.Money() + main.moneySign + "§c dans dans votre compte.");
+                        return true;
+                    }
+
+                    territoryData.addTerritoryMoney(terr,amount);
+                    playerData.removeMoney(amount);
+                    p.sendMessage(main.prefix + "§a" + amount + main.moneySign + "§2 ont été transféré de votre compte à la banque de votre territoire !");
+                    return true;
+                } catch (Exception e) {
+                    p.sendMessage(main.prefix + "§4Une erreur s'est produite...");
+                    main.logError("Couldn't deposit money to territory",e);
+                    return true;
+                }
+            }
         }
+
+        //END OF ARGUMENTS!!!
 
         if(territoryData.getTerritoryTeamOfPlayer(p) == null) {
             if(args.length==1) {
@@ -338,16 +410,34 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
             if(s instanceof Player && territoryData.getPlayerTerritory((Player)s) !=null){
                 tabComplete.add("territory-menu");
             }
-            if(s instanceof Player && territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s))){
+            if(s instanceof Player && (territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s)) || territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s)))) {
                 tabComplete.add("claim");
                 tabComplete.add("unclaim");
+                tabComplete.add("depositMoney");
+                tabComplete.add("withdrawMoney");
             }
             if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))){
                 tabComplete.add("makeOfficer");
                 tabComplete.add("removeOfficer");
                 tabComplete.add("buyWorker");
-                tabComplete.add("claim");
-                tabComplete.add("unclaim");
+            }
+        }
+        if(args.length == 2) {
+            if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))) {
+                if (args[0].equalsIgnoreCase("buyWorker")) {
+                    for (WorkerType type : WorkerType.values()) {
+                        tabComplete.add(type.name().toLowerCase());
+                    }
+                }
+            }
+            if(s instanceof Player && (territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s)) || territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s)))) {
+                if (args[0].equalsIgnoreCase("depositMoney") || args[0].equalsIgnoreCase("withdrawMoney")) {
+                    tabComplete.add("10");
+                    tabComplete.add("100");
+                    tabComplete.add("1000");
+                    tabComplete.add("10000");
+                    tabComplete.add("100000");
+                }
             }
         }
 

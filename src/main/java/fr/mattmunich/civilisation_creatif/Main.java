@@ -57,6 +57,7 @@ public final class Main extends JavaPlugin {
     public String playerToExc = prefix + "§4Vous devez être un joueur pour éxecuter cette commande !";
     public String noPermToExc = prefix + "§4Vous n'avez pas la permission d'éxecuter cette commande !";
     public String wrongUsage = prefix + "§4Utilisation : §c";
+    public String moneySign = "¢";
     public String playerNotFound(String name) {return prefix + "§4Impossible de trouver le joueur §c" + name;}
     public void logError(String message,Exception error) {
         Bukkit.getConsoleSender().sendMessage(prefix + "§4" + hex(message) + " because of §eerror: \n§r" + error + Arrays.toString(error.getStackTrace()).replace(",", ",\n"));

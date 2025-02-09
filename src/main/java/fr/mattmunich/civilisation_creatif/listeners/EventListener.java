@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -670,8 +671,12 @@ public class EventListener implements Listener {
                          ORANGE_BANNER, PINK_BANNER, PURPLE_BANNER, YELLOW_BANNER -> {
                         Team territory = territoryData.getTerritoryTeamFromItem(it);
                         if (territory != null) {
+                            p.sendMessage(territory.getName());
+                            p.sendMessage(String.valueOf(territory.getColor()));
+                            p.sendMessage("\"" + territoryData.getTerritoryTeamFromItem(it) + "\"");
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
-                            p.openInventory(territoryData.getTerrInv(p,territory));
+                            Inventory terrInv = territoryData.getTerrInv(p,territory);
+                            Bukkit.getScheduler().runTask(main, () -> p.openInventory(terrInv));
                             break;
                         } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite - territoire non trouvé !");
@@ -760,7 +765,8 @@ public class EventListener implements Listener {
                         .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
                         .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
                         .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                        .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append("1").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append(main.moneySign).color(net.md_5.bungee.api.ChatColor.GREEN)
                         .append(" & ").color(net.md_5.bungee.api.ChatColor.YELLOW)
                         .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
                         .append("XP ").color(net.md_5.bungee.api.ChatColor.GREEN)
@@ -776,7 +782,8 @@ public class EventListener implements Listener {
                         .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
                         .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
                         .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                        .append("1¢").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append("1").color(net.md_5.bungee.api.ChatColor.GREEN)
+                        .append(main.moneySign).color(net.md_5.bungee.api.ChatColor.GREEN)
                         .build();
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
             }
@@ -793,9 +800,33 @@ public class EventListener implements Listener {
             e.setCancelled(true);
             try {
                 SpawnEggMeta meta = (SpawnEggMeta) e.getItem().getItemMeta();
-                territoryData.spawnWorker(p,meta,e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation());
+                territoryData.spawnWorker(p,meta,e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation(), e.getItem());
                 return;
             } catch (ClassCastException ignored) {}
+        }
+    }
+
+    @EventHandler
+    public void onVillagerDeath(EntityDeathEvent e) {
+        if(e.getEntity() instanceof Villager villager) {
+            UUID workerUUID = null;
+            for (String tag : villager.getScoreboardTags()) {
+                if (tag.contains("workerUUID=")) {
+                    workerUUID = UUID.fromString(tag.replace("workerUUID=",""));
+                }
+            }
+            if(workerUUID == null || !territoryData.getWorkerList().contains(workerUUID.toString())) {
+                return;
+            }
+            String workerType = null;
+            for (String tag : villager.getScoreboardTags()) {
+                if (tag.contains("workerType=")) {
+                    workerType = tag.replace("workerType=","");
+                }
+            }
+            String territoryName = territoryData.getWorkerTerritory(workerUUID);
+            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".isSpawned", false);
+            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + workerType + " a été tué !");
         }
     }
 }
