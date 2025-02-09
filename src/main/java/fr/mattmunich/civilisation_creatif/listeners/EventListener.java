@@ -671,9 +671,6 @@ public class EventListener implements Listener {
                          ORANGE_BANNER, PINK_BANNER, PURPLE_BANNER, YELLOW_BANNER -> {
                         Team territory = territoryData.getTerritoryTeamFromItem(it);
                         if (territory != null) {
-                            p.sendMessage(territory.getName());
-                            p.sendMessage(String.valueOf(territory.getColor()));
-                            p.sendMessage("\"" + territoryData.getTerritoryTeamFromItem(it) + "\"");
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
                             Inventory terrInv = territoryData.getTerrInv(p,territory);
                             Bukkit.getScheduler().runTask(main, () -> p.openInventory(terrInv));
