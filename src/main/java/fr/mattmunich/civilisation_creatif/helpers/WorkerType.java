@@ -10,9 +10,9 @@ public enum WorkerType {//                                                      
     PILOTE_TRAIN(3500,3000,-1,Material.RAIL,ChatColor.GREEN, Villager.Profession.CARTOGRAPHER),           //TRAIN
     NAVIGATEUR(3500,3000,-1,Material.OAK_BOAT,ChatColor.GREEN, Villager.Profession.CARTOGRAPHER),         //PORT
     //BONUS JOUEUR
-    INGENIEUR(3000,3000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //VOYAGES PRIX REDUITS
-    JARDINIER(1200,1000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
-    BUCHERON(1300,500,45,Material.SPRUCE_LOG,ChatColor.GOLD, Villager.Profession.LIBRARIAN),           //+ARGENT QUAND BLOCK BOIS PLACE
+    INGENIEUR(500,3000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //VOYAGES PRIX REDUITS
+    JARDINIER(500,1000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
+    BUCHERON(500,1000,45,Material.SPRUCE_LOG,ChatColor.GOLD, Villager.Profession.LIBRARIAN),           //+ARGENT QUAND BLOCK BOIS PLACE
     //ALIMENTATION VILLAGEOIS => + BIEN-ÊTRE => + ARGENT
     BOULANGER(1000,500,90,Material.BREAD,ChatColor.GOLD, Villager.Profession.FARMER),
     BOUCHER(1700,1000,90,Material.SMOKER,ChatColor.GOLD, Villager.Profession.BUTCHER),

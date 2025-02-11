@@ -432,6 +432,7 @@ public class EventListener implements Listener {
                     case END_CRYSTAL:
                         //INVITE PLAYER
                         invView.close();
+                        p.sendTitle("§2§o🚀 Chargement du menu...","",20,500,20);
                         Inventory inviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
 
                         inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
@@ -445,6 +446,7 @@ public class EventListener implements Listener {
 
                             inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
                         }
+                        p.sendTitle("","",1,1,1);
                         p.openInventory(inviteInv);
                         break;
                     case CYAN_STAINED_GLASS:
@@ -821,9 +823,11 @@ public class EventListener implements Listener {
                     workerType = tag.replace("workerType=","");
                 }
             }
-            String territoryName = territoryData.getWorkerTerritory(workerUUID);
-            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".isSpawned", false);
-            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + workerType + " a été tué !");
+            String territoryName = territoryData.getWorkerTerritory(villager);
+            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
+            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
+            territoryData.saveConfig();
+            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " a été tué !");
         }
     }
 }

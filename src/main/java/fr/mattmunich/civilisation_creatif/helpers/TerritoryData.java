@@ -272,8 +272,12 @@ public class TerritoryData {
         return getPlayerTerritory(player).equals(territoryName);
     }
 
+    public boolean hasTerritory(OfflinePlayer player) {
+        return getPlayerTerritory(player) !=null;
+    }
+
     public boolean isOfficer(OfflinePlayer player, String territoryName){
-        if(!isInTerritory(player,territoryName)) {
+        if(!hasTerritory(player) || !isInTerritory(player,territoryName)) {
             return false;
         }
         List<String> officers = getTerritoryOfficers(getPlayerTerritory(player));
@@ -281,7 +285,7 @@ public class TerritoryData {
     }
 
     public boolean isChief(OfflinePlayer player, String territoryName){
-        if(!isInTerritory(player,territoryName)) {
+        if(!hasTerritory(player) || !isInTerritory(player,territoryName)) {
             return false;
         }
         return getTerritoryChiefUUID(getPlayerTerritory(player)).equals(player.getUniqueId().toString());
@@ -602,14 +606,10 @@ public class TerritoryData {
             }
             try {
                 for(String key : config.getConfigurationSection("territories").getKeys(false)) {
-//                    Bukkit.getConsoleSender().sendMessage("[DEBUG] Checking territory " + key);
                     List<Map<?, ?>> territoryClaims = getTerritoryChunks(key);
-//                    Bukkit.getConsoleSender().sendMessage("[DEBUG] Chunks of territory are " + territoryClaims);
                     try {
                         for (Map<?, ?> territoryClaim : territoryClaims) {
-//                            Bukkit.getConsoleSender().sendMessage("[DEBUG] Is territoryClaim : " + territoryClaim + " same as asked :" + chunk);
                             if(territoryClaim.equals(chunk)){
-//                                Bukkit.getConsoleSender().sendMessage("[DEBUG] Found corresponding chunk ; asked : " +chunk + " ; found : " + territoryClaim);
                                 return key;
                             }
                         }
@@ -943,7 +943,7 @@ public class TerritoryData {
         ItemStack banner = getTerritoryBanner(terr);
         BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
         assert bannerMeta != null;
-        if (getPlayerTerritory(p) !=null && (isChief(p,terr))) {
+        if (hasTerritory(p) && (isChief(p,terr))) {
             bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
             banner.setItemMeta(bannerMeta);
         } else {
@@ -952,10 +952,10 @@ public class TerritoryData {
         }
         terrInv.setItem(4, banner);
         terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-        if (getPlayerTerritory(p) !=null && (isOfficer(p,terr) || isChief(p,terr))) {
+        if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
         }
-        if (getPlayerTerritory(p) !=null && (isChief(p,terr))) {
+        if (hasTerritory(p) && (isChief(p,terr))) {
             terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
             terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
         }
@@ -964,17 +964,6 @@ public class TerritoryData {
     }
 
     //WORKERS
-    public String getRandomWorkerName() {
-        List<String> names = Arrays.asList(
-                "Louise", "Ambre", "Alba", "Jade", "Emma",
-                "Rose", "Alice", "Romy", "Anna", "Lina",
-                "Gabriel", "Léo", "Raphaël", "Maël", "Louis",
-                "Noah", "Jules", "Arthur", "Adam", "Lucas"
-        );
-
-        Random random = new Random();
-        return names.get(random.nextInt(names.size()));
-    }
 
     public List<String> getWorkerList() {
         return config.getStringList("workerList");
@@ -1015,7 +1004,7 @@ public class TerritoryData {
     public void addWorkerToTerritoryList(UUID workerUUID, String territoryName) {
         List<String> workers = getTerritoryWorkerList(territoryName);
         workers.add(workerUUID.toString());
-        setWorkerList(workers);
+        setTerritoryWorkerList(workers,territoryName);
         saveConfig();
     }
 
@@ -1026,8 +1015,24 @@ public class TerritoryData {
         } catch (Exception e) {
             main.logError("Couldn't remove worker " + workerUUID + " from Territory workerList",e);
         }
-        setWorkerList(workers);
+        setTerritoryWorkerList(workers,territoryName);
         saveConfig();
+    }
+
+    public String formatType(String typeName) {
+        String[] words = typeName.toLowerCase().split("_");
+        StringBuilder formattedName = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                // Capitalize the first letter and add it to the result
+                formattedName.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return formattedName.toString().trim();
     }
 
     public void buyWorker(Player p, WorkerType type) {
@@ -1050,10 +1055,15 @@ public class TerritoryData {
         UUID workerUUID = UUID.randomUUID();
         villager.addScoreboardTag("workerUUID=" + workerUUID);
         villager.addScoreboardTag("workerType=" + type.name().toLowerCase());
-        String workerName = getRandomWorkerName();
+        villager.addScoreboardTag("workerTerritory=" + getPlayerTerritory(p));
+        String workerName = formatType(type.name());
         villager.setProfession(type.getProfession());
         villager.setCustomName(workerName);
         villager.setCustomNameVisible(true);
+        villager.setVillagerType(Villager.Type.PLAINS);
+        if(type.getLifespan()==-1){
+            villager.setInvulnerable(true);
+        }
         ItemStack spawnEgg = new ItemStack(Material.VILLAGER_SPAWN_EGG);
         SpawnEggMeta meta = (SpawnEggMeta) spawnEgg.getItemMeta();
         assert meta != null;
@@ -1063,10 +1073,13 @@ public class TerritoryData {
         spawnEgg.setItemMeta(meta);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".bought", System.currentTimeMillis());
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysToLive", type.getLifespan());
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".timeLived", 0);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".isSpawned", false);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysLived", 0);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", false);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.toString().toLowerCase());
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".name", workerName);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".tier", 0);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".spawnEgg", spawnEgg);
         addWorkerToList(workerUUID);
         addWorkerToTerritoryList(workerUUID,territoryName);
@@ -1077,6 +1090,7 @@ public class TerritoryData {
 
     public void spawnWorker(Player p, SpawnEggMeta spawnEggMeta, Location spawnLocation, ItemStack it) {
         try {
+            String territoryName = getPlayerTerritory(p);
             if (!spawnLocation.getBlock().getType().equals(Material.AIR)){
                 spawnLocation.setY(spawnLocation.getY()+1);
             }
@@ -1093,13 +1107,18 @@ public class TerritoryData {
             if(workerUUID == null || !getWorkerList().contains(workerUUID.toString())) {
                 return;
             }
-            if(config.getBoolean("territories." + getPlayerTerritory(p) + ".villagers." + workerUUID + ".isSpawned")) {
+            if(config.getBoolean("territories." + territoryName + ".villagers." + workerUUID + ".alive")) {
                 villager.remove();
                 p.sendMessage(main.prefix + "§4L'employé existe déjà !");
                 return;
             }
-            config.set("territories." + getPlayerTerritory(p) + ".villagers." + workerUUID + ".isSpawned", true);
-            Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),5);
+
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
+            saveConfig();
+            Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),100);
+            p.playSound(p,Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
             p.getInventory().remove(it);
             p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
         } catch (Exception e) {
@@ -1108,31 +1127,91 @@ public class TerritoryData {
         }
     }
 
-    public String getWorkerTerritory(UUID workerUUID) {
+    public String getWorkerTerritory(Villager villager) {
+        String workerTerritory = null;
+        for (String tag : villager.getScoreboardTags()) {
+            if (tag.contains("workerTerritory=")) {
+                workerTerritory = tag.replace("workerTerritory=","");
+            }
+        }
+        return workerTerritory;
+    }
+
+    public void runWorkerCheckup(){
+        for (String workerUUID : getWorkerList()) {
+            String workerTerritory = getWorkerTerritory(workerUUID);
+            String pathToWorker = "territories." + workerTerritory + ".villagers." + workerUUID;
+            boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
+            WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
+            if(!workerAlive){
+                continue;
+            }
+            if(!(Bukkit.getEntity(UUID.fromString(Objects.requireNonNull(config.getString(pathToWorker + ".villagerUUID")))) instanceof Villager worker)){
+                continue;
+            }
+            int daysToLive = config.getInt(pathToWorker + ".daysToLive");
+            if (daysToLive!=-1){
+                daysToLive=daysToLive-1;
+                config.set(pathToWorker + ".daysToLive",daysToLive);
+            }
+            int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
+            config.set(pathToWorker + ".daysLived",daysLived);
+            if(Math.floor((double) daysLived /30)== (double) daysLived /30) {
+                addTerritoryMoney(workerTerritory,workerType.getIncome());
+            }
+            if(daysToLive == 0){
+                worker.remove();
+                removeWorkerFromTerritoryList(UUID.fromString(workerUUID),workerTerritory);
+                removeWorkerFromList(UUID.fromString(workerUUID));
+                config.set(pathToWorker,null);
+            }
+            saveConfig();
+        }
+        programNextWorkerCheckup();
+    }
+
+    public void programNextWorkerCheckup(){
+        Calendar cal = Calendar.getInstance();
+        long now = cal.getTimeInMillis();
+        cal.add(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long offset = cal.getTimeInMillis() - now;
+        long ticks = offset / 50L;
         try {
-            if(!getWorkerList().contains(workerUUID.toString())) {
+            Bukkit.getScheduler().runTaskLater(main, this::runWorkerCheckup, ticks);
+        } catch (Exception e) {
+            main.logError("§4Coulnd't schedule next WorkerCheckup",e);
+        }
+    }
+
+    public String getWorkerTerritory(String workerUUID) {
+        try {
+            if(!getWorkerList().contains(workerUUID)) {
                 return null;
             }
             try {
-                for(String key : Objects.requireNonNull(config.getConfigurationSection("territories")).getKeys(false)) {
-                    List<String> territoryClaims = getTerritoryWorkerList(key);
+                for(String key : config.getConfigurationSection("territories").getKeys(false)) {
+                    List<String> territoryWorkerList = getTerritoryWorkerList(key);
                     try {
-                        for (String workerUUIDTag: territoryClaims) {
-                            if(workerUUIDTag.equals(workerUUID.toString())){
+                        for (String worker : territoryWorkerList) {
+                            if(worker.equals(workerUUID)){
                                 return key;
                             }
                         }
                     } catch (Exception e) {
-                        main.logError("Couldn't check worker owner - 3",e);
+                        main.logError("Couldn't check worker territory",e);
                     }
                 }
                 return null;
             } catch (NullPointerException e) {
-                main.logError("Couldn't check worker owner - 2",e);
+                main.logError("Couldn't check worker territory",e);
                 return null;
             }
         } catch (Exception e) {
-            main.logError("Couldn't check worker owner - 1",e);
+            main.logError("Couldn't check worker territory",e);
             return null;
 
         }

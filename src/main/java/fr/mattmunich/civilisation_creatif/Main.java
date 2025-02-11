@@ -1,16 +1,13 @@
 package fr.mattmunich.civilisation_creatif;
 
 import fr.mattmunich.civilisation_creatif.commands.*;
-import fr.mattmunich.civilisation_creatif.helpers.Backup;
-import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
-import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
-import fr.mattmunich.civilisation_creatif.helpers.Warp;
+import fr.mattmunich.civilisation_creatif.helpers.*;
 import fr.mattmunich.civilisation_creatif.listeners.AntiSpeed;
 import fr.mattmunich.civilisation_creatif.listeners.EventListener;
 import fr.mattmunich.civilisation_creatif.listeners.JoinListener;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.*;
@@ -164,7 +161,24 @@ public final class Main extends JavaPlugin {
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(prefix + "§4Coulnd't schedule backup : §r" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replace(",",",\n"));
         }
-        
+
+        territoryData.programNextWorkerCheckup();
+        try {
+            Bukkit.getWorld("spawn").loadChunk(0,0);
+        } catch (NullPointerException e) {
+            try {
+                WorldCreator wc = new WorldCreator("spawn");
+
+                wc.type(WorldType.FLAT);
+                wc.generator(new EmptyChunkGenerator());
+                wc.keepSpawnInMemory(true);
+
+                wc.createWorld();
+                Bukkit.createWorld(wc);
+            } catch (Exception ex) {
+                logError("Couldn't create or load spawn world",e);
+            }
+        }
     }
 
     private static String getWorldname(Player all) {
@@ -178,6 +192,9 @@ public final class Main extends JavaPlugin {
 
         } else if(worldname.equalsIgnoreCase("world_the_end")) {
             worldname = "§2Civilisation §e- §5End";
+
+        } else if(worldname.equalsIgnoreCase("spawn")) {
+            worldname = "§2Civilisation §e- §6Spawn";
 
         } else {
             worldname = all.getLocation().getWorld().getName();
@@ -207,5 +224,4 @@ public final class Main extends JavaPlugin {
         super.onDisable();
     }
 
-    //OTHER
 }

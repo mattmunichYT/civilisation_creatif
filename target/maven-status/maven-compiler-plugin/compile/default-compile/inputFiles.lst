@@ -10,6 +10,7 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/WarpCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/XPCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Backup.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/EmptyChunkGenerator.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Grades.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/ItemBuilder.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/PlayerData.java

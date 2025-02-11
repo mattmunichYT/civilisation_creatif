@@ -415,21 +415,14 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 tabComplete.add("unclaim");
                 tabComplete.add("depositMoney");
                 tabComplete.add("withdrawMoney");
+                tabComplete.add("buyWorker");
             }
             if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))){
                 tabComplete.add("makeOfficer");
                 tabComplete.add("removeOfficer");
-                tabComplete.add("buyWorker");
             }
         }
         if(args.length == 2) {
-            if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))) {
-                if (args[0].equalsIgnoreCase("buyWorker")) {
-                    for (WorkerType type : WorkerType.values()) {
-                        tabComplete.add(type.name().toLowerCase());
-                    }
-                }
-            }
             if(s instanceof Player && (territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s)) || territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s)))) {
                 if (args[0].equalsIgnoreCase("depositMoney") || args[0].equalsIgnoreCase("withdrawMoney")) {
                     tabComplete.add("10");
@@ -437,6 +430,11 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     tabComplete.add("1000");
                     tabComplete.add("10000");
                     tabComplete.add("100000");
+                }
+                if (args[0].equalsIgnoreCase("buyWorker")) {
+                    for (WorkerType type : WorkerType.values()) {
+                        tabComplete.add(type.name().toLowerCase());
+                    }
                 }
             }
         }
