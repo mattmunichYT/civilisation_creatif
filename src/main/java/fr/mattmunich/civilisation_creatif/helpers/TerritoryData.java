@@ -1153,7 +1153,7 @@ public class TerritoryData {
                 return;
             }
             villager.setHealth(20);
-            villager = (Villager) villager.createSnapshot().createEntity(spawnLocation);
+//            villager = (Villager) villager.createSnapshot().createEntity(spawnLocation); not needed
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());

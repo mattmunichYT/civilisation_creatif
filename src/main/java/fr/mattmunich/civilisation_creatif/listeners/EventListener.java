@@ -28,6 +28,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
@@ -47,6 +49,10 @@ public class EventListener implements Listener {
         this.main = main;
         this.territoryData = territoryData;
     }
+
+    private final Map<UUID, Integer> moneyGained = new HashMap<>();
+    private final Map<UUID, Integer> xpGained = new HashMap<>();
+    private final Map<UUID, BukkitTask> resetTasks = new HashMap<>();
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
@@ -773,42 +779,61 @@ public class EventListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
-        try {
-            PlayerData playerData = new PlayerData(p.getUniqueId());
-            playerData.addMoney(1);
-            if(territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())) !=null && territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p))) {
-                territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), 1);
-                BaseComponent baseComponent = new ComponentBuilder()
-                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
-                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                        .append("1").color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .append(main.moneySign).color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .append(" & ").color(net.md_5.bungee.api.ChatColor.YELLOW)
-                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("XP ").color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .append("Territoire").color(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE)
-                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                        .append("1 XP").color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .build();
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
-            } else {
-                BaseComponent baseComponent = new ComponentBuilder()
-                        .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
-                        .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
-                        .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
-                        .append("1").color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .append(main.moneySign).color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .build();
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
-            }
-        } catch (Exception ex) {
-            main.logError("Couldn't give reward to player for placing block",ex);
-        }
+        UUID playerId = p.getUniqueId();
 
+        try {
+            PlayerData playerData = new PlayerData(playerId);
+            playerData.addMoney(1);
+
+            boolean isInOwnTerritory = territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())) != null &&
+                    territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p));
+
+            // Update accumulated values
+            moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + 1);
+            if (isInOwnTerritory) {
+                xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + 1);
+                territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), 1);
+            }
+
+            // Build and send the action bar message
+            BaseComponent baseComponent = new ComponentBuilder()
+                    .append("[").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append("Argent").color(net.md_5.bungee.api.ChatColor.DARK_GREEN)
+                    .append("] ").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append("+").color(net.md_5.bungee.api.ChatColor.WHITE)
+                    .append(String.valueOf(moneyGained.get(playerId))).color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .append(main.moneySign).color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .append(isInOwnTerritory ? " & " : "").color(net.md_5.bungee.api.ChatColor.YELLOW)
+                    .append(isInOwnTerritory ? "[" : "").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append(isInOwnTerritory ? "XP " : "").color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .append(isInOwnTerritory ? "Territoire" : "").color(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE)
+                    .append(isInOwnTerritory ? "] " : "").color(net.md_5.bungee.api.ChatColor.GRAY)
+                    .append(isInOwnTerritory ? "+" : "").color(net.md_5.bungee.api.ChatColor.WHITE)
+                    .append(isInOwnTerritory ? xpGained.get(playerId) + " XP" : "").color(net.md_5.bungee.api.ChatColor.GREEN)
+                    .build();
+
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+
+            // Cancel the old reset task if it exists
+            if (resetTasks.containsKey(playerId)) {
+                resetTasks.get(playerId).cancel();
+            }
+
+            // Schedule a new reset task after 5 seconds of inactivity
+            BukkitTask resetTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    moneyGained.remove(playerId);
+                    xpGained.remove(playerId);
+                    resetTasks.remove(playerId);
+                }
+            }.runTaskLater(main, 100L); // 100 ticks = 5 seconds
+
+            resetTasks.put(playerId, resetTask);
+
+        } catch (Exception ex) {
+            main.logError("Couldn't give reward to player for placing block", ex);
+        }
     }
 
     @EventHandler
