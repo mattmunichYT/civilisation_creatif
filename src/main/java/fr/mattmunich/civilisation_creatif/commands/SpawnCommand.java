@@ -34,12 +34,15 @@ public class SpawnCommand implements CommandExecutor, TabCompleter {
                 if(args[0].equalsIgnoreCase("overworld")) {
                     p.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§aOverworld§2 !");
+                    return true;
                 } else if(args[0].equalsIgnoreCase("nether")) {
                     p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_nether")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 du §cNether§2 !");
+                    return true;
                 } else if(args[0].equalsIgnoreCase("end")) {
                     p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_the_end")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§5End§2 !");
+                    return true;
                 }
                 World world = Bukkit.getWorld(args[0]);
                 if(world==null){
