@@ -1047,11 +1047,7 @@ public class TerritoryData {
             chooseTierInv.setItem(slot,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
         }
 
-        int[] slots = {10,11,12,14,15,16};
-        for (int slot : slots){
-            chooseTierInv.setItem(slot,null);
-        }
-        for (int tier = 1; tier <= 5; tier++) {
+        for (int tier = 0; tier <= 5; tier++) {
             int price = type.getPrice();
             int income = type.getIncome();
             ChatColor tierColor= ChatColor.DARK_GRAY;
@@ -1171,7 +1167,8 @@ public class TerritoryData {
         addWorkerToTerritoryList(workerUUID,territoryName);
         p.getInventory().addItem(spawnEgg);
         removeTerritoryMoney(territoryName, price);
-        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + "§2de" + tierColor + (tier>=3 ? "§lTier" : "tier") + tier + "§2 !");
+        p.playSound(p.getLocation(),type.getSound(),SoundCategory.NEUTRAL,1,type.getSoundPitch());
+        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + " §2de " + tierColor + (tier>=3 ? "§lTier" : "tier") + tier + "§2 !");
         p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + type.getPrice() + main.moneySign + "§2 !");
     }
 
@@ -1204,34 +1201,40 @@ public class TerritoryData {
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
-            Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),100,2,2,2);
+
             switch (tier){
                 case 0:
-                    p.playSound(p,Sound.ENTITY_VILLAGER_YES,SoundCategory.NEUTRAL,1,1);
+                    p.getWorld().playSound(p.getLocation(),Sound.ENTITY_VILLAGER_YES,SoundCategory.NEUTRAL,1,1);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),10,2,2,2);
                     villager.setVillagerLevel(1);
                     break;
                 case 1:
-                    p.playSound(p,Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.SCRAPE,villager.getLocation(),100,1,1,1,1);
+                    p.getWorld().playSound(p.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
                     villager.setVillagerLevel(2);
                     break;
                 case 2:
-                    p.playSound(p,Sound.BLOCK_BEACON_ACTIVATE,SoundCategory.NEUTRAL,1,1);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.FIREWORK,villager.getLocation(),100,1,1,1,0.1);
+                    p.getWorld().playSound(p.getLocation(),Sound.BLOCK_BEACON_ACTIVATE,SoundCategory.NEUTRAL,1,1);
                     villager.setVillagerLevel(3);
                     break;
                 case 3:
-                    p.playSound(p,Sound.BLOCK_ENCHANTMENT_TABLE_USE,SoundCategory.NEUTRAL,1,1);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.FLASH,villager.getLocation(),100,1,1,1,0.1);
+                    p.getWorld().playSound(p.getLocation(),Sound.BLOCK_ENCHANTMENT_TABLE_USE,SoundCategory.NEUTRAL,1,1);
                     villager.setVillagerLevel(4);
                     break;
                 case 4:
-                    p.playSound(p,Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,1);
-                    p.playSound(p,Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,0.1f);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.POOF,villager.getLocation(),100,1,1,1,0.1);
+                    p.getWorld().playSound(p.getLocation(),Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,1);
+                    p.getWorld().playSound(p.getLocation(),Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,0.1f);
                     villager.setVillagerLevel(5);
                     break;
                 case 5:
-                    p.playSound(p,Sound.ITEM_TOTEM_USE,SoundCategory.NEUTRAL,0.5f,0.5f);
-                    p.playSound(p,Sound.UI_TOAST_CHALLENGE_COMPLETE,SoundCategory.NEUTRAL,1,1);
+                    Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.EXPLOSION,villager.getLocation(),100,1,1,1,0.1);
+                    p.getWorld().playSound(p.getLocation(),Sound.ITEM_TOTEM_USE,SoundCategory.NEUTRAL,0.5f,0.5f);
+                    p.getWorld().playSound(p.getLocation(),Sound.UI_TOAST_CHALLENGE_COMPLETE,SoundCategory.NEUTRAL,1,1);
                     villager.setVillagerLevel(5);
-                    villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,1,true,true));
+                    villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,255,true,true));
                     break;
             }
             p.getInventory().remove(it);

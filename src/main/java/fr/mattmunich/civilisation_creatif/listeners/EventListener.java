@@ -753,26 +753,32 @@ public class EventListener implements Listener {
                         break;
                     }
                     case COAL_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,0);
                         break;
                     }
                     case IRON_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,1);
                         break;
                     }
                     case GOLD_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,2);
                         break;
                     }
                     case EMERALD_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,3);
                         break;
                     }
                     case DIAMOND_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,4);
                         break;
                     }
                     case NETHERITE_BLOCK -> {
+                        invView.close();
                         territoryData.buyWorker(p,type,5);
                         break;
                     }
@@ -944,7 +950,7 @@ public class EventListener implements Listener {
                     territoryData.spawnWorker(villager,e.getEntity().getLocation());
                 }
             }
-            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " a été tué !");
+            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
         }
     }
 }
