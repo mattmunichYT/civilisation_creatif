@@ -31,27 +31,27 @@ public class SpawnCommand implements CommandExecutor, TabCompleter {
         Player p = (Player)s;
         if(args.length == 1) {
             try {
+                if(args[0].equalsIgnoreCase("overworld")) {
+                    p.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§aOverworld§2 !");
+                } else if(args[0].equalsIgnoreCase("nether")) {
+                    p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_nether")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 du §cNether§2 !");
+                } else if(args[0].equalsIgnoreCase("end")) {
+                    p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_the_end")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§5End§2 !");
+                }
                 World world = Bukkit.getWorld(args[0]);
-                if (world==null){
-                    if(args[0].equalsIgnoreCase("overworld")) {
-                        p.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§aOverworld§2 !");
-                    } else if(args[0].equalsIgnoreCase("nether")) {
-                        p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_nether")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 du §cNether§2 !");
-                    } else if(args[0].equalsIgnoreCase("end")) {
-                        p.teleport(Objects.requireNonNull(Bukkit.getWorld("world_the_end")).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 de l'§5End§2 !");
-                    } else {
-                        p.sendMessage(main.prefix + "§4Monde non trouvé !");
-                    }
+                if(world==null){
+                    p.sendMessage(main.prefix  + "§4Monde non trouvé.");
+                    return true;
                 }
                 p.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 p.sendMessage(main.prefix + "§2Vous avez été téléporté au §6spawn§2 du monde §6" + world.getName() + " §2!");
                 return true;
             } catch (Exception e) {
-                main.logError("Couldn't tp player to spawn of world" + args[0],e);
-                p.sendMessage(main.prefix  + "§4Une erreur s'est produite.");
+                main.logError("Couldn't tp player to spawn of world " + args[0],e);
+                p.sendMessage(main.prefix  + "§4Une erreur s'est produite");
                 return true;
             }
         } else if (args.length == 0) {
