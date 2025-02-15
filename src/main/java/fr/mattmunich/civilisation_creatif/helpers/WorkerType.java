@@ -11,7 +11,7 @@ public enum WorkerType {//                                                      
     NAVIGATEUR(3500,3000,-1,Material.OAK_BOAT,ChatColor.GREEN, Villager.Profession.CARTOGRAPHER),         //PORT
     //BONUS JOUEUR
     INGENIEUR(500,3000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //VOYAGES PRIX REDUITS
-    JARDINIER(500,1000,120,Material.CRAFTER,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
+    JARDINIER(500,1000,120,Material.FLOWERING_AZALEA,ChatColor.GREEN, Villager.Profession.LIBRARIAN),          //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
     BUCHERON(500,1000,45,Material.SPRUCE_LOG,ChatColor.GOLD, Villager.Profession.LIBRARIAN),           //+ARGENT QUAND BLOCK BOIS PLACE
     //ALIMENTATION VILLAGEOIS => + BIEN-ÊTRE => + ARGENT
     BOULANGER(1000,500,90,Material.BREAD,ChatColor.GOLD, Villager.Profession.FARMER),

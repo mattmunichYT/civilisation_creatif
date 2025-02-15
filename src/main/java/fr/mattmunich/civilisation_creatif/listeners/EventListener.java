@@ -710,6 +710,73 @@ public class EventListener implements Listener {
                         break;
                     }
                 }
+            } else if (invView.getTitle().contains("§6Acheter un villegeois")){
+                e.setCancelled(true);
+                if(it == null || it.getType()==Material.GRAY_STAINED_GLASS_PANE) { return; }
+                if (it.getType() == Material.BARRIER) {
+                    invView.close();
+                    return;
+                } else {
+                    WorkerType workerType = null;
+                    for (WorkerType checkWorkerType : WorkerType.values()){
+                        if(it.getType().equals(checkWorkerType.getItem())){
+                            workerType = checkWorkerType;
+                            break;
+                        }
+                    }
+                    if(workerType==null) { return; }
+                    invView.close();
+                    territoryData.openChooseTierInv(p, workerType);
+                    return;
+                }
+            } else if (invView.getTitle().contains("§6Choisir le tier du villageois")) {
+                e.setCancelled(true);
+                if (it == null || it.getType() == Material.GRAY_STAINED_GLASS_PANE) {
+                    return;
+                }
+                if(invView.getItem(13)==null){
+                    p.sendMessage(main.prefix + "§4Une erreur s'est produite !");
+                    return;
+                }
+                WorkerType type = null;
+                String parsedType=invView.getItem(13).getItemMeta().getDisplayName().replace("§aℹ Choisissez le tier de votre villageois ","").replace(" ","_").toUpperCase();
+                try {
+                    type = WorkerType.valueOf(parsedType);
+                } catch (IllegalArgumentException ex) {
+                    p.sendMessage(main.prefix + "§4Une erreur s'est produite !");
+                    main.logError("Couldn't get WorkerType from Paper Item. Tried valueOf(" + parsedType + "). This was ",ex);
+                    return;
+                }
+                switch (it.getType()){
+                    case BARRIER -> {
+                        invView.close();
+                        break;
+                    }
+                    case COAL_BLOCK -> {
+                        territoryData.buyWorker(p,type,0);
+                        break;
+                    }
+                    case IRON_BLOCK -> {
+                        territoryData.buyWorker(p,type,1);
+                        break;
+                    }
+                    case GOLD_BLOCK -> {
+                        territoryData.buyWorker(p,type,2);
+                        break;
+                    }
+                    case EMERALD_BLOCK -> {
+                        territoryData.buyWorker(p,type,3);
+                        break;
+                    }
+                    case DIAMOND_BLOCK -> {
+                        territoryData.buyWorker(p,type,4);
+                        break;
+                    }
+                    case NETHERITE_BLOCK -> {
+                        territoryData.buyWorker(p,type,5);
+                        break;
+                    }
+                }
             }
         }
     }

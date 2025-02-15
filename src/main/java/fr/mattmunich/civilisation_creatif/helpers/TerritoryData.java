@@ -14,6 +14,8 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -863,7 +865,7 @@ public class TerritoryData {
         if(page!=1) {
             terrListInv.setItem(47,ItemBuilder.getItem(Material.RED_STAINED_GLASS_PANE,"§c§l←",false,false,null,null,null));
         }
-        terrListInv.setItem(49,ItemBuilder.getItem(Material.BARRIER,"§cFermer le menu",false,false,null,null,null));
+        terrListInv.setItem(49,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu",false,false,null,null,null));
         if(page!=pageNum){
             terrListInv.setItem(51,ItemBuilder.getItem(Material.LIME_STAINED_GLASS_PANE,"§a§l→",false,false,null,null,null));
         }
@@ -1038,8 +1040,90 @@ public class TerritoryData {
         return formattedName.toString().trim();
     }
 
-    public void buyWorker(Player p, WorkerType type) {
+    public void openChooseTierInv(Player p, WorkerType type) {
+
+        Inventory chooseTierInv = Bukkit.createInventory(p,27,"§6Choisir le tier du villageois");
+        for (int slot = 0; slot < 27; slot++) {
+            chooseTierInv.setItem(slot,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        }
+
+        int[] slots = {10,11,12,14,15,16};
+        for (int slot : slots){
+            chooseTierInv.setItem(slot,null);
+        }
+        for (int tier = 1; tier <= 5; tier++) {
+            int price = type.getPrice();
+            int income = type.getIncome();
+            ChatColor tierColor= ChatColor.DARK_GRAY;
+            switch (tier){
+                case 0:
+                    chooseTierInv.setItem(10,ItemBuilder.getItem(Material.COAL_BLOCK,tierColor + "Tier 0",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+                case 1:
+                    price= (int) (price+(price*0.1));//+10%
+                    income= (int) (income+(income*0.1));//+10%
+                    tierColor= ChatColor.GRAY;
+                    chooseTierInv.setItem(11,ItemBuilder.getItem(Material.IRON_BLOCK,tierColor + "Tier 1",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+                case 2:
+                    price= (int) (price+(price*0.25));//+25%
+                    income= (int) (income+(income*0.25));//+25%
+                    tierColor= ChatColor.YELLOW;
+                    chooseTierInv.setItem(12,ItemBuilder.getItem(Material.GOLD_BLOCK,tierColor + "Tier 2",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+                case 3:
+                    price= (int) (price+(price*0.45));//+45%
+                    income= (int) (income+(income*0.45));//+45%
+                    tierColor= ChatColor.GREEN;
+                    chooseTierInv.setItem(14,ItemBuilder.getItem(Material.EMERALD_BLOCK,tierColor + "§lTier 3",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+                case 4:
+                    price= (int) (price+(price*0.70));//+70%
+                    income= (int) (income+(income*0.70));//+70%
+                    tierColor= ChatColor.AQUA;
+                    chooseTierInv.setItem(15,ItemBuilder.getItem(Material.DIAMOND_BLOCK,tierColor + "§lTier 4",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+                case 5:
+                    price= (int) (price+(price*0.95));//+95%
+                    income= (int) (income+(income*0.95));//+95%
+                    tierColor= ChatColor.BLACK;
+                    chooseTierInv.setItem(16,ItemBuilder.getItem(Material.NETHERITE_BLOCK,tierColor + "§lTier 5",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    break;
+            }
+        }
+        chooseTierInv.setItem(13,ItemBuilder.getItem(Material.PAPER,"§aℹ Choisissez le tier de votre villageois " + formatType(type.name())));
+        p.openInventory(chooseTierInv);
+        return;
+    }
+
+    public void buyWorker(Player p, WorkerType type, int tier) {
         String territoryName = getPlayerTerritory(p);
+        int price = type.getPrice();
+        ChatColor tierColor= ChatColor.DARK_GRAY;
+        switch (tier){
+            case 0:
+                break;
+            case 1:
+                price= (int) (price+(price*0.1));//+10%
+                tierColor= ChatColor.GRAY;
+                break;
+            case 2:
+                price= (int) (price+(price*0.25));//+25%
+                tierColor= ChatColor.YELLOW;
+                break;
+            case 3:
+                price= (int) (price+(price*0.45));//+45%
+                tierColor= ChatColor.GREEN;
+                break;
+            case 4:
+                price= (int) (price+(price*0.70));//+70%
+                tierColor= ChatColor.AQUA;
+                break;
+            case 5:
+                price= (int) (price+(price*0.95));//+95%
+                tierColor= ChatColor.BLACK;
+                break;
+        }
         if (getPlayerTerritory(p) == null) {
             p.sendMessage(main.prefix + "§4Vous devez être dans un territoire pour faire cela!");
             return;
@@ -1049,7 +1133,7 @@ public class TerritoryData {
             return;
         }
 
-        if (getTerritoryMoney(territoryName) < type.getPrice()) {
+        if (getTerritoryMoney(territoryName) < price) {
             p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans la banque de votre territoire !");
             return;
         }
@@ -1063,7 +1147,6 @@ public class TerritoryData {
         villager.setProfession(type.getProfession());
         villager.setCustomName(workerName);
         villager.setCustomNameVisible(true);
-        villager.setVillagerType(Villager.Type.PLAINS);
         if(type.getLifespan()==-1){
             villager.setInvulnerable(true);
         }
@@ -1082,12 +1165,13 @@ public class TerritoryData {
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.toString().toLowerCase());
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".name", workerName);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".tier", 0);
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".tier", tier);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".spawnEgg", spawnEgg);
         addWorkerToList(workerUUID);
         addWorkerToTerritoryList(workerUUID,territoryName);
         p.getInventory().addItem(spawnEgg);
-        removeTerritoryMoney(territoryName, type.getPrice());
+        removeTerritoryMoney(territoryName, price);
+        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + "§2de" + tierColor + (tier>=3 ? "§lTier" : "tier") + tier + "§2 !");
         p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + type.getPrice() + main.moneySign + "§2 !");
     }
 
@@ -1115,13 +1199,41 @@ public class TerritoryData {
                 p.sendMessage(main.prefix + "§4L'employé existe déjà !");
                 return;
             }
-
+            int tier = config.getInt("territories." + territoryName + ".villagers." + workerUUID + ".tier");
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
             Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),100,2,2,2);
-            p.playSound(p,Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
+            switch (tier){
+                case 0:
+                    p.playSound(p,Sound.ENTITY_VILLAGER_YES,SoundCategory.NEUTRAL,1,1);
+                    villager.setVillagerLevel(1);
+                    break;
+                case 1:
+                    p.playSound(p,Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
+                    villager.setVillagerLevel(2);
+                    break;
+                case 2:
+                    p.playSound(p,Sound.BLOCK_BEACON_ACTIVATE,SoundCategory.NEUTRAL,1,1);
+                    villager.setVillagerLevel(3);
+                    break;
+                case 3:
+                    p.playSound(p,Sound.BLOCK_ENCHANTMENT_TABLE_USE,SoundCategory.NEUTRAL,1,1);
+                    villager.setVillagerLevel(4);
+                    break;
+                case 4:
+                    p.playSound(p,Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,1);
+                    p.playSound(p,Sound.BLOCK_ANVIL_USE,SoundCategory.NEUTRAL,1,0.1f);
+                    villager.setVillagerLevel(5);
+                    break;
+                case 5:
+                    p.playSound(p,Sound.ITEM_TOTEM_USE,SoundCategory.NEUTRAL,0.5f,0.5f);
+                    p.playSound(p,Sound.UI_TOAST_CHALLENGE_COMPLETE,SoundCategory.NEUTRAL,1,1);
+                    villager.setVillagerLevel(5);
+                    villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,1,true,true));
+                    break;
+            }
             p.getInventory().remove(it);
             p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
         } catch (Exception e) {
@@ -1283,5 +1395,30 @@ public class TerritoryData {
             return null;
 
         }
+    }
+
+    public void showBuyWorkerInv(Player p){
+        Inventory inv = Bukkit.createInventory(p,45,"§6Acheter un villegeois");
+        for (int slot = 0; slot < 45; slot++) {
+            inv.setItem(slot,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        }
+
+        int[] slots = {11,12,13,14,15,19,20,21,22,23,24,25,29,30,31,32,33};
+        for (int slot : slots){
+            inv.setItem(slot,null);
+        }
+
+        for (WorkerType workerType : WorkerType.values()){
+            Material item = workerType.getItem();
+            ChatColor typeColor = workerType.getColor();
+            String typeName = formatType(workerType.toString());
+            String price = "§aPrix : " + typeColor + workerType.getPrice() + main.moneySign;
+            String income = "§aRevenus : §6" + workerType.getIncome() + main.moneySign + "§a/mois";
+            String lifespan = "§aDurée de vie : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : "§6" + workerType.getLifespan()/30 + "§a mois");
+            inv.addItem(ItemBuilder.getItem(item, typeColor+typeName,false,false,price,income,lifespan));
+        }
+        inv.setItem(44,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu"));
+
+        p.openInventory(inv);
     }
 }

@@ -146,19 +146,24 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args[0].equalsIgnoreCase("buyWorker")) {
-                if(args.length!=2) {
-                    p.sendMessage(main.wrongUsage + "/territoire buyWorker <WorkerType>");
+                if (!territoryData.isChief(p, territoryData.getPlayerTerritory(p)) && !territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
+                    p.sendMessage(main.prefix + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
                     return true;
                 }
-                WorkerType type = null;
-                try {
-                    type = WorkerType.valueOf(args[1].toUpperCase());
-                } catch (IllegalArgumentException ex) {
-                    p.sendMessage(main.prefix + "§4Type d'employé invalide !");
-                    return true;
-                }
-
-                territoryData.buyWorker(p, type);
+                territoryData.showBuyWorkerInv(p);
+//                if(args.length!=2) {
+//                    p.sendMessage(main.wrongUsage + "/territoire buyWorker <WorkerType>");
+//                    return true;
+//                }
+//                WorkerType type = null;
+//                try {
+//                    type = WorkerType.valueOf(args[1].toUpperCase());
+//                } catch (IllegalArgumentException ex) {
+//                    p.sendMessage(main.prefix + "§4Type d'employé invalide !");
+//                    return true;
+//                }
+//
+//                territoryData.buyWorker(p, type);
                 return true;
             }
 

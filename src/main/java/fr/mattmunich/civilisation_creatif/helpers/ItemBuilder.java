@@ -6,7 +6,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ItemBuilder {
     public static ItemStack getItem(Material material, String customName, boolean Enchanted, boolean Unbreakable, String DescLine1, String DescLine2, String DescLine3) {
@@ -77,6 +81,23 @@ public class ItemBuilder {
         } else {
             itemM.setDisplayName("");
         }
+
+
+        item.setItemMeta(itemM);
+        return item;
+
+    }
+    public static ItemStack getItem(Material material, String customName, List<String> lore) {
+
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta itemM = item.getItemMeta();
+
+        if(customName != null) {
+            itemM.setDisplayName(customName);
+        } else {
+            itemM.setDisplayName("");
+        }
+        itemM.setLore(lore);
 
 
         item.setItemMeta(itemM);
