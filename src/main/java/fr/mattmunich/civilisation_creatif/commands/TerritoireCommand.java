@@ -151,19 +151,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 territoryData.showBuyWorkerInv(p);
-//                if(args.length!=2) {
-//                    p.sendMessage(main.wrongUsage + "/territoire buyWorker <WorkerType>");
-//                    return true;
-//                }
-//                WorkerType type = null;
-//                try {
-//                    type = WorkerType.valueOf(args[1].toUpperCase());
-//                } catch (IllegalArgumentException ex) {
-//                    p.sendMessage(main.prefix + "§4Type d'employé invalide !");
-//                    return true;
-//                }
-//
-//                territoryData.buyWorker(p, type);
                 return true;
             }
 
@@ -259,16 +246,38 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 }
             }
             if(args[0].equalsIgnoreCase("runCheckup")){
+                PlayerData playerData = null;
                 try {
-                    PlayerData playerData = new PlayerData(p.getUniqueId());
-                    if(playerData.getRank().equals(Grades.ADMIN)) {
+                    playerData = new PlayerData(p.getUniqueId());
+                } catch (Exception ignored) { return true; }
+                if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
+                if(args.length==1) {
+                    try {
                         territoryData.runWorkerCheckup();
                         p.sendMessage(main.prefix + "§2Success!");
                         return true;
+
+                    } catch (Exception e) {
+                        p.sendMessage(main.prefix + "§4Une erreur s'est produite");
+                        return true;
                     }
-                } catch (Exception e) {
-                    p.sendMessage(main.prefix + "§4Une erreur s'est produite");
-                    return true;
+                } else {
+                    int nOfRun;
+                    try {
+                        nOfRun = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        p.sendMessage(main.prefix + "Veuillez entrer un nombre !");
+                        return true;
+                    }
+                    try {
+                        for (int i = 0 ; i < nOfRun; i++) {
+                            territoryData.runWorkerCheckup();
+                        }
+                        p.sendMessage(main.prefix + "§2Success §6- §aran WorkerCheckup §6"  + nOfRun + "§a times ");
+                    } catch (Exception e) {
+                        p.sendMessage(main.prefix + "§4Une erreur s'est produite");
+                        return true;
+                    }
                 }
             }
         }

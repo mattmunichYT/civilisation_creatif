@@ -923,7 +923,7 @@ public class TerritoryData {
             ItemMeta bannerMeta = banner.getItemMeta();
             assert bannerMeta != null;
             bannerMeta.setDisplayName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
             banner.setItemMeta(bannerMeta);
 
             // Add the item to the next available slot
@@ -950,13 +950,15 @@ public class TerritoryData {
         assert bannerMeta != null;
         if (hasTerritory(p) && (isChief(p,terr))) {
             bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
             banner.setItemMeta(bannerMeta);
         } else {
             bannerMeta.setItemName(territory.getColor() + territory.getName());
+            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
             banner.setItemMeta(bannerMeta);
         }
         terrInv.setItem(4, banner);
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), true, false, "§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr))));
         if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
         }
@@ -1298,6 +1300,7 @@ public class TerritoryData {
             for (String workerUUID : getTerritoryWorkerList(territoryName)){
                 String pathToWorker = "territories." + territoryName + ".villagers." + workerUUID;
                 boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
+                int tier = config.getInt(pathToWorker + ".tier");
                 WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
                 if(!workerAlive){
                     continue;
@@ -1313,10 +1316,30 @@ public class TerritoryData {
                 int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
                 config.set(pathToWorker + ".daysLived",daysLived);
                 if(Math.floor((double) daysLived /30)== (double) daysLived /30) {
-                    addTerritoryMoney(territoryName,workerType.getIncome());
+                    int income = workerType.getIncome();
+                    switch (tier){
+                        case 0:
+                            break;
+                        case 1:
+                            income= (int) (income+(income*0.1));//+10%
+                            break;
+                        case 2:
+                            income= (int) (income+(income*0.25));//+25%
+                            break;
+                        case 3:
+                            income= (int) (income+(income*0.45));//+45%
+                            break;
+                        case 4:
+                            income= (int) (income+(income*0.70));//+70%
+                            break;
+                        case 5:
+                            income= (int) (income+(income*0.95));//+95%
+                            break;
+                    }
+                    addTerritoryMoney(territoryName,income);
+                    territorySumMoney=income;
                 }
 //                addTerritoryMoney(territoryName,workerType.getIncome()); // FOR TESTING
-                territorySumMoney=workerType.getIncome();
                 if(daysToLive == 0){
                     sendAnouncementToTerritory(territoryName,"§eUn de vos villageois §c" + formatType(workerType.toString()) + "§e est mort de viellesse !");
                     worker.remove();
