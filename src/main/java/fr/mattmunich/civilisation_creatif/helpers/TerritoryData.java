@@ -1053,37 +1053,37 @@ public class TerritoryData {
             ChatColor tierColor= ChatColor.DARK_GRAY;
             switch (tier){
                 case 0:
-                    chooseTierInv.setItem(10,ItemBuilder.getItem(Material.COAL_BLOCK,tierColor + "Tier 0",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(10,ItemBuilder.getItem(Material.COAL_BLOCK,tierColor + "Tier 0",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
                 case 1:
                     price= (int) (price+(price*0.1));//+10%
                     income= (int) (income+(income*0.1));//+10%
                     tierColor= ChatColor.GRAY;
-                    chooseTierInv.setItem(11,ItemBuilder.getItem(Material.IRON_BLOCK,tierColor + "Tier 1",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(11,ItemBuilder.getItem(Material.IRON_BLOCK,tierColor + "Tier 1",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
                 case 2:
                     price= (int) (price+(price*0.25));//+25%
                     income= (int) (income+(income*0.25));//+25%
                     tierColor= ChatColor.YELLOW;
-                    chooseTierInv.setItem(12,ItemBuilder.getItem(Material.GOLD_BLOCK,tierColor + "Tier 2",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(12,ItemBuilder.getItem(Material.GOLD_BLOCK,tierColor + "Tier 2",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
                 case 3:
                     price= (int) (price+(price*0.45));//+45%
                     income= (int) (income+(income*0.45));//+45%
                     tierColor= ChatColor.GREEN;
-                    chooseTierInv.setItem(14,ItemBuilder.getItem(Material.EMERALD_BLOCK,tierColor + "§lTier 3",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(14,ItemBuilder.getItem(Material.EMERALD_BLOCK,tierColor + "§lTier 3",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
                 case 4:
                     price= (int) (price+(price*0.70));//+70%
                     income= (int) (income+(income*0.70));//+70%
                     tierColor= ChatColor.AQUA;
-                    chooseTierInv.setItem(15,ItemBuilder.getItem(Material.DIAMOND_BLOCK,tierColor + "§lTier 4",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(15,ItemBuilder.getItem(Material.DIAMOND_BLOCK,tierColor + "§lTier 4",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
                 case 5:
                     price= (int) (price+(price*0.95));//+95%
                     income= (int) (income+(income*0.95));//+95%
                     tierColor= ChatColor.BLACK;
-                    chooseTierInv.setItem(16,ItemBuilder.getItem(Material.NETHERITE_BLOCK,tierColor + "§lTier 5",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign)));
+                    chooseTierInv.setItem(16,ItemBuilder.getItem(Material.NETHERITE_BLOCK,tierColor + "§lTier 5",Arrays.asList("§aPrix : §6" + price + main.moneySign,"§aRevenus : §6" + income + main.moneySign + "§a/mois")));
                     break;
             }
         }
@@ -1141,7 +1141,7 @@ public class TerritoryData {
         villager.addScoreboardTag("workerTerritory=" + getPlayerTerritory(p));
         String workerName = formatType(type.name());
         villager.setProfession(type.getProfession());
-        villager.setCustomName(workerName);
+        villager.setCustomName(tierColor + workerName);
         villager.setCustomNameVisible(true);
         if(type.getLifespan()==-1){
             villager.setInvulnerable(true);
@@ -1168,7 +1168,7 @@ public class TerritoryData {
         p.getInventory().addItem(spawnEgg);
         removeTerritoryMoney(territoryName, price);
         p.playSound(p.getLocation(),type.getSound(),SoundCategory.NEUTRAL,1,type.getSoundPitch());
-        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + " §2de " + tierColor + (tier>=3 ? "§lTier" : "tier") + tier + "§2 !");
+        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + " §2de " + tierColor + (tier>=3 ? "§lTier " : "tier ") + tier + "§2 !");
         p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + type.getPrice() + main.moneySign + "§2 !");
     }
 
@@ -1234,7 +1234,7 @@ public class TerritoryData {
                     p.getWorld().playSound(p.getLocation(),Sound.ITEM_TOTEM_USE,SoundCategory.NEUTRAL,0.5f,0.5f);
                     p.getWorld().playSound(p.getLocation(),Sound.UI_TOAST_CHALLENGE_COMPLETE,SoundCategory.NEUTRAL,1,1);
                     villager.setVillagerLevel(5);
-                    villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,255,true,true));
+                    villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,1,false,true));
                     break;
             }
             p.getInventory().remove(it);
