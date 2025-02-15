@@ -2,6 +2,7 @@ package fr.mattmunich.civilisation_creatif.commands;
 
 import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
+import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import fr.mattmunich.civilisation_creatif.helpers.WorkerType;
@@ -249,6 +250,19 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 } catch (Exception e) {
                     p.sendMessage(main.prefix + "§4Une erreur s'est produite...");
                     main.logError("Couldn't deposit money to territory",e);
+                    return true;
+                }
+            }
+            if(args[0].equalsIgnoreCase("runCheckup")){
+                try {
+                    PlayerData playerData = new PlayerData(p.getUniqueId());
+                    if(playerData.getRank().equals(Grades.ADMIN)) {
+                        territoryData.runWorkerCheckup();
+                        p.sendMessage(main.prefix + "§2Success!");
+                        return true;
+                    }
+                } catch (Exception e) {
+                    p.sendMessage(main.prefix + "§4Une erreur s'est produite");
                     return true;
                 }
             }

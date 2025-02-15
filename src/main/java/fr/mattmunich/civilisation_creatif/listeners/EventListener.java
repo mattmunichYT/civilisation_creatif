@@ -432,7 +432,26 @@ public class EventListener implements Listener {
                     case END_CRYSTAL:
                         //INVITE PLAYER
                         invView.close();
-                        p.sendTitle("§2§o🚀 Chargement du menu...","",20,500,20);
+//                        p.sendTitle("§2§o🚀 Chargement du menu...","",20,500,20);
+                        Inventory preInviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
+
+                        preInviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
+                        for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+                            PlayerData playerData = new PlayerData(all.getUniqueId());
+                            PlayerData senderData = new PlayerData(p.getUniqueId());
+
+                            if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                                continue;
+                            }
+                            ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
+                            SkullMeta skullMeta = (SkullMeta) playerSkull.getItemMeta();
+                            skullMeta.setOwnerProfile(all.getPlayerProfile());
+                            skullMeta.setLore(Collections.singletonList("§bCliquez pour inviter le joueur §5"));
+                            skullMeta.setDisplayName(all.getName());
+                            playerSkull.setItemMeta(skullMeta);
+                            preInviteInv.addItem(playerSkull);
+                        }
+                        p.openInventory(preInviteInv);
                         Inventory inviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
 
                         inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
@@ -446,7 +465,7 @@ public class EventListener implements Listener {
 
                             inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
                         }
-                        p.sendTitle("","",1,1,1);
+                        p.closeInventory();
                         p.openInventory(inviteInv);
                         break;
                     case CYAN_STAINED_GLASS:
@@ -827,6 +846,12 @@ public class EventListener implements Listener {
             territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
             territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
             territoryData.saveConfig();
+            if (workerType!=null) {
+                WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
+                if (type.getLifespan()==-1){
+                    territoryData.spawnWorker(villager,e.getEntity().getLocation());
+                }
+            }
             territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " a été tué !");
         }
     }

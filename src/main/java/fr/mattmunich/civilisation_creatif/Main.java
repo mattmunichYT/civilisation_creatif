@@ -163,6 +163,7 @@ public final class Main extends JavaPlugin {
         }
 
         territoryData.programNextWorkerCheckup();
+        Bukkit.getConsoleSender().sendMessage(prefix + "§eLoading spawn world...");
         try {
             Bukkit.getWorld("spawn").loadChunk(0,0);
         } catch (NullPointerException e) {
@@ -179,6 +180,7 @@ public final class Main extends JavaPlugin {
                 logError("Couldn't create or load spawn world",e);
             }
         }
+        Bukkit.getConsoleSender().sendMessage(prefix + "§2Spawn world loaded !");
     }
 
     private static String getWorldname(Player all) {
@@ -218,8 +220,12 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         for(Player all : Bukkit.getOnlinePlayers()) {
-            all.transfer("91.197.6.60", 25599);
             all.sendMessage("§e(§6!§e)§4 Le serveur Civilisation Créatif §credémarre§4 !");
+            all.sendTitle("§4🚀 Redémarrage du serveur...","",20,100,20);
+            all.transfer("91.197.6.60", 25599);
+        }
+        if (territoryData != null) {
+            territoryData.cancelWorkerCheckup();
         }
         super.onDisable();
     }

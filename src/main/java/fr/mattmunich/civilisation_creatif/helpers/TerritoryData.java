@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
@@ -34,6 +35,8 @@ public class TerritoryData {
         this.plugin = plugin;
         this.main = main;
     }
+
+    private BukkitTask workerCheckupTask = null;
 
     public int chunkPrice = 300;
 
@@ -1117,12 +1120,48 @@ public class TerritoryData {
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
-            Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),100);
+            Objects.requireNonNull(villager.getLocation().getWorld()).spawnParticle(Particle.HAPPY_VILLAGER,villager.getLocation(),100,2,2,2);
             p.playSound(p,Sound.ENTITY_PLAYER_LEVELUP,SoundCategory.NEUTRAL,1,1);
             p.getInventory().remove(it);
             p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
         } catch (Exception e) {
             p.sendMessage(main.prefix + "§4Une erreur s'est produite lors du spawn de cet employé !");
+            main.logError("An error encourred while spawning a worker",e);
+        }
+    }
+
+    public void spawnWorker(Villager villager, Location spawnLocation) {
+        try {
+            if (!spawnLocation.getBlock().getType().equals(Material.AIR)){
+                spawnLocation.setY(spawnLocation.getY()+1);
+            }
+            if(villager==null) {
+                return;
+            }
+            UUID workerUUID = null;
+            for (String tag : villager.getScoreboardTags()) {
+                if (tag.contains("workerUUID=")) {
+                    workerUUID = UUID.fromString(tag.replace("workerUUID=",""));
+                }
+            }
+            String territoryName = getWorkerTerritory(villager);
+            if(workerUUID == null || !getWorkerList().contains(workerUUID.toString()) || territoryName == null || spawnLocation.getWorld() == null) {
+                return;
+            }
+            if(config.getBoolean("territories." + territoryName + ".villagers." + workerUUID + ".alive")) {
+                villager.remove();
+                return;
+            }
+            villager.setHealth(20);
+            villager = (Villager) villager.createSnapshot().createEntity(spawnLocation);
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
+            config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
+            saveConfig();
+
+            spawnLocation.getWorld().spawnParticle(Particle.ASH,villager.getLocation(),100,2,2,2);
+            spawnLocation.getWorld().playSound(spawnLocation,Sound.BLOCK_FIRE_EXTINGUISH,1,1);
+        } catch (Exception e) {
             main.logError("An error encourred while spawning a worker",e);
         }
     }
@@ -1138,39 +1177,56 @@ public class TerritoryData {
     }
 
     public void runWorkerCheckup(){
-        for (String workerUUID : getWorkerList()) {
-            String workerTerritory = getWorkerTerritory(workerUUID);
-            String pathToWorker = "territories." + workerTerritory + ".villagers." + workerUUID;
-            boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
-            WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
-            if(!workerAlive){
-                continue;
+        Bukkit.getConsoleSender().sendMessage(main.prefix + "§eRunning daily worker checkup...");
+        for (String territoryName : getTerritoriesList()) {
+            int territorySumMoney=0;
+            for (String workerUUID : getTerritoryWorkerList(territoryName)){
+                String pathToWorker = "territories." + territoryName + ".villagers." + workerUUID;
+                boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
+                WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
+                if(!workerAlive){
+                    continue;
+                }
+                if(!(Bukkit.getEntity(UUID.fromString(Objects.requireNonNull(config.getString(pathToWorker + ".villagerUUID")))) instanceof Villager worker)){
+                    continue;
+                }
+                int daysToLive = config.getInt(pathToWorker + ".daysToLive");
+                if (daysToLive!=-1){
+                    daysToLive=daysToLive-1;
+                    config.set(pathToWorker + ".daysToLive",daysToLive);
+                }
+                int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
+                config.set(pathToWorker + ".daysLived",daysLived);
+                if(Math.floor((double) daysLived /30)== (double) daysLived /30) {
+                    addTerritoryMoney(territoryName,workerType.getIncome());
+                }
+//                addTerritoryMoney(territoryName,workerType.getIncome()); // FOR TESTING
+                territorySumMoney=workerType.getIncome();
+                if(daysToLive == 0){
+                    sendAnouncementToTerritory(territoryName,"§eUn de vos villageois §c" + formatType(workerType.toString()) + "§e est mort de viellesse !");
+                    worker.remove();
+                    removeWorkerFromTerritoryList(UUID.fromString(workerUUID),territoryName);
+                    removeWorkerFromList(UUID.fromString(workerUUID));
+                    config.set(pathToWorker,null);
+                }
+                saveConfig();
             }
-            if(!(Bukkit.getEntity(UUID.fromString(Objects.requireNonNull(config.getString(pathToWorker + ".villagerUUID")))) instanceof Villager worker)){
-                continue;
+            if(territorySumMoney!=0){
+                sendAnouncementToTerritory(territoryName,"§2Vous avez gagné §6" + territorySumMoney + main.moneySign + " grâce à vos villageois ce mois-ci");
             }
-            int daysToLive = config.getInt(pathToWorker + ".daysToLive");
-            if (daysToLive!=-1){
-                daysToLive=daysToLive-1;
-                config.set(pathToWorker + ".daysToLive",daysToLive);
-            }
-            int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
-            config.set(pathToWorker + ".daysLived",daysLived);
-            if(Math.floor((double) daysLived /30)== (double) daysLived /30) {
-                addTerritoryMoney(workerTerritory,workerType.getIncome());
-            }
-            if(daysToLive == 0){
-                worker.remove();
-                removeWorkerFromTerritoryList(UUID.fromString(workerUUID),workerTerritory);
-                removeWorkerFromList(UUID.fromString(workerUUID));
-                config.set(pathToWorker,null);
-            }
-            saveConfig();
         }
         programNextWorkerCheckup();
+        Bukkit.getConsoleSender().sendMessage(main.prefix + "§aDone running daily worker checkup !");
     }
 
     public void programNextWorkerCheckup(){
+        // Cancel any existing scheduled task before scheduling a new one
+        if (workerCheckupTask != null && !workerCheckupTask.isCancelled()) {
+            Bukkit.getLogger().warning("Duplicate WorkerCheckup detected! Cancelling previous one.");
+            workerCheckupTask.cancel();
+        }
+
+        // Calculate ticks until midnight
         Calendar cal = Calendar.getInstance();
         long now = cal.getTimeInMillis();
         cal.add(Calendar.DATE, 1);
@@ -1180,10 +1236,22 @@ public class TerritoryData {
         cal.set(Calendar.MILLISECOND, 0);
         long offset = cal.getTimeInMillis() - now;
         long ticks = offset / 50L;
+
         try {
-            Bukkit.getScheduler().runTaskLater(main, this::runWorkerCheckup, ticks);
+            // Schedule the task and store the reference
+            workerCheckupTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                runWorkerCheckup();
+                workerCheckupTask = null; // Clear reference after execution
+            }, ticks);
         } catch (Exception e) {
-            main.logError("§4Coulnd't schedule next WorkerCheckup",e);
+            main.logError("§4Couldn't schedule next WorkerCheckup",e);
+        }
+    }
+
+    public void cancelWorkerCheckup() {
+        if (workerCheckupTask != null && !workerCheckupTask.isCancelled()) {
+            workerCheckupTask.cancel();
+            workerCheckupTask = null;
         }
     }
 
