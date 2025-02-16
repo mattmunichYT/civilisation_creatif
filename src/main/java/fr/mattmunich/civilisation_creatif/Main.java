@@ -82,6 +82,7 @@ public final class Main extends JavaPlugin {
     //END OF HELPERS GET
     //OTHER ARRAY LISTS
     public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
+    public ArrayList<Player> bypassClaims = new ArrayList<>();
     //END OF OTHER ARRAY LISTS
     //SCOREBOARDS
 

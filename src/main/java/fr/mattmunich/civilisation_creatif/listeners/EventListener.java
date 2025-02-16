@@ -856,10 +856,17 @@ public class EventListener implements Listener {
 
         try {
             PlayerData playerData = new PlayerData(playerId);
+            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
+            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryData.getPlayerTerritory(p))){
+                e.setCancelled(true);
+                p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer de blocks ici !");
+                return;
+            }
+
             playerData.addMoney(1);
 
-            boolean isInOwnTerritory = territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())) != null &&
-                    territoryData.getChunkOwner(territoryData.getChunkMap(p.getLocation().getChunk())).equals(territoryData.getPlayerTerritory(p));
+            boolean isInOwnTerritory = chunkOwner != null &&
+                    chunkOwner.equals(territoryData.getPlayerTerritory(p));
 
             // Update accumulated values
             moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + 1);

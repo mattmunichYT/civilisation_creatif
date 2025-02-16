@@ -30,7 +30,7 @@ public class JoinListener implements Listener {
 
         PlayerData data = null;
         try {
-            data = new PlayerData(p.getUniqueId());
+            data = new PlayerData(p);
         } catch (Exception err) {
             main.logError("Coudln't get PlayerData of player",err);
         }

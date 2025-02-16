@@ -70,6 +70,27 @@ public final class PlayerData {
 		saveConfig();
 	}
 
+	public PlayerData(Player p){
+		if(!f.exists()) {
+			f.mkdirs();
+		}
+		file = new File(f, p.getUniqueId() + ".yml");
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (Exception e) { logError("Couldn't create PlayerData file", e); }
+		}
+		new YamlConfiguration();
+		config = YamlConfiguration.loadConfiguration(file);
+		this.plugin = getPlugin();
+
+		config.set("player.name", p.getName());
+		if(config.getString("player.rank") == null) {
+			config.set("player.rank", "membre");
+		}
+		saveConfig();
+	}
+
 	private void setXPScore(int setXP) {
 		String name = config.getString("player.name");
 		Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();

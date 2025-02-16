@@ -38,6 +38,8 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        PlayerData playerData = new PlayerData(p);
+
         if(args.length==1 || args.length==2) {
             int mapRenderRange = 4;
 //            if(args.length==2){
@@ -198,7 +200,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 try {
-                    PlayerData playerData = new PlayerData(p.getUniqueId());
                     territoryData.removeTerritoryMoney(terr,amount);
                     playerData.addMoney(amount);
                     p.sendMessage(main.prefix + "§a" + amount + main.moneySign + "§2 ont été transféré de la banque de votre territoire à votre compte !");
@@ -228,7 +229,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 try {
-                    PlayerData playerData = new PlayerData(p.getUniqueId());
                     if(playerData.Money() < amount) {
                         p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans votre compte !");
                         p.sendMessage(main.prefix + "§cIl y a §e" + playerData.Money() + main.moneySign + "§c dans dans votre compte.");
@@ -246,10 +246,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 }
             }
             if(args[0].equalsIgnoreCase("runCheckup")){
-                PlayerData playerData = null;
-                try {
-                    playerData = new PlayerData(p.getUniqueId());
-                } catch (Exception ignored) { return true; }
                 if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
                 if(args.length==1) {
                     try {
@@ -279,6 +275,20 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
                 }
+            }
+            if (args[0].equalsIgnoreCase("bypassClaims")){
+                if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
+                if(main.bypassClaims.contains(p)){
+                    main.bypassClaims.remove(p);
+                    p.sendTitle("§eBypass Claims : §c§lOFF","",20,60,20);
+                    p.sendMessage(main.prefix + "§cVous n'ignorez plus protections des claims !");
+                } else {
+                    main.bypassClaims.add(p);
+                    p.sendTitle("§eBypass Claims : §a§lON","",20,60,20);
+                    p.sendMessage(main.prefix + "§aVous ignorez désormais les protections des claims !");
+                }
+                return true;
+
             }
         }
 
