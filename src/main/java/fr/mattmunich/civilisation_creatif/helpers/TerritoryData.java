@@ -40,7 +40,8 @@ public class TerritoryData {
 
     private BukkitTask workerCheckupTask = null;
 
-    public int chunkPrice = 300;
+    public int baseChunkPrice = 300;
+    public int changeBannerPrice = 300;
 
     public final Plugin getPlugin() {
         return plugin;
@@ -536,14 +537,18 @@ public class TerritoryData {
                 }
                 return;
             }
+            if(getTerritoryMoney(territoryName) < getChunkPrice(territoryName)){
+                sender.sendMessage(main.prefix + "§4Iln'y a pas assez d'argent dans la banque du territoire !");
+                return;
+            }
             terrClaims.add(chunk);
             globalClaims.add(chunk);
             config.set("territories." + territory.getName() + ".claims", terrClaims);
             config.set("claims", globalClaims);
             saveConfig();
-            PlayerData data = new PlayerData(sender.getUniqueId());
-            data.removeMoney(chunkPrice);
-            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]","") + " §apour §e "  + chunkPrice + main.moneySign + "§a!");
+            removeTerritoryMoney(territoryName,getChunkPrice(territoryName));
+            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]","") + " §apour §e"  + getChunkPrice(territoryName) + main.moneySign + "§a!");
+            addOneClaimedChunkToCount(territoryName);
             return;
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du claim du chunk !");
@@ -551,6 +556,30 @@ public class TerritoryData {
             return;
         }
     }
+
+    public int getChunkPrice(String territoryName){
+        return baseChunkPrice + ((getClaimdChunkCount(territoryName)) * 50);
+    }
+
+    public void setClaimedChunkCount(String territoryName, int claimedChunkCount){
+        config.set("territories." + territoryName + ".claimedChunkCount",claimedChunkCount);
+        saveConfig();
+    }
+
+    public void addOneClaimedChunkToCount(String territoryName) {
+        int currentClaimedChunkCount = getClaimdChunkCount(territoryName);
+        setClaimedChunkCount(territoryName, currentClaimedChunkCount+1);
+    }
+
+    public void removeOneClaimedChunkFromCount(String territoryName) {
+        int currentClaimedChunkCount = getClaimdChunkCount(territoryName);
+        setClaimedChunkCount(territoryName, currentClaimedChunkCount-1);
+    }
+
+    public int getClaimdChunkCount(String territoryName){
+        return config.get("territories." + territoryName + ".claimedChunkCount") == null ? 0 : config.getInt("territories." + territoryName + ".claimedChunkCount");
+    }
+
     public void unclaimChunk(Player sender, String territoryName, Map<Integer,Integer> chunk) {
         try {
             Team territory = getTerritoryTeam(territoryName);
@@ -564,6 +593,7 @@ public class TerritoryData {
                 config.set("claims", globalClaims);
                 saveConfig();
                 sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
+                removeOneClaimedChunkFromCount(territoryName);
                 return;
             } else {
                 sender.sendMessage(main.prefix + "§cVous n'avez pas claim le chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[","").replace("]","") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[","").replace("]",""));
@@ -1160,7 +1190,7 @@ public class TerritoryData {
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysLived", 0);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", false);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.toString().toLowerCase());
+        config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.name().toLowerCase());
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".name", workerName);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
         config.set("territories." + territoryName + ".villagers." + workerUUID + ".tier", tier);
@@ -1198,12 +1228,19 @@ public class TerritoryData {
                 p.sendMessage(main.prefix + "§4L'employé existe déjà !");
                 return;
             }
+            WorkerType workerType = null;
+            try {
+                workerType = WorkerType.valueOf(config.getString("territories." + territoryName + ".villagers." + workerUUID + ".type").toUpperCase());
+            } catch (IllegalArgumentException | NullPointerException e) {
+                p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
+                main.logError("Couldn't get workerType when spawning it",e);
+                return;
+            }
             int tier = config.getInt("territories." + territoryName + ".villagers." + workerUUID + ".tier");
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
             config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
-
             switch (tier){
                 case 0:
                     p.getWorld().playSound(p.getLocation(),Sound.ENTITY_VILLAGER_YES,SoundCategory.NEUTRAL,1,1);
@@ -1239,6 +1276,7 @@ public class TerritoryData {
                     villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,1,false,true));
                     break;
             }
+            addOneAliveWorkerToCount(territoryName,workerType);
             p.getInventory().remove(it);
             p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
         } catch (Exception e) {
@@ -1345,6 +1383,7 @@ public class TerritoryData {
                     worker.remove();
                     removeWorkerFromTerritoryList(UUID.fromString(workerUUID),territoryName);
                     removeWorkerFromList(UUID.fromString(workerUUID));
+                    removeOneAliveWorkerFromCount(territoryName,workerType);
                     config.set(pathToWorker,null);
                 }
                 saveConfig();
@@ -1446,5 +1485,24 @@ public class TerritoryData {
         inv.setItem(44,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu"));
 
         p.openInventory(inv);
+    }
+
+    public void setAliveWorkerCount(String territoryName, int workerCount, WorkerType workerType){
+        config.set("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase(),workerCount);
+        saveConfig();
+    }
+
+    public void addOneAliveWorkerToCount(String territoryName, WorkerType workerType) {
+        int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
+        setAliveWorkerCount(territoryName, currentWorkerCount+1, workerType);
+    }
+
+    public void removeOneAliveWorkerFromCount(String territoryName, WorkerType workerType) {
+        int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
+        setAliveWorkerCount(territoryName, currentWorkerCount-1, workerType);
+    }
+
+    public int getAliveWorkerCount(String territoryName, WorkerType workerType){
+        return (config.get("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) == null ||  config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) < 0) ? 0 : config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase());
     }
 }

@@ -86,13 +86,7 @@ public final class Main extends JavaPlugin {
     //END OF OTHER ARRAY LISTS
     //SCOREBOARDS
 
-
-    @SuppressWarnings("DataFlowIssue")
-    @Override
-    public void onEnable() {
-
-        //HELPERS INIT
-
+    public void loadConfigs(){
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard;
         if (manager != null) {
@@ -119,6 +113,13 @@ public final class Main extends JavaPlugin {
         territoryData.initConfig();
         warp = new Warp(this);
         warp.initConfig();
+    }
+    @SuppressWarnings("DataFlowIssue")
+    @Override
+    public void onEnable() {
+
+        //HELPERS INIT
+        loadConfigs();
 
         //END OF HELPERS INIT
 
@@ -222,14 +223,6 @@ public final class Main extends JavaPlugin {
     @Override
     public void onLoad() {
         super.onLoad();
-        //HELPERS INIT
-        pdata = new PlayerData(this, this);
-        territoryData = new TerritoryData(this, this);
-        territoryData.initConfig();
-        backup = new Backup(this,this);
-        warp = new Warp(this);
-        warp.initConfig();
-        //END OF HELPERS INIT
     }
 
     @Override

@@ -277,7 +277,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 }
             }
             if (args[0].equalsIgnoreCase("bypassClaims")){
-                if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
+                if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
                 if(main.bypassClaims.contains(p)){
                     main.bypassClaims.remove(p);
                     p.sendTitle("§eBypass Claims : §c§lOFF","",20,60,20);
@@ -312,18 +312,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     String territoryName = territoryData.getPlayerTerritory(p);
                     if(!territoryData.isChief(p,territoryName) && !territoryData.isOfficer(p,territoryName)) {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4claim des chunk §cpour votre territoire !");
-                        return true;
-                    }
-                    PlayerData data = null;
-                    try {
-                        data = new PlayerData(p.getUniqueId());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    int chunkPrice = 300;
-                    if(data.Money() < chunkPrice) {
-                        p.sendMessage(main.prefix + "§4Vous n'avez pas assez d'argent pour claim ce chunk !");
                         return true;
                     }
 

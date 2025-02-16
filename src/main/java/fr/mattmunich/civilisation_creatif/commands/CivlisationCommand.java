@@ -31,13 +31,11 @@ public class CivlisationCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
             }
-            s.sendMessage(main.prefix + "§2§oRechargement du plugin... §8Cela peut prendre un certain temps.");
-//          main.onDisable(); -- NOT NEEDED (+ auto tranfer to mjep onDisable)
-            main.onLoad();
-            main.onEnable();
-            s.sendMessage(main.prefix + "§2Plugin rechargé !");
+            s.sendMessage(main.prefix + "§2§oRechargement des fichiers de configuration... §8Cela peut prendre un certain temps.");
+            main.loadConfigs();
+            s.sendMessage(main.prefix + "§2Fichiers de configuration rechargés !");
         } else if(args[0].equalsIgnoreCase("credits") || args[0].equalsIgnoreCase("copyright")) {
-            s.sendMessage(main.prefix + "§6§lCrédits : §2Made by §6mattmunich\n§aCopyright ©2024 mattmunich All rights reserved.");
+            s.sendMessage(main.prefix + "§6§lCrédits : §2Made by §6mattmunich\n§aCopyright ©2025 mattmunich All rights reserved.");
         } else if(args[0].equalsIgnoreCase("version")) {
             s.sendMessage("§2§6Civlisation §6Créatif §2Version " + main.version +"\n§aMinecraft version 1.21.1 or later");
         } else {

@@ -853,26 +853,50 @@ public class EventListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
         UUID playerId = p.getUniqueId();
+        Material brokenBlockType = e.getBlock().getType();
 
         try {
             PlayerData playerData = new PlayerData(playerId);
+            String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
-            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryData.getPlayerTerritory(p))){
+            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                 e.setCancelled(true);
                 p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer de blocks ici !");
                 return;
             }
 
-            playerData.addMoney(1);
 
             boolean isInOwnTerritory = chunkOwner != null &&
-                    chunkOwner.equals(territoryData.getPlayerTerritory(p));
+                    chunkOwner.equals(territoryName);
 
-            // Update accumulated values
-            moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + 1);
-            if (isInOwnTerritory) {
-                xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + 1);
-                territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), 1);
+            int moneyGain = 1;
+            int xpGain = 1;
+
+            if(Tag.LOGS.isTagged(brokenBlockType)) {
+                moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
+                xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
+                playerData.addMoney(moneyGain);
+                moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + moneyGain);
+                if (isInOwnTerritory) {
+                    territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), xpGain);
+                    xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + xpGain);
+                }
+            } else if(CustomPlantTag.isCustomPlant(brokenBlockType)) {
+                moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
+                xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
+                playerData.addMoney(moneyGain);
+                moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + moneyGain);
+                if (isInOwnTerritory) {
+                    territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), xpGain);
+                    xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + xpGain);
+                }
+            } else {
+                playerData.addMoney(moneyGain);
+                moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + moneyGain);
+                if (isInOwnTerritory) {
+                    territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), xpGain);
+                    xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + xpGain);
+                }
             }
 
             // Build and send the action bar message
@@ -955,6 +979,8 @@ public class EventListener implements Listener {
                 WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
                 if (type.getLifespan()==-1){
                     territoryData.spawnWorker(villager,e.getEntity().getLocation());
+                } else {
+                    territoryData.removeOneAliveWorkerFromCount(territoryName,type);
                 }
             }
             territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
