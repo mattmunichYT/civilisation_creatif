@@ -28,11 +28,11 @@ public class Backup {
         Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §eBackups des mondes en cours...");
         for(World world : Bukkit.getWorlds()) {
             try {
-                File f = new File("Backups/" + formatter.format(System.currentTimeMillis()) + "/");
+                File f = new File("Backups/" + formatter.format(System.currentTimeMillis()) + "/" + world.getName() + "/");
                 try {
                     boolean check = f.mkdirs();
                     if(check) {
-                        Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §2Le système de backups a été configuré !");
+                        Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §2Création du backup pour le monde §6" + world.getName() + "§2...");
                     }
                 } catch (Exception e) {
                     Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §4Un backup a déjà été créé récemment !");
@@ -46,7 +46,7 @@ public class Backup {
                 if(!f.exists()) {
                     Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §4§lUne erreur s'est produite lors de la sauvegarde du monde §c ! - La destination n'existe pas");
                 }
-                org.apache.commons.io.FileUtils.copyDirectory(origin, f);//main thing
+                org.apache.commons.io.FileUtils.copyDirectory(origin, f);//main thing (basically copies the world files)
 
                 Bukkit.getConsoleSender().sendMessage("§6[AdminCmdsB] §2Le monde §a" + world.getName() + "§2 a été sauvegardé !");
             } catch (Exception e) {
