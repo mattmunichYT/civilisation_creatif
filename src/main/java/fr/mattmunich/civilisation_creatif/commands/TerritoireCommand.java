@@ -245,7 +245,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
             }
-            if(args[0].equalsIgnoreCase("runCheckup")){
+            if(args[0].equalsIgnoreCase("runWorkerCeckup")){
                 if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
                 if(args.length==1) {
                     try {
@@ -459,9 +459,16 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 tabComplete.add("makeOfficer");
                 tabComplete.add("removeOfficer");
             }
+            if(s instanceof Player p) {
+                PlayerData playerData = new PlayerData(p);
+                if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
+                    tabComplete.add("bypassClaims");
+                    tabComplete.add("runWorkerCeckup");
+                }
+            }
         }
         if(args.length == 2) {
-            if(s instanceof Player && (territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s)) || territoryData.isOfficer((Player) s, territoryData.getPlayerTerritory((Player) s)))) {
+            if(s instanceof Player p && (territoryData.isChief(p, territoryData.getPlayerTerritory(p)) || territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)))) {
                 if (args[0].equalsIgnoreCase("depositMoney") || args[0].equalsIgnoreCase("withdrawMoney")) {
                     tabComplete.add("10");
                     tabComplete.add("100");
@@ -474,6 +481,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         tabComplete.add(type.name().toLowerCase());
                     }
                 }
+
             }
         }
 
