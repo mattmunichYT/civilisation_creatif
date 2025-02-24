@@ -141,7 +141,7 @@ public final class Main extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(this,territoryData), this);
         pm.registerEvents(new AntiSpeed(this), this);
-        pm.registerEvents(new EventListener(this,territoryData), this);
+        pm.registerEvents(new EventListener(this,this,territoryData), this);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             for(Player all : Bukkit.getOnlinePlayers()) {
 

@@ -26,6 +26,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,10 +45,13 @@ public class EventListener implements Listener {
 
     private final Main main;
 
+    private final Plugin plugin;
+
     private final TerritoryData territoryData;
 
-    public EventListener(Main main, TerritoryData territoryData) {
+    public EventListener(Main main, Plugin plugin, TerritoryData territoryData) {
         this.main = main;
+        this.plugin = plugin;
         this.territoryData = territoryData;
     }
 
@@ -436,6 +441,7 @@ public class EventListener implements Listener {
                 if(it ==null) {return;}
                 switch (Objects.requireNonNull(it).getType()) {
                     case END_CRYSTAL:
+                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
                         //INVITE PLAYER
                         invView.close();
 //                        p.sendTitle("§2§o🚀 Chargement du menu...","",20,500,20);
@@ -475,6 +481,7 @@ public class EventListener implements Listener {
                         p.openInventory(inviteInv);
                         break;
                     case CYAN_STAINED_GLASS:
+                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
                         //CHANGE COLOR
                         Inventory chooseColorInv = Bukkit.createInventory(p, 27,"§2Couleur du territoire " + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName());
                         chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
@@ -507,6 +514,7 @@ public class EventListener implements Listener {
                         p.openInventory(chooseColorInv);
                         break;
                     case RED_DYE:
+                        if(territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
                         invView.close();
                         //DELETE TERRITORY
                        try {
@@ -529,18 +537,33 @@ public class EventListener implements Listener {
                            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get territory chief to verify a player's permission. §cAllowed " + p.getName() + " to delete territory " + territoryData.getTerritoryTeamOfPlayer(p).getName());
                        }
                         return;
-                    case WHITE_BANNER,BLACK_BANNER,RED_BANNER,BLUE_BANNER,LIGHT_BLUE_BANNER,BROWN_BANNER,CYAN_BANNER,GRAY_BANNER,GREEN_BANNER,LIGHT_GRAY_BANNER,LIME_BANNER,MAGENTA_BANNER,ORANGE_BANNER,PINK_BANNER,PURPLE_BANNER,YELLOW_BANNER:
-                        Bukkit.getScheduler().runTask(main, p::closeInventory);
-                        p.sendTitle("§2Prenez la bannière","§2§ldans votre main",20,100,20);
-                        p.sendMessage(main.prefix + "§2Prenez la §5future§2 bannière de territoire §2§ldans votre main§r§2.");
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
-                            p.sendTitle("§rQuand c'est fait","§2§lentrez §r§2\"GO\"§2§l dans le tchat",20,60,20);
-                            p.sendMessage(main.prefix + "§2Lorsque c'est fait, entrez \"GO\" dans le tchat.");
-                            defTerritoryBanner.add(p);
-                        }, 100);
+                    case VILLAGER_SPAWN_EGG:
+                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        //MANAGER WORKERS
+                        p.closeInventory();
+                        p.openInventory(territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), 1));
+                        break;
+                    case PLAYER_HEAD:
+                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        //MANAGE MEMBERS
+                        p.sendMessage(main.prefix + "§c§oEn développement!");
                         break;
                     case BARRIER:
                         invView.close();
+                        break;
+                    default:
+                        if(Tag.BANNERS.isTagged(it.getType())){
+                            if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                            Bukkit.getScheduler().runTask(main, p::closeInventory);
+                            p.sendTitle("§2Prenez la bannière","§2§ldans votre main",20,100,20);
+                            p.sendMessage(main.prefix + "§2Prenez la §5future§2 bannière de territoire §2§ldans votre main§r§2.");
+                            Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
+                                p.sendTitle("§rQuand c'est fait","§2§lentrez §r§2\"GO\"§2§l dans le tchat",20,60,20);
+                                p.sendMessage(main.prefix + "§2Lorsque c'est fait, entrez \"GO\" dans le tchat.");
+                                defTerritoryBanner.add(p);
+                            }, 100);
+                            return;
+                        }
                         break;
                 }
             } else if(invView.getTitle().contains("§2Couleur du territoire ")){
@@ -681,14 +704,14 @@ public class EventListener implements Listener {
                     }
                     case RED_STAINED_GLASS -> {
                         invView.close();
-                        int page = territoryData.extractTerrListPageNumber(invView.getTitle());
+                        int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory terrListInv = territoryData.getTerritoryListInventory(p, page - 1);
                         p.openInventory(terrListInv);
                         break;
                     }
                     case LIME_STAINED_GLASS -> {
                         invView.close();
-                        int page = territoryData.extractTerrListPageNumber(invView.getTitle());
+                        int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory terrListInv = territoryData.getTerritoryListInventory(p, page + 1);
                         p.openInventory(terrListInv);
                         break;
@@ -781,6 +804,109 @@ public class EventListener implements Listener {
                         invView.close();
                         territoryData.buyWorker(p,type,5);
                         break;
+                    }
+                }
+            } else if (invView.getTitle().contains("§bGérer vos villageois §7- §ePage §6")) {
+                e.setCancelled(true);
+                if(it==null) {return;}
+                switch (it.getType()) {
+                    case BARRIER -> {
+                        invView.close();
+                        break;
+                    }
+                    case RED_STAINED_GLASS -> {
+                        invView.close();
+                        int page = territoryData.extractInventoryPageNumber(invView.getTitle());
+                        Inventory workerListInv = territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), page - 1);
+                        p.openInventory(workerListInv);
+                        break;
+                    }
+                    case LIME_STAINED_GLASS -> {
+                        invView.close();
+                        int page = territoryData.extractInventoryPageNumber(invView.getTitle());
+                        Inventory workerListInv = territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), page + 1);
+                        p.openInventory(workerListInv);
+                        break;
+                    }
+                   default -> {
+                        if(it.getItemMeta() != null && it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                            p.closeInventory();
+                            String workerUUID = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING);
+                            territoryData.showWorkerInventory(p,workerUUID,territoryData.getPlayerTerritory(p));
+                            return;
+                        }
+                    }
+                }
+            } else if (invView.getTitle().contains("§bGérer le villageois")) {
+                e.setCancelled(true);
+                if(it==null) {return;}
+                switch (it.getType()) {
+                    case VILLAGER_SPAWN_EGG -> {
+                        //GIVE SPAWNEGG
+                        ItemStack workerItem = inv.getItem(4);
+                        if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                            p.closeInventory();
+                            String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
+                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive")){
+                                ItemStack workerSpawnEgg = territoryData.getConfig().getItemStack("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".spawnEgg");
+                                p.getInventory().addItem(workerSpawnEgg);
+                                p.sendMessage(main.prefix + "§aVous avez reçu l'œuf d'apparition du villageois !");
+                                return;
+                            } else {
+                                p.sendMessage(main.prefix + "§cLe villegois est déjà en vie/activité !");
+                                return;
+                            }
+                        } else {
+                            p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
+                            return;
+                        }
+                    }
+                    case IRON_SWORD -> {
+                        //KILL VILLAGER
+                        ItemStack workerItem = inv.getItem(4);
+                        if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                            p.closeInventory();
+                            String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
+                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive") && territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID") != null){
+                                UUID villagerUUID = UUID.fromString(Objects.requireNonNull(territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID")));
+                                Villager villager = (Villager) Bukkit.getEntity(villagerUUID);
+                                if(villager==null) {
+                                    return;
+                                }
+                                villager.remove();
+
+                                if(workerUUID == null || !territoryData.getWorkerList().contains(workerUUID)) {
+                                    return;
+                                }
+                                String workerType = null;
+                                for (String tag : villager.getScoreboardTags()) {
+                                    if (tag.contains("workerType=")) {
+                                        workerType = tag.replace("workerType=","");
+                                    }
+                                }
+                                String territoryName = territoryData.getWorkerTerritory(villager);
+                                territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".alive", false);
+                                territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
+                                territoryData.saveConfig();
+                                if (workerType!=null) {
+                                    WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
+                                    if (type.getLifespan()==-1){
+                                        territoryData.spawnWorker(villager,villager.getLocation());
+                                        return;
+                                    } else {
+                                        territoryData.removeOneAliveWorkerFromCount(territoryName,type);
+                                    }
+                                }
+                                territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+
+                            }
+                        }else {
+                            p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
+                            return;
+                        }
+                    }
+                    case BARRIER -> {
+                        p.closeInventory();
                     }
                 }
             }
@@ -972,13 +1098,14 @@ public class EventListener implements Listener {
                 }
             }
             String territoryName = territoryData.getWorkerTerritory(villager);
-            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
-            territoryData.getConfig().set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
+            territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".alive", false);
+            territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
             territoryData.saveConfig();
             if (workerType!=null) {
                 WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
                 if (type.getLifespan()==-1){
                     territoryData.spawnWorker(villager,e.getEntity().getLocation());
+                    return;
                 } else {
                     territoryData.removeOneAliveWorkerFromCount(territoryName,type);
                 }

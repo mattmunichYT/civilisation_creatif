@@ -4,7 +4,6 @@ import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -13,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -864,23 +865,23 @@ public class TerritoryData {
 
     public Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p,54,"§aListe des territoires §7- §ePage §6" + page);
-        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
+        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE,"");
         for (int i = 0; i < 53; i++) {
             terrListInv.setItem(i, none);
         }
         //Borders
-        terrListInv.setItem(0,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(1,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(7,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(8,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(9,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(17,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(36,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(44,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(45,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(46,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(52,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
-        terrListInv.setItem(53,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,"",false,false,null,null,null));
+        terrListInv.setItem(0,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(1,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(7,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(8,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(9,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(17,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(36,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(44,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(45,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(46,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(52,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(53,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
         //Borders
         //Inner part
         int[] ranges = {10, 16, 19, 25, 28, 34, 37, 43};
@@ -903,17 +904,14 @@ public class TerritoryData {
         return terrListInv;
     }
 
-    public int extractTerrListPageNumber(String title) {
-        // Regular expression to match the integer at the end of the string
+    public int extractInventoryPageNumber(String title) {
         Pattern pattern = Pattern.compile("§6(\\d+)$");
         Matcher matcher = pattern.matcher(title);
 
         if (matcher.find()) {
-            // Extract and return the integer as a number
             return Integer.parseInt(matcher.group(1));
         } else {
-            // Default value if no number is found
-            return -1;
+            return 1;
         }
     }
 
@@ -964,6 +962,119 @@ public class TerritoryData {
         return terrListInv_Layout;
     }
 
+    public Inventory getTerrWorkersInv_Layout(Player p, int page, int pageNum) {
+        Inventory terrListInv = Bukkit.createInventory(p,54,"§bGérer vos villageois §7- §ePage §6" + page);
+        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
+        for (int i = 0; i < 53; i++) {
+            terrListInv.setItem(i, none);
+        }
+        //Borders
+        terrListInv.setItem(0,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(1,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(7,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(8,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(9,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(17,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(36,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(44,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(45,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(46,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(52,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        terrListInv.setItem(53,ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE,""));
+        //Borders
+        //Inner part
+        int[] ranges = {10, 16, 19, 25, 28, 34, 37, 43};
+
+        for (int i = 0; i < ranges.length; i += 2) {
+            for (int slot = ranges[i]; slot <= ranges[i + 1]; slot++) {
+                terrListInv.setItem(slot, null);
+            }
+        }
+        //Inner part
+        //Navigation bar
+        if(page!=1) {
+            terrListInv.setItem(47,ItemBuilder.getItem(Material.RED_STAINED_GLASS_PANE,"§c§l←",false,false,null,null,null));
+        }
+        terrListInv.setItem(49,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu",false,false,null,null,null));
+        if(page!=pageNum){
+            terrListInv.setItem(51,ItemBuilder.getItem(Material.LIME_STAINED_GLASS_PANE,"§a§l→",false,false,null,null,null));
+        }
+        //Navigation bar
+        return terrListInv;
+    }
+
+    public Inventory getTerritoryWorkersInventory(Player p, String territoryName, int page) {
+        int itemsPerPage = 28;
+        List<String> workerList = getTerritoryWorkerList(territoryName);
+        int totalPages = (int) Math.ceil((double) workerList.size() / itemsPerPage);
+
+        if (page < 1 || page > totalPages) {
+            page = 1;
+        }
+
+        Inventory terrWorkersInv_Layout = getTerrWorkersInv_Layout(p, page, totalPages);
+
+        int startIndex = (page - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, workerList.size());
+
+        // Populate the inventory with items for the current page
+        for (int i = startIndex; i < endIndex; i++) {
+            String workerUUID = workerList.get(i);
+            String pathToWorker = "territories." + territoryName + ".workers." + workerUUID;
+            boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
+            int tier = config.getInt(pathToWorker + ".tier");
+            WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
+            int daysToLive = config.getInt(pathToWorker + ".daysToLive");
+            int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
+            config.set(pathToWorker + ".daysLived",daysLived);
+            int income = workerType.getIncome();
+            ChatColor tierColor= ChatColor.DARK_GRAY;
+            switch (tier){
+                case 0:
+                    break;
+                case 1:
+                    tierColor=ChatColor.GRAY;
+                    income= (int) (income+(income*0.1));//+10%
+                    break;
+                case 2:
+                    tierColor=ChatColor.YELLOW;
+                    income= (int) (income+(income*0.25));//+25%
+                    break;
+                case 3:
+                    tierColor=ChatColor.GREEN;
+                    income= (int) (income+(income*0.45));//+45%
+                    break;
+                case 4:
+                    tierColor=ChatColor.AQUA;
+                    income= (int) (income+(income*0.70));//+70%
+                    break;
+                case 5:
+                    tierColor=ChatColor.BLACK;
+                    income= (int) (income+(income*0.95));//+95%
+                    break;
+            }
+
+            Material workerItemType = workerType.getItem();
+            String typeName = formatType(workerType.toString());
+            String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
+            String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
+            String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysLived < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1" + daysToLive + "§a jours"));
+
+            ItemStack workerItem = new ItemStack(workerItemType);
+            ItemMeta workerItemMeta = workerItem.getItemMeta();
+            assert workerItemMeta != null;
+            PersistentDataContainer data = workerItemMeta.getPersistentDataContainer();
+            data.set(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING,workerUUID);
+            workerItemMeta.setDisplayName(tierColor+typeName);
+            workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan));
+            workerItem.setItemMeta(workerItemMeta);
+            terrWorkersInv_Layout.addItem(workerItem);
+        }
+
+        // Return the populated inventory for the specified page
+        return terrWorkersInv_Layout;
+    }
+
 
     public Inventory getTerrInv(Player p, Team territory) {
         Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
@@ -990,13 +1101,15 @@ public class TerritoryData {
         terrInv.setItem(4, banner);
         terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr))));
         if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
-            terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b\uD83D\uDC64➕ Inviter des joueurs", false, false, null, null, null));
+            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎️ Gérer les villageois"));
+            terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b👤➕ Inviter des joueurs"));
         }
         if (hasTerritory(p) && (isChief(p,terr))) {
-            terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire", false, false, null, null, null));
-            terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire", false, false, null, null, null));
+            terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire"));
+            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎️ Gérer les membres"));
+            terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire"));
         }
-        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
+        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu"));
         return terrInv;
     }
 
@@ -1185,16 +1298,16 @@ public class TerritoryData {
         meta.setDisplayName("§a" + type.name().substring(0,1).toUpperCase() + type.name().substring(1).toLowerCase());
         villager.remove();
         spawnEgg.setItemMeta(meta);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".bought", System.currentTimeMillis());
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysToLive", type.getLifespan());
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".daysLived", 0);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", false);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", false);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".type", type.name().toLowerCase());
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".name", workerName);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", null);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".tier", tier);
-        config.set("territories." + territoryName + ".villagers." + workerUUID + ".spawnEgg", spawnEgg);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".bought", System.currentTimeMillis());
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".daysToLive", type.getLifespan());
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".daysLived", 0);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".alive", false);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".hasEverBeenSpawned", false);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".type", type.name().toLowerCase());
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".name", workerName);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".tier", tier);
+        config.set("territories." + territoryName + ".workers." + workerUUID + ".spawnEgg", spawnEgg);
         addWorkerToList(workerUUID);
         addWorkerToTerritoryList(workerUUID,territoryName);
         p.getInventory().addItem(spawnEgg);
@@ -1223,23 +1336,23 @@ public class TerritoryData {
             if(workerUUID == null || !getWorkerList().contains(workerUUID.toString())) {
                 return;
             }
-            if(config.getBoolean("territories." + territoryName + ".villagers." + workerUUID + ".alive")) {
+            if(config.getBoolean("territories." + territoryName + ".workers." + workerUUID + ".alive")) {
                 villager.remove();
                 p.sendMessage(main.prefix + "§4L'employé existe déjà !");
                 return;
             }
             WorkerType workerType = null;
             try {
-                workerType = WorkerType.valueOf(config.getString("territories." + territoryName + ".villagers." + workerUUID + ".type").toUpperCase());
+                workerType = WorkerType.valueOf(config.getString("territories." + territoryName + ".workers." + workerUUID + ".type").toUpperCase());
             } catch (IllegalArgumentException | NullPointerException e) {
                 p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
                 main.logError("Couldn't get workerType when spawning it",e);
                 return;
             }
-            int tier = config.getInt("territories." + territoryName + ".villagers." + workerUUID + ".tier");
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
+            int tier = config.getInt("territories." + territoryName + ".workers." + workerUUID + ".tier");
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".alive", true);
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".hasEverBeenSpawned", true);
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
             switch (tier){
                 case 0:
@@ -1303,15 +1416,15 @@ public class TerritoryData {
             if(workerUUID == null || !getWorkerList().contains(workerUUID.toString()) || territoryName == null || spawnLocation.getWorld() == null) {
                 return;
             }
-            if(config.getBoolean("territories." + territoryName + ".villagers." + workerUUID + ".alive")) {
+            if(config.getBoolean("territories." + territoryName + ".workers." + workerUUID + ".alive")) {
                 villager.remove();
                 return;
             }
             villager.setHealth(20);
 //            villager = (Villager) villager.createSnapshot().createEntity(spawnLocation); not needed
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".alive", true);
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".hasEverBeenSpawned", true);
-            config.set("territories." + territoryName + ".villagers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".alive", true);
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".hasEverBeenSpawned", true);
+            config.set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", villager.getUniqueId().toString());
             saveConfig();
 
             spawnLocation.getWorld().spawnParticle(Particle.ASH,villager.getLocation(),100,2,2,2);
@@ -1336,7 +1449,7 @@ public class TerritoryData {
         for (String territoryName : getTerritoriesList()) {
             int territorySumMoney=0;
             for (String workerUUID : getTerritoryWorkerList(territoryName)){
-                String pathToWorker = "territories." + territoryName + ".villagers." + workerUUID;
+                String pathToWorker = "territories." + territoryName + ".workers." + workerUUID;
                 boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
                 int tier = config.getInt(pathToWorker + ".tier");
                 WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
@@ -1504,5 +1617,65 @@ public class TerritoryData {
 
     public int getAliveWorkerCount(String territoryName, WorkerType workerType){
         return (config.get("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) == null ||  config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) < 0) ? 0 : config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase());
+    }
+
+    public void showWorkerInventory(Player p, String workerUUID, String territoryName) {
+        Inventory workerInv = Bukkit.createInventory(p,9,"§bGérer le villageois");
+        String pathToWorker = "territories." + territoryName + ".workers." + workerUUID;
+        boolean workerAlive = config.getBoolean(pathToWorker + ".alive");
+        int tier = config.getInt(pathToWorker + ".tier");
+        WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
+        int daysToLive = config.getInt(pathToWorker + ".daysToLive");
+        int daysLived = config.getInt(pathToWorker + ".daysLived")+1;
+        config.set(pathToWorker + ".daysLived",daysLived);
+        int income = workerType.getIncome();
+        ChatColor tierColor= ChatColor.DARK_GRAY;
+        switch (tier){
+            case 0:
+                break;
+            case 1:
+                tierColor=ChatColor.GRAY;
+                income= (int) (income+(income*0.1));//+10%
+                break;
+            case 2:
+                tierColor=ChatColor.YELLOW;
+                income= (int) (income+(income*0.25));//+25%
+                break;
+            case 3:
+                tierColor=ChatColor.GREEN;
+                income= (int) (income+(income*0.45));//+45%
+                break;
+            case 4:
+                tierColor=ChatColor.AQUA;
+                income= (int) (income+(income*0.70));//+70%
+                break;
+            case 5:
+                tierColor=ChatColor.BLACK;
+                income= (int) (income+(income*0.95));//+95%
+                break;
+        }
+
+        Material workerItemType = workerType.getItem();
+        String typeName = formatType(workerType.toString());
+        String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
+        String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
+        String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysLived < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1" + daysToLive + "§a jours"));
+
+        ItemStack workerItem = new ItemStack(workerItemType);
+        ItemMeta workerItemMeta = workerItem.getItemMeta();
+        assert workerItemMeta != null;
+        PersistentDataContainer data = workerItemMeta.getPersistentDataContainer();
+        data.set(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING,workerUUID);
+        workerItemMeta.setDisplayName(tierColor+typeName);
+        workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan));
+        workerItem.setItemMeta(workerItemMeta);
+        workerInv.setItem(4,workerItem);
+        if(!workerAlive) {
+            workerInv.setItem(0,ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG,"§a➕ Obtenir l'œuf d'appaition du villageois"));
+        } else {
+            workerInv.setItem(0,ItemBuilder.getItem(Material.IRON_SWORD,"§c➖ Faire disparaitre le villageois"));
+        }
+        workerInv.setItem(8,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu"));
+        p.openInventory(workerInv);
     }
 }
