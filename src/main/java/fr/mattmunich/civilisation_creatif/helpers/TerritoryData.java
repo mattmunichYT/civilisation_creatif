@@ -38,7 +38,7 @@ public class TerritoryData {
         this.main = main;
     }
 
-    private BukkitTask workerCheckupTask = null;
+    public BukkitTask workerCheckupTask = null;
 
     public int baseChunkPrice = 300;
     public int changeBannerPrice = 300;

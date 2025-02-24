@@ -162,21 +162,7 @@ public final class Main extends JavaPlugin {
             }
         }, 1, 1);
 
-        Calendar cal = Calendar.getInstance();
-        long now = cal.getTimeInMillis();
-        if(cal.get(Calendar.HOUR_OF_DAY) >= 22)
-            cal.add(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 22);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        long offset = cal.getTimeInMillis() - now;
-        long ticks = offset / 50L;
-        try {
-            Bukkit.getScheduler().runTaskTimer(this, () -> backup.run(), ticks,1728000);
-        } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(prefix + "§4Coulnd't schedule backup : §r" + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replace(",",",\n"));
-        }
+        backup.scheduleNextBackup();
 
         territoryData.programNextWorkerCheckup();
         Bukkit.getConsoleSender().sendMessage(prefix + "§eLoading spawn world...");
@@ -232,8 +218,11 @@ public final class Main extends JavaPlugin {
             all.sendTitle("§4🚀 Redémarrage du serveur...","",20,100,20);
             all.transfer("91.197.6.60", 25599);
         }
-        if (territoryData != null) {
-            territoryData.cancelWorkerCheckup();
+        if (territoryData != null && territoryData.workerCheckupTask!=null) {
+            territoryData.workerCheckupTask.cancel();
+        }
+        if(backup != null && backup.backupTask !=null){
+            backup.backupTask.cancel();
         }
         super.onDisable();
     }
