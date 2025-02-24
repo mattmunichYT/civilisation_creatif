@@ -867,15 +867,17 @@ public class EventListener implements Listener {
                         if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
                             p.closeInventory();
                             String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
-                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive") && territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID") != null){
-                                UUID villagerUUID = UUID.fromString(Objects.requireNonNull(territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID")));
-                                Villager villager = (Villager) Bukkit.getEntity(villagerUUID);
+                            String villagerUUID = territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID");
+                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive") && villagerUUID != null){
+                                Villager villager = (Villager) Bukkit.getEntity(UUID.fromString(villagerUUID));
                                 if(villager==null) {
+                                    p.sendMessage(main.prefix + "§cVillageois non trouvé.");
                                     return;
                                 }
                                 villager.remove();
 
                                 if(workerUUID == null || !territoryData.getWorkerList().contains(workerUUID)) {
+                                    p.sendMessage(main.prefix + "§cLe villageois est invalide.");
                                     return;
                                 }
                                 String workerType = null;
@@ -898,7 +900,9 @@ public class EventListener implements Listener {
                                     }
                                 }
                                 territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
-
+                            } else {
+                                p.sendMessage(main.prefix + "§cLe villageois n'existe pas.");
+                                return;
                             }
                         }else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
