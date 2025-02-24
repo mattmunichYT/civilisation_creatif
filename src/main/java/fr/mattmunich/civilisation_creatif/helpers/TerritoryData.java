@@ -1101,12 +1101,12 @@ public class TerritoryData {
         terrInv.setItem(4, banner);
         terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr))));
         if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
-            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎️ Gérer les villageois"));
+            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎ Gérer les villageois"));
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b👤➕ Inviter des joueurs"));
         }
         if (hasTerritory(p) && (isChief(p,terr))) {
             terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire"));
-            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎️ Gérer les membres"));
+            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎ Gérer les membres"));
             terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire"));
         }
         terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu"));
