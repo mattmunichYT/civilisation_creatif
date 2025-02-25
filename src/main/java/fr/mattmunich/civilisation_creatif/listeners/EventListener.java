@@ -862,13 +862,15 @@ public class EventListener implements Listener {
                         }
                     }
                     case IRON_SWORD -> {
+                        if(e.getSlot()!=0) {return;}
                         //KILL VILLAGER
                         ItemStack workerItem = inv.getItem(4);
                         if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
                             p.closeInventory();
                             String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
                             String villagerUUID = territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID");
-                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive") && villagerUUID != null){
+                            boolean workerAlive = territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive");
+                            if(workerAlive && villagerUUID != null){
                                 Villager villager = (Villager) Bukkit.getEntity(UUID.fromString(villagerUUID));
                                 if(villager==null) {
                                     p.sendMessage(main.prefix + "§cVillageois non trouvé.");

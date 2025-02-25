@@ -1058,7 +1058,7 @@ public class TerritoryData {
             String typeName = formatType(workerType.toString());
             String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
             String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
-            String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysLived < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
+            String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysToLive < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
 
             ItemStack workerItem = new ItemStack(workerItemType);
             ItemMeta workerItemMeta = workerItem.getItemMeta();
@@ -1659,7 +1659,7 @@ public class TerritoryData {
         String typeName = formatType(workerType.toString());
         String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
         String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
-        String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysLived < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
+        String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysToLive < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
 
         ItemStack workerItem = new ItemStack(workerItemType);
         ItemMeta workerItemMeta = workerItem.getItemMeta();
