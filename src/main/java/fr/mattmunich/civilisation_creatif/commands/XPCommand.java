@@ -2,7 +2,6 @@ package fr.mattmunich.civilisation_creatif.commands;
 
 import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
-import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.Utility;
 import org.bukkit.Bukkit;
@@ -43,7 +42,7 @@ public class XPCommand implements CommandExecutor, TabCompleter {
         }
 
         if(args.length==1) {
-            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.XP() + "XP §2!");
+            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.xp() + "XP §2!");
             return true;
         }
 
@@ -69,7 +68,7 @@ public class XPCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if(args[1].equalsIgnoreCase("get")) {
-            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.XP() + "XP §2!");
+            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.xp() + "XP §2!");
             return true;
         }
 

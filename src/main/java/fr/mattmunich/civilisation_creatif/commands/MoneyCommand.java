@@ -39,7 +39,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if(args.length==1) {
-            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.Money() + main.moneySign + "§2 !");
+            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.money() + main.moneySign + "§2 !");
             return true;
         }
 
@@ -63,7 +63,7 @@ public class MoneyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if(args[1].equalsIgnoreCase("get")) {
-            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.Money() + main.moneySign + "§2 !");
+            s.sendMessage(main.prefix + "§2Le joueur §6" + args[0] + "§2 a §6" + data.money() + main.moneySign + "§2 !");
             return true;
         }
         if(s instanceof Player p) {

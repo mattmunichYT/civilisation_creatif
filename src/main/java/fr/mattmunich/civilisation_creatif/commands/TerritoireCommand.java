@@ -18,7 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class TerritoireCommand implements CommandExecutor, TabCompleter {
@@ -229,9 +228,9 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 try {
-                    if(playerData.Money() < amount) {
+                    if(playerData.money() < amount) {
                         p.sendMessage(main.prefix + "§4Il n'y a pas assez d'argent dans votre compte !");
-                        p.sendMessage(main.prefix + "§cIl y a §e" + playerData.Money() + main.moneySign + "§c dans dans votre compte.");
+                        p.sendMessage(main.prefix + "§cIl y a §e" + playerData.money() + main.moneySign + "§c dans dans votre compte.");
                         return true;
                     }
 

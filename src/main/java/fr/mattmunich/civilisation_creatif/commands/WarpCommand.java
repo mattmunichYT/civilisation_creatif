@@ -57,7 +57,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 			}
 
 			if(args.length > 2 || args.length < 1) {
-				p.sendMessage("§cSintax : /setwarp <warpName> [permission]");
+				p.sendMessage(main.wrongUsage + "/setwarp <warpName> [permission]");
 				return true;
 			}
 
@@ -99,7 +99,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 		}else if (l.equalsIgnoreCase("warp")) {
 			if(args.length != 1) {
 				warp.sendWarpListMsg(p);
-				p.sendMessage("§cSintax : /warp <warpName>");
+				p.sendMessage(main.wrongUsage + "/warp <warpName>");
 				return true;
 			}
 			String warpName = args[0];
@@ -116,7 +116,7 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
 			}
 
 			if(args.length != 1) {
-				p.sendMessage("§cSintax : /delwarp <warpName>");
+				p.sendMessage(main.wrongUsage + "/delwarp <warpName>");
 				return true;
 			}
 

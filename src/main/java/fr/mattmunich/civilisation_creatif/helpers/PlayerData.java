@@ -33,6 +33,8 @@ public final class PlayerData {
 	private FileConfiguration config;
 	private File file;
 
+	private Player p = null;
+
     public PlayerData(Plugin plugin, Main main) {
 		this.plugin = plugin;
 		this.main = main;
@@ -58,6 +60,7 @@ public final class PlayerData {
 		new YamlConfiguration();
 		config = YamlConfiguration.loadConfiguration(file);
 		this.plugin = getPlugin();
+		this.p=Bukkit.getPlayer(uuid);
 		if(Utility.getNameFromUUID(uuid) == null) {
 			throw new Exception("Error while getting player with UUID");
 		}
@@ -88,6 +91,7 @@ public final class PlayerData {
 		if(config.getString("player.rank") == null) {
 			config.set("player.rank", "membre");
 		}
+		this.p = p;
 		saveConfig();
 	}
 
@@ -97,6 +101,7 @@ public final class PlayerData {
         assert name != null;
         Score xp = Objects.requireNonNull(scoreboard.getObjective("xp")).getScore(name);
 		xp.setScore(setXP);
+		if(p!=null) {SidebarManager.updateScoreboard(p);}
 	}
 
 	private void setMoneyScore(int setMoney) {
@@ -105,6 +110,23 @@ public final class PlayerData {
         assert name != null;
         Score money = Objects.requireNonNull(scoreboard.getObjective("money")).getScore(name);
 		money.setScore(setMoney);
+		if(p!=null) {SidebarManager.updateScoreboard(p);}
+	}
+
+	public int getXPScore() {
+		String name = config.getString("player.name");
+		Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+		assert name != null;
+		Score xp = Objects.requireNonNull(scoreboard.getObjective("xp")).getScore(name);
+		return xp.getScore();
+	}
+
+	public int getMoneyScore() {
+		String name = config.getString("player.name");
+		Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+		assert name != null;
+		Score money = Objects.requireNonNull(scoreboard.getObjective("money")).getScore(name);
+		return money.getScore();
 	}
 
 	public Plugin getPlugin(){
@@ -137,9 +159,7 @@ public final class PlayerData {
 		return config.getInt("civilisation.xp")/1000;
 	}
 
-	public int XP() {
-		return config.getInt("civilisation.xp");
-	}
+	public int xp() { return config.getInt("civilisation.xp");}
 
 	public void setXP(int xp) {
 		config.set("civilisation.xp", xp);
@@ -167,9 +187,7 @@ public final class PlayerData {
 		saveConfig();
 	}
 
-	public int Money() {
-		return config.getInt("civilisation.money");
-	}
+	public int money() { return config.getInt("civilisation.money");}
 
 	public void setMoney(int money) {
 		config.set("civilisation.money", money);
@@ -231,6 +249,7 @@ public final class PlayerData {
 
 	public void setTerritory(String territoryName) {
 		config.set("civilisation.territories.territory",territoryName);
+		if(p!=null) {SidebarManager.updateScoreboard(p);}
 		saveConfig();
 	}
 

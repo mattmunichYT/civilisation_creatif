@@ -96,7 +96,7 @@ public class Backup {
 
     public void scheduleNextBackup(){
         if(backupTask != null && !backupTask.isCancelled()) {
-            Bukkit.getLogger().warning(main.prefix + "Duplicate BackupTask detected! Cancelling previous one.");
+            Bukkit.getConsoleSender().sendMessage(main.prefix + "Duplicate BackupTask detected! Cancelling previous one.");
             backupTask.cancel();
         }
 

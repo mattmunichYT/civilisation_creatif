@@ -63,7 +63,9 @@ public final class Main extends JavaPlugin {
     //END OF GRADES
     //PUBLIC UTILITIES
     public ArrayList<Player> speeding = new ArrayList<>();
-    public String prefix = "§e[§2Civilisation§e] §2";
+    public String fullName = hex("#FCD05C§lC#FCD05C§li#FCD05C§lv#FCD05C§li#FCD05C§ll#E0CF56§li#C4CD50§ls#A8CC4A§la#8CCA44§lt#70C93D§li#54C737§lo#38C631§ln #00C325§lC#00CD38§lr#00D74B§lé#00E15F§la#00EB72§lt#00F585§li#00FF98§lf");
+    public String shortName = hex("#FCD05C§lC#FCD05C§li#FCD05C§lv#D2CE53§li#A8CC4A§ll#7ECA41§li#54C737§ls#2AC52E§la#00C325§lt#00D74B§li#00EB72§lo#00FF98§ln");
+    public String prefix = hex("§e[" + shortName + "] §2");
     public String makeItSafePrefix = "§1[§b§lMake It Safe§1] §a";
     public String playerToExc = prefix + "§4Vous devez être un joueur pour éxecuter cette commande !";
     public String noPermToExc = prefix + "§4Vous n'avez pas la permission d'éxecuter cette commande !";
@@ -79,6 +81,7 @@ public final class Main extends JavaPlugin {
     Backup backup;
     TerritoryData territoryData;
     Warp warp;
+    SidebarManager sidebarManager;
     //END OF HELPERS GET
     //OTHER ARRAY LISTS
     public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
@@ -87,6 +90,12 @@ public final class Main extends JavaPlugin {
     //SCOREBOARDS
 
     public void loadConfigs(){
+        pdata = null;
+        backup = null;
+        territoryData = null;
+        warp = null;
+        sidebarManager = null;
+
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard;
         if (manager != null) {
@@ -113,6 +122,8 @@ public final class Main extends JavaPlugin {
         territoryData.initConfig();
         warp = new Warp(this);
         warp.initConfig();
+        sidebarManager = new SidebarManager(this, this,territoryData);
+        sidebarManager.setupScoreboard();
     }
     @SuppressWarnings("DataFlowIssue")
     @Override
@@ -139,13 +150,13 @@ public final class Main extends JavaPlugin {
         getCommand("delwarp").setExecutor(new WarpCommand(this,warp));
 
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new JoinListener(this,territoryData), this);
+        pm.registerEvents(new JoinListener(this,territoryData,sidebarManager), this);
         pm.registerEvents(new AntiSpeed(this), this);
         pm.registerEvents(new EventListener(this,this,territoryData), this);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             for(Player all : Bukkit.getOnlinePlayers()) {
 
-                all.setPlayerListHeader("§2§lBienvenue " + all.getDisplayName() +  "§2§l\n sur §6le serveur §2§lCivilisation §6Créatif !\n");
+                all.setPlayerListHeader("§2§lBienvenue " + all.getDisplayName() +  "§2§l\n sur §6le serveur " + fullName + " !\n");
                 int ndj = Bukkit.getOnlinePlayers().size();
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
@@ -158,7 +169,7 @@ public final class Main extends JavaPlugin {
 
                 String worldname = getWorldname(all);
 
-                all.setPlayerListFooter("\n§2Nombre de joueurs en ligne : §6" + ndj + "§r\n§2IP : §6§lminijeux.mine.fun" + "§r\n§2Heure : §6" + h + "§e:§6" + m + "§r\n§2Monde : §6" + worldname + "§r§2,\n Position : §eX: §6" + all.getLocation().getBlockX() + "§r§2, §eY: §6" + all.getLocation().getBlockY() + "§r§2, §eZ: §6" + all.getLocation().getBlockZ());
+                all.setPlayerListFooter("\n§2Nombre de joueurs en ligne : §6" + ndj + "§r\n§2IP : §6§lcivilisation-mjep.mine.fun" + "§r\n§2Heure : §6" + h + "§e:§6" + m + "§r\n§2Monde : §6" + worldname + "§r§2,\n Position : §eX: §6" + all.getLocation().getBlockX() + "§r§2, §eY: §6" + all.getLocation().getBlockY() + "§r§2, §eZ: §6" + all.getLocation().getBlockZ());
             }
         }, 1, 1);
 
@@ -185,23 +196,23 @@ public final class Main extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(prefix + "§2Spawn world loaded !");
     }
 
-    private static String getWorldname(Player all) {
+    private String getWorldname(Player all) {
         String worldname = Objects.requireNonNull(all.getLocation().getWorld()).getName();
 
         if(worldname.equalsIgnoreCase("world")) {
-            worldname = "§2Civilisaton §e- §6Overworld";
+            worldname = this.shortName + " §e- §6Overworld";
 
         } else if(worldname.equalsIgnoreCase("world_nether")) {
-            worldname = "§2pq Civilisation §e- §cNether";
+            worldname = this.shortName + " §e- §cNether";
 
         } else if(worldname.equalsIgnoreCase("world_the_end")) {
-            worldname = "§2Civilisation §e- §5End";
+            worldname = this.shortName + " §e- §5End";
 
         } else if(worldname.equalsIgnoreCase("spawn")) {
-            worldname = "§2Civilisation §e- §6Spawn";
+            worldname = this.shortName + " §e- §6Spawn";
 
         } else {
-            worldname = all.getLocation().getWorld().getName();
+            worldname = this.shortName + " §e- " + all.getLocation().getWorld().getName();
         }
         return worldname;
     }
@@ -214,7 +225,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         for(Player all : Bukkit.getOnlinePlayers()) {
-            all.sendMessage("§e(§6!§e)§4 Le serveur Civilisation Créatif §credémarre§4 !");
+            all.sendMessage("§e(§6!§e)§4 Le serveur " + fullName + " §credémarre§4 !");
             all.sendTitle("§4🚀 Redémarrage du serveur...","",20,100,20);
             all.transfer("91.197.6.60", 25599);
         }

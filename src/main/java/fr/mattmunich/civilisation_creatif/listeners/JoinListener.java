@@ -3,25 +3,24 @@ package fr.mattmunich.civilisation_creatif.listeners;
 import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
+import fr.mattmunich.civilisation_creatif.helpers.SidebarManager;
 import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import java.util.Arrays;
 
 public class JoinListener implements Listener {
 
-    private static Main main;
-    private static TerritoryData territoryData;
+    private final Main main;
+    private final TerritoryData territoryData;
+    private final SidebarManager sidebarManager;
 
-    public JoinListener(Main main, TerritoryData territoryData) {
+    public JoinListener(Main main, TerritoryData territoryData, SidebarManager sidebarManager) {
         this.main = main;
         this.territoryData = territoryData;
+        this.sidebarManager = sidebarManager;
     }
 
     @EventHandler
@@ -86,6 +85,7 @@ public class JoinListener implements Listener {
 
         if(!main.modo.contains(p)) {
             p.kickPlayer("§cAccès au serveur refusé !\n§eLe serveur est en développement.");
+            Bukkit.getConsoleSender().sendMessage(main.makeItSafePrefix + "§a --> §e[§6§lJoin Logger§r§e] §cAccess refused to §4" + p.getName() + "§c because the player didn't have a §ehigh enough rank§c !");
             return;
         }
         Bukkit.getConsoleSender().sendMessage(main.makeItSafePrefix + "§a --> §e[§6§lJoin Logger§r§e] §ePlayer §c" + p.getName() + "§e with UUID §c" + p.getUniqueId() + "§e and IP-Adress §c" + p.getAddress() + "§e§l successfully connected to the server§r§e.");
@@ -93,11 +93,12 @@ public class JoinListener implements Listener {
 
         p.sendMessage("\n\n\n§e----------------------------------");
         p.sendMessage("§2        Bienvenue sur le serveur        ");
-        p.sendMessage("          §2§lCivilisation §6Créatif          \n");
+        p.sendMessage("          " + main.fullName + "          \n");
         p.sendMessage("§e              -----------             \n");
         p.sendMessage("§a              Propulsé par              ");
         p.sendMessage("        §x§f§f§0§0§0§0§lM§x§f§e§0§f§0§0§li§x§f§c§1§e§0§0§ln§x§f§b§2§d§0§0§li §x§f§9§3§c§0§0§lJ§x§f§8§4§b§0§0§le§x§f§7§5§a§0§0§lu§x§f§5§6§9§0§0§lx §x§f§4§7§8§0§0§lE§x§f§2§8§7§0§0§ln§x§f§1§9§6§0§0§lt§x§e§f§a§5§0§0§lr§x§e§e§b§4§0§0§le §x§e§d§c§3§0§0§lP§x§e§b§d§2§0§0§lo§x§e§a§e§1§0§0§lt§x§e§8§f§0§0§0§le§x§e§7§f§f§0§0§ls          ");
         p.sendMessage("§e----------------------------------\n\n\n");
 
+        sidebarManager.showScoreboard(p);
     }
 }

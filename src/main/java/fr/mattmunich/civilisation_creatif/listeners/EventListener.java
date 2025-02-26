@@ -13,6 +13,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -810,30 +811,28 @@ public class EventListener implements Listener {
                 e.setCancelled(true);
                 if(it==null) {return;}
                 switch (it.getType()) {
-                    case BARRIER -> {
-                        invView.close();
-                        break;
-                    }
+                    case BARRIER -> invView.close();
                     case RED_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory workerListInv = territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), page - 1);
                         p.openInventory(workerListInv);
-                        break;
                     }
                     case LIME_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory workerListInv = territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), page + 1);
                         p.openInventory(workerListInv);
-                        break;
                     }
-                   default -> {
+                    case VILLAGER_SPAWN_EGG -> {
+                        p.closeInventory();
+                        territoryData.showBuyWorkerInv(p);
+                    }
+                    default -> {
                         if(it.getItemMeta() != null && it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
                             p.closeInventory();
                             String workerUUID = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING);
                             territoryData.showWorkerInventory(p,workerUUID,territoryData.getPlayerTerritory(p));
-                            return;
                         }
                     }
                 }
@@ -985,10 +984,10 @@ public class EventListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
         UUID playerId = p.getUniqueId();
-        Material brokenBlockType = e.getBlock().getType();
+        Material placedBlockType = e.getBlock().getType();
 
         try {
-            PlayerData playerData = new PlayerData(playerId);
+            PlayerData playerData = new PlayerData(p);
             String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
             if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
@@ -1004,7 +1003,7 @@ public class EventListener implements Listener {
             int moneyGain = 1;
             int xpGain = 1;
 
-            if(Tag.LOGS.isTagged(brokenBlockType)) {
+            if(Tag.LOGS.isTagged(placedBlockType)) {
                 moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
                 xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
                 playerData.addMoney(moneyGain);
@@ -1013,7 +1012,7 @@ public class EventListener implements Listener {
                     territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), xpGain);
                     xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + xpGain);
                 }
-            } else if(CustomPlantTag.isCustomPlant(brokenBlockType)) {
+            } else if(CustomPlantTag.isCustomPlant(placedBlockType)) {
                 moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
                 xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
                 playerData.addMoney(moneyGain);
@@ -1075,6 +1074,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onSpawnVillager(PlayerInteractEvent e) {
         Player p = e.getPlayer();
+        String territoryName = territoryData.getPlayerTerritory(p);
+        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getClickedBlock().getChunk()));
+        if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            e.setCancelled(true);
+            p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
+            return;
+        }
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getMaterial().equals(Material.VILLAGER_SPAWN_EGG)) {
             e.setCancelled(true);
             try {
@@ -1082,6 +1088,18 @@ public class EventListener implements Listener {
                 territoryData.spawnWorker(p,meta,e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation(), e.getItem());
                 return;
             } catch (ClassCastException ignored) {}
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e){
+        Player p = e.getPlayer();
+        String territoryName = territoryData.getPlayerTerritory(p);
+        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
+        if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            e.setCancelled(true);
+            p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser de blocs ici !");
+            return;
         }
     }
 

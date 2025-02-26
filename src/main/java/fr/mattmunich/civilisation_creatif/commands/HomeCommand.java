@@ -62,7 +62,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
                 throw new RuntimeException(e);
             }
             if(args.length != 1) {
-				player.sendMessage("§cSintax : /sethome <HomeName>");
+				player.sendMessage(main.wrongUsage + "/sethome <homeName");
 				return true;
 			}
 			data.getConfig().createSection("homes");
@@ -186,7 +186,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 				}else {
 					player.sendMessage("§e--------§2§lHomes§e--------\n§2Vos Homes : §r\n§l§6" + data.getHomes().replace(",", ", "));
 				}
-				player.sendMessage("§cSintax : /home <HomeName>");
+				player.sendMessage(main.wrongUsage + "/home <HomeName>");
 				return true;
 			}
 
@@ -221,7 +221,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
             }
 
             if(args.length != 1) {
-				player.sendMessage("§cSintax : /delhome <HomeName>");
+				player.sendMessage(main.wrongUsage + "/delhome <HomeName>");
 				return true;
 			}
 

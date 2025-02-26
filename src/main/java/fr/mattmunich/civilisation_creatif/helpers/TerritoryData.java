@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
@@ -31,8 +32,7 @@ import java.util.regex.Pattern;
 
 public class TerritoryData {
     private final Plugin plugin;
-
-    private Main main;
+    private final Main main;
 
     public TerritoryData(Plugin plugin, Main main) {
         this.plugin = plugin;
@@ -50,6 +50,7 @@ public class TerritoryData {
 
     private FileConfiguration config;
     private File file;
+
 
     public FileConfiguration getConfig() {
         return config;
@@ -241,6 +242,7 @@ public class TerritoryData {
         }
         officers.add(target.getUniqueId().toString());
         config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
+        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
         saveConfig();
         sender.sendMessage(main.prefix + "§2Le joueur §a" + target.getName() + "§2 a été ajouté aux officiers de votre territoire !");
         if(target.isOnline() && target.getPlayer() !=null){
@@ -272,6 +274,7 @@ public class TerritoryData {
         }
         officers.remove(target.getUniqueId().toString());
         config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
+        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
         saveConfig();
     }
 
@@ -1012,7 +1015,7 @@ public class TerritoryData {
             page = 1;
         }
 
-        Inventory terrWorkersInv_Layout = getTerrWorkersInv_Layout(p, page, totalPages);
+        Inventory terrWorkersInv = getTerrWorkersInv_Layout(p, page, totalPages);
 
         int startIndex = (page - 1) * itemsPerPage;
         int endIndex = Math.min(startIndex + itemsPerPage, workerList.size());
@@ -1068,11 +1071,11 @@ public class TerritoryData {
             workerItemMeta.setDisplayName(tierColor+typeName);
             workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan));
             workerItem.setItemMeta(workerItemMeta);
-            terrWorkersInv_Layout.addItem(workerItem);
+            terrWorkersInv.addItem(workerItem);
         }
-
-        // Return the populated inventory for the specified page
-        return terrWorkersInv_Layout;
+        terrWorkersInv.setItem(0,ItemBuilder.getItem(Material.PAPER, "§bℹ Informations", Arrays.asList("    §bIci, vous pouvez gérer les","    §bvillageois de votre territoire","§aℹ Les villageois vous rapportent","    §aune somme d'argent définie","    §achaque mois. Certains ont","    §amême d'autres utilités...")));
+        terrWorkersInv.setItem(8, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG,"§a💰 Acheter des villageois"));
+        return terrWorkersInv;
     }
 
 
@@ -1313,8 +1316,8 @@ public class TerritoryData {
         p.getInventory().addItem(spawnEgg);
         removeTerritoryMoney(territoryName, price);
         p.playSound(p.getLocation(),type.getSound(),SoundCategory.NEUTRAL,1,type.getSoundPitch());
-        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + " §2de " + tierColor + (tier>=3 ? "§lTier " : "tier ") + tier + "§2 !");
-        p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + type.getPrice() + main.moneySign + "§2 !");
+        sendAnouncementToTerritory(territoryName,"§6" + p.getName() + "§2 a acheté un villageois §6" + workerName + " §2de " + tierColor + (tier>=3 ? "§lTier " : "tier ") + tier + "§2pour §6" + price + main.moneySign + "§2 !");
+        p.sendMessage(main.prefix + "§2Vous avez acheté un employé §a" + type.name().toLowerCase() + "§2 pour §a" + price + main.moneySign + "§2 !");
     }
 
     public void spawnWorker(Player p, SpawnEggMeta spawnEggMeta, Location spawnLocation, ItemStack it) {
@@ -1512,7 +1515,7 @@ public class TerritoryData {
     public void programNextWorkerCheckup(){
         // Cancel any existing scheduled task before scheduling a new one
         if (workerCheckupTask != null && !workerCheckupTask.isCancelled()) {
-            Bukkit.getLogger().warning("Duplicate WorkerCheckup detected! Cancelling previous one.");
+            Bukkit.getConsoleSender().sendMessage(main.prefix + "Duplicate WorkerCheckup detected! Cancelling previous one.");
             workerCheckupTask.cancel();
         }
 
@@ -1538,12 +1541,6 @@ public class TerritoryData {
         }
     }
 
-    public void cancelWorkerCheckup() {
-        if (workerCheckupTask != null && !workerCheckupTask.isCancelled()) {
-            workerCheckupTask.cancel();
-            workerCheckupTask = null;
-        }
-    }
 
     public String getWorkerTerritory(String workerUUID) {
         try {
