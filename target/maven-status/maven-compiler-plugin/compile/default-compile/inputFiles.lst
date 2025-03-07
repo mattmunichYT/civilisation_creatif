@@ -16,8 +16,10 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/ItemBuilder.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/PlayerData.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/SidebarManager.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/SkinManager.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/TerritoryData.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Utility.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/VersionChecker.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Warp.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/WorkerType.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/AntiSpeed.java

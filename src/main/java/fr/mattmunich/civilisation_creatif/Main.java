@@ -82,6 +82,8 @@ public final class Main extends JavaPlugin {
     TerritoryData territoryData;
     Warp warp;
     SidebarManager sidebarManager;
+    VersionChecker versionChecker;
+    public double serverVersion = 0.0;
     //END OF HELPERS GET
     //OTHER ARRAY LISTS
     public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
@@ -95,6 +97,7 @@ public final class Main extends JavaPlugin {
         territoryData = null;
         warp = null;
         sidebarManager = null;
+        versionChecker = null;
 
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard;
@@ -123,6 +126,8 @@ public final class Main extends JavaPlugin {
         warp = new Warp(this);
         warp.initConfig();
         sidebarManager = new SidebarManager(this, this,territoryData);
+        versionChecker = new VersionChecker(this);
+        serverVersion = versionChecker.getVersion();
     }
     @SuppressWarnings("DataFlowIssue")
     @Override
