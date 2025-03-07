@@ -5,13 +5,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SidebarManager {
     private static Plugin plugin;
     private static Main main;
     private static TerritoryData territoryData;
-
-    private static Scoreboard scoreboard;
-    private static Objective objective;
 
     public SidebarManager(Plugin plugin,Main main, TerritoryData territoryData) {
         SidebarManager.plugin = plugin;
@@ -19,47 +19,53 @@ public class SidebarManager {
         SidebarManager.territoryData = territoryData;
     }
 
-    public void setupScoreboard() {
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        if (manager != null) {
-            scoreboard = manager.getNewScoreboard();
-        }
+    private static final Map<Player,Scoreboard> playerScoreboard = new HashMap<Player,Scoreboard>();
 
-        assert scoreboard != null;
-        objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, main.hex("§6- " + main.fullName + " §6-"));
+
+    public void setupPlayerObjective(Player p){
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        if (manager == null) { return; }
+        Scoreboard scoreboard = manager.getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, main.hex("§6- " + main.fullName + " §6-"));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        playerScoreboard.put(p,scoreboard);
+    }
+
+    public static Scoreboard getPlayerScoreboard(Player p) {
+        return playerScoreboard.get(p);
     }
 
     public void showScoreboard(Player player) {
-        player.setScoreboard(scoreboard);
+        player.setScoreboard(getPlayerScoreboard(player));
         updateScoreboard(player);
     }
 
     public static void updateScoreboard(Player player) {
-        if (scoreboard == null) { return;}
-        scoreboard.getEntries().forEach(scoreboard::resetScores);
         setValues(player);
-        player.setScoreboard(scoreboard);
+        player.setScoreboard(getPlayerScoreboard(player));
     }
 
 
-    private static void setValues(Player player) {
-        PlayerData playerData = new PlayerData(player);
+    private static void setValues(Player p) {
+        PlayerData playerData = new PlayerData(p);
         String territoryName = playerData.getTerritory();
         Team terr = playerData.getTerritory()!=null ? territoryData.getTerritoryTeam(territoryName) : null;
-        setScore("",7);
-        setScore("§aArgent : §6" + playerData.getMoneyScore() + main.moneySign, 6);
-        setScore("§bXP : §6" + playerData.getXPScore(), 5);
-        setScore(" ",4);
-        setScore("§6- §2§lTerritoire §6-", 3);
-        setScore("§a-> §2Nom : " + (terr!=null ? terr.getColor() + terr.getName() :"§8§oPas de territoire"), 2);
+        setScore(p, "",8);
+        setScore(p, "§aNom : " + p.getDisplayName(),7);
+        setScore(p,"§aArgent : §6" + playerData.getMoneyScore() + main.moneySign, 6);
+        setScore(p,"§bXP : §6" + playerData.getXPScore(), 5);
+        setScore(p," ",4);
+        setScore(p,"§6- §2§lTerritoire §6-", 3);
+        setScore(p,"§a-> §2Nom : " + (terr!=null ? terr.getColor() + terr.getName() :"§8§oPas de territoire"), 2);
         if(terr!=null) {
-            setScore("§a-> §2Grade : " + (territoryData.isChief(player,territoryName) ? "§6§lChef" : (territoryData.isOfficer(player,territoryName) ? "§aOfficier" : "§7Membre")), 1);
+            setScore(p,"§a-> §2Grade : " + (territoryData.isChief(p,territoryName) ? "§6§lChef" : (territoryData.isOfficer(p,territoryName) ? "§aOfficier" : "§7Membre")), 1);
         }
     }
 
-    private static void setScore(String title, int value) {
-        Score score = objective.getScore(title);
+    private static void setScore(Player p, String title, int value) {
+        Objective sidebar = getPlayerScoreboard(p).getObjective("sidebar");
+        if(sidebar == null) { return; }
+        Score score = sidebar.getScore(title);
         score.setScore(value);
     }
 }

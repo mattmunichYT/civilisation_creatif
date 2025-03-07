@@ -539,7 +539,7 @@ public class EventListener implements Listener {
                        }
                         return;
                     case VILLAGER_SPAWN_EGG:
-                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if(!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
                         //MANAGER WORKERS
                         p.closeInventory();
                         p.openInventory(territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), 1));
@@ -850,11 +850,10 @@ public class EventListener implements Listener {
                                 ItemStack workerSpawnEgg = territoryData.getConfig().getItemStack("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".spawnEgg");
                                 p.getInventory().addItem(workerSpawnEgg);
                                 p.sendMessage(main.prefix + "§aVous avez reçu l'œuf d'apparition du villageois !");
-                                return;
                             } else {
                                 p.sendMessage(main.prefix + "§cLe villegois est déjà en vie/activité !");
-                                return;
                             }
+                            return;
                         } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
                             return;
@@ -1072,15 +1071,27 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
-    public void onSpawnVillager(PlayerInteractEvent e) {
+    public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        String territoryName = territoryData.getPlayerTerritory(p);
-        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getClickedBlock().getChunk()));
-        if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
-            e.setCancelled(true);
-            p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
-            return;
+        if (e.getClickedBlock() != null) {
+            String territoryName = territoryData.getPlayerTerritory(p);
+            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getClickedBlock().getChunk()));
+            if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+                    e.setCancelled(true);
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
+                    return;
+                }
+            }
+            if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
+                if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+                    e.setCancelled(true);
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
+                    return;
+                }
+            }
         }
+
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getMaterial().equals(Material.VILLAGER_SPAWN_EGG)) {
             e.setCancelled(true);
             try {

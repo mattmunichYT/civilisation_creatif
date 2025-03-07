@@ -123,7 +123,6 @@ public final class Main extends JavaPlugin {
         warp = new Warp(this);
         warp.initConfig();
         sidebarManager = new SidebarManager(this, this,territoryData);
-        sidebarManager.setupScoreboard();
     }
     @SuppressWarnings("DataFlowIssue")
     @Override

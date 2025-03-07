@@ -99,6 +99,7 @@ public class JoinListener implements Listener {
         p.sendMessage("        §x§f§f§0§0§0§0§lM§x§f§e§0§f§0§0§li§x§f§c§1§e§0§0§ln§x§f§b§2§d§0§0§li §x§f§9§3§c§0§0§lJ§x§f§8§4§b§0§0§le§x§f§7§5§a§0§0§lu§x§f§5§6§9§0§0§lx §x§f§4§7§8§0§0§lE§x§f§2§8§7§0§0§ln§x§f§1§9§6§0§0§lt§x§e§f§a§5§0§0§lr§x§e§e§b§4§0§0§le §x§e§d§c§3§0§0§lP§x§e§b§d§2§0§0§lo§x§e§a§e§1§0§0§lt§x§e§8§f§0§0§0§le§x§e§7§f§f§0§0§ls          ");
         p.sendMessage("§e----------------------------------\n\n\n");
 
+        sidebarManager.setupPlayerObjective(p);
         sidebarManager.showScoreboard(p);
     }
 }

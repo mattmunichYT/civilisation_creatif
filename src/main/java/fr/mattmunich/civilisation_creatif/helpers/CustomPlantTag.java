@@ -8,10 +8,10 @@ import java.util.Set;
 
 public class CustomPlantTag {
     private static final Set<Material> CUSTOM_PLANT_TAG = EnumSet.of(
-            // Moss & Leaves
+            // Moss & Leaves & Grass Block
             Material.MOSS_BLOCK, Material.MOSS_CARPET,
             Material.AZALEA, Material.FLOWERING_AZALEA,
-            Material.VINE,
+            Material.VINE, Material.GRASS_BLOCK,
 
             // Mushrooms & Fungi
             Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
