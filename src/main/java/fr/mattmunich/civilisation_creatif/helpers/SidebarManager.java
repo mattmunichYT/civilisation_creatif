@@ -29,6 +29,7 @@ public class SidebarManager {
         Objective objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, main.hex("§6- " + main.fullName + " §6-"));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         playerScoreboard.put(p,scoreboard);
+        showScoreboard(p);
     }
 
     public static Scoreboard getPlayerScoreboard(Player p) {
@@ -41,8 +42,10 @@ public class SidebarManager {
     }
 
     public static void updateScoreboard(Player player) {
+        Scoreboard playerScoreboard = getPlayerScoreboard(player);
+        playerScoreboard.getEntries().forEach(playerScoreboard::resetScores);
         setValues(player);
-        player.setScoreboard(getPlayerScoreboard(player));
+        player.setScoreboard(playerScoreboard);
     }
 
 
@@ -64,7 +67,7 @@ public class SidebarManager {
 
     private static void setScore(Player p, String title, int value) {
         Objective sidebar = getPlayerScoreboard(p).getObjective("sidebar");
-        if(sidebar == null) { return; }
+        if (sidebar == null) { p.sendMessage(main.prefix + "§4Erreur! §cImpossible de mettre à jour votre sidebar."); return; }
         Score score = sidebar.getScore(title);
         score.setScore(value);
     }

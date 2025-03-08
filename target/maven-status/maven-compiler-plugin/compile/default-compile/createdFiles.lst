@@ -1,8 +1,10 @@
 fr/mattmunich/civilisation_creatif/commands/XPCommand.class
 fr/mattmunich/civilisation_creatif/listeners/EventListener$2.class
+fr/mattmunich/civilisation_creatif/helpers/VersionChecker.class
 fr/mattmunich/civilisation_creatif/helpers/ItemBuilder.class
 fr/mattmunich/civilisation_creatif/listeners/EventListener$1.class
 fr/mattmunich/civilisation_creatif/helpers/TerritoryData$1.class
 fr/mattmunich/civilisation_creatif/helpers/TerritoryData.class
 fr/mattmunich/civilisation_creatif/listeners/EventListener.class
+fr/mattmunich/civilisation_creatif/helpers/SkinManager.class
 fr/mattmunich/civilisation_creatif/Main.class
