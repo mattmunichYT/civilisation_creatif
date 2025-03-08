@@ -81,10 +81,10 @@ public class NickCommand implements CommandExecutor, TabCompleter {
                 p.sendMessage(main.prefix + "§e§oChangement de skin en cours...");
                 skinManager.changeSkin(p,p,args[1]);
                 p.sendMessage(main.prefix + "§2Votre nom a été changé en \"§6" + name + "§2\" §5avec changement de skin §2!");
-                return true;
+            } else {
+                p.sendMessage(main.prefix + "§2Votre nom a été changé en \"§6" + name + "§2\" !");
             }
 
-            p.sendMessage(main.prefix + "§2Votre nom a été changé en \"§6" + name + "§2\" !");
             //Update name on sidebar
             SidebarManager.updateScoreboard(p);
             return true;
@@ -126,10 +126,10 @@ public class NickCommand implements CommandExecutor, TabCompleter {
                 p.sendMessage(main.prefix + "§e§oChangement de skin en cours...");
                 skinManager.changeSkin(p,target,args[1]);
                 p.sendMessage(main.prefix + "§2Le nom de §6" + target.getName() + "§2 a été changé en \"§6" + name + "§2\" §5§avec changement de skin §2!");
-                return true;
+            } else {
+                p.sendMessage(main.prefix + "§2Le nom de §6" + target.getName() + "§2 a été changé en \"§6" + name + "§2\" !");
             }
 
-            p.sendMessage(main.prefix + "§2Le nom de §6" + target.getName() + "§2 a été changé en \"§6" + name + "§2\" !");
             //Update name on sidebar
             SidebarManager.updateScoreboard(target);
             return true;
