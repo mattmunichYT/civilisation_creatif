@@ -60,3 +60,6 @@ commands:
   nick:
     usage: /nick <name/target> <grade/name> [grade]
     description: §6Commande pour §5changer de nom §6!
+  vanish:
+    usage: /vanish [on/off/target] [on/off]
+    description: §6Commande pour §5disparaitre§6 aux yeux des autres joueurs !

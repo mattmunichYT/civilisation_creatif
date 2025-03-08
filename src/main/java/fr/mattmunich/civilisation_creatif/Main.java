@@ -67,6 +67,7 @@ public final class Main extends JavaPlugin {
     public String shortName = hex("#FCD05C§lC#FCD05C§li#FCD05C§lv#D2CE53§li#A8CC4A§ll#7ECA41§li#54C737§ls#2AC52E§la#00C325§lt#00D74B§li#00EB72§lo#00FF98§ln");
     public String prefix = hex("§e[" + shortName + "] §2");
     public String makeItSafePrefix = "§1[§b§lMake It Safe§1] §a";
+    public String vanishNamePrefix = hex("#C30000§lV#CF1D00§lA#DB3A00§lN#E75700§lI#F37400§lS#FF9100§lH ");
     public String playerToExc = prefix + "§4Vous devez être un joueur pour éxecuter cette commande !";
     public String noPermToExc = prefix + "§4Vous n'avez pas la permission d'éxecuter cette commande !";
     public String wrongUsage = prefix + "§4Utilisation : §c";
@@ -75,6 +76,8 @@ public final class Main extends JavaPlugin {
     public void logError(String message,Exception error) {
         Bukkit.getConsoleSender().sendMessage(prefix + "§4" + hex(message) + " because of §eerror: \n§r" + error + Arrays.toString(error.getStackTrace()).replace(",", ",\n"));
     }
+    public String joinMessage(Player p) { return "§7[§a+§7] §e" + p.getDisplayName(); }
+    public String leaveMessage(Player p) { return "§7[§c-§7] §e" + p.getDisplayName(); }
     //END OF PUBLIC UTILITIES
     //HELPERS GET
     PlayerData pdata;
@@ -89,6 +92,7 @@ public final class Main extends JavaPlugin {
     //OTHER ARRAY LISTS
     public ArrayList<Player> seeTerritoryBorders = new ArrayList<>();
     public ArrayList<Player> bypassClaims = new ArrayList<>();
+    public ArrayList<Player> vanished = new ArrayList<>();
     //END OF OTHER ARRAY LISTS
     //SCOREBOARDS
 
@@ -156,14 +160,15 @@ public final class Main extends JavaPlugin {
         getCommand("setwarp").setExecutor(new WarpCommand(this,warp));
         getCommand("delwarp").setExecutor(new WarpCommand(this,warp));
         getCommand("nick").setExecutor(new NickCommand(this,skinManager));
+        getCommand("vanish").setExecutor(new VanishCommand(this, this));
 
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new JoinListener(this,territoryData,sidebarManager), this);
+        pm.registerEvents(new JoinListener(this, territoryData, sidebarManager), this);
+        pm.registerEvents(new EventListener(this,this, territoryData), this);
         pm.registerEvents(new AntiSpeed(this), this);
-        pm.registerEvents(new EventListener(this,this,territoryData), this);
+        pm.registerEvents(new VanishCommand(this,this), this);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             for(Player all : Bukkit.getOnlinePlayers()) {
-
                 all.setPlayerListHeader("§2§lBienvenue " + all.getDisplayName() +  "§2§l\n sur §6le serveur " + fullName + " !\n");
                 int ndj = Bukkit.getOnlinePlayers().size();
                 Calendar calendar = Calendar.getInstance();

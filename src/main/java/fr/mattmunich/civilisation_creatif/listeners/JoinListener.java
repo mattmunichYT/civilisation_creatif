@@ -89,7 +89,7 @@ public class JoinListener implements Listener {
             return;
         }
         Bukkit.getConsoleSender().sendMessage(main.makeItSafePrefix + "§a --> §e[§6§lJoin Logger§r§e] §ePlayer §c" + p.getName() + "§e with UUID §c" + p.getUniqueId() + "§e and IP-Adress §c" + p.getAddress() + "§e§l successfully connected to the server§r§e.");
-        e.setJoinMessage("§7[§a+§7] §e" + p.getDisplayName());
+        e.setJoinMessage(main.joinMessage(p));
 
         p.sendMessage("\n\n\n§e----------------------------------");
         p.sendMessage("§2        Bienvenue sur le serveur        ");

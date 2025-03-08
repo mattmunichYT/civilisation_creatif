@@ -63,7 +63,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        e.setQuitMessage("§7[§c-§7] §e" + p.getDisplayName());
+        e.setQuitMessage(main.leaveMessage(p));
     }
 
     @EventHandler
