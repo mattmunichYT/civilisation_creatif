@@ -22,14 +22,13 @@ import com.google.gson.JsonObject;
 
 public class SkinManager {
 
-    private static Main main;
+    private final Main main;
 
     public SkinManager(Main main) {
-        SkinManager.main = main;
+        this.main = main;
     }
 
-    @SuppressWarnings("deprecated")
-    public static void changeSkin(Player sender, Player target, String nameOfSkinHolder) {
+    public void changeSkin(Player sender, Player target, String nameOfSkinHolder) {
 
         if(main.serverVersion != 21.4) {
             sender.sendMessage("§c---------------------------------------------------------------------------");
@@ -69,7 +68,7 @@ public class SkinManager {
         sender.sendMessage(main.prefix + "§2Le skin de §6" + target.getName() + "§2 a été changé au skin de §6" + nameOfSkinHolder + "§2 ! §8§o(Visible uniquement pour les autres joueurs)");
     }
 
-    private static String[] getSkin(String name) {
+    private String[] getSkin(String name) {
         try {
             URL url_0 = URI.create("https://api.mojang.com/users/profiles/minecraft/" + name).toURL();
             Reader reader_0 = new InputStreamReader(url_0.openStream());

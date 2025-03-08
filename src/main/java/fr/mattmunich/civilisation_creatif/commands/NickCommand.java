@@ -21,9 +21,12 @@ import fr.mattmunich.civilisation_creatif.helpers.Grades;
 public class NickCommand implements CommandExecutor, TabCompleter {
 
     private final Main main;
+
+    private final SkinManager skinManager;
     
-    public NickCommand(Main main) {
+    public NickCommand(Main main, SkinManager skinManager) {
         this.main = main;
+        this.skinManager = skinManager;
     }
 
     @Override
@@ -76,7 +79,7 @@ public class NickCommand implements CommandExecutor, TabCompleter {
             //Change name + skin
             if(args.length == 3 && args[2].contains("!changeSkin")) {
                 p.sendMessage(main.prefix + "§e§oChangement de skin en cours...");
-                SkinManager.changeSkin(p,p,args[1]);
+                skinManager.changeSkin(p,p,args[1]);
                 p.sendMessage(main.prefix + "§2Votre nom a été changé en \"§6" + name + "§2\" §5avec changement de skin §2!");
                 return true;
             }
@@ -121,7 +124,7 @@ public class NickCommand implements CommandExecutor, TabCompleter {
             //Change name + skin
             if(args.length == 4 && args[3].contains("!changeSkin")) {
                 p.sendMessage(main.prefix + "§e§oChangement de skin en cours...");
-                SkinManager.changeSkin(p,target,args[1]);
+                skinManager.changeSkin(p,target,args[1]);
                 p.sendMessage(main.prefix + "§2Le nom de §6" + target.getName() + "§2 a été changé en \"§6" + name + "§2\" §5§avec changement de skin §2!");
                 return true;
             }
@@ -147,7 +150,7 @@ public class NickCommand implements CommandExecutor, TabCompleter {
 
         if(args.length == 2) {
             for(Grades grade : Grades.values()) {
-                if(grade.getName().toLowerCase().startsWith(args[2].toLowerCase())) {
+                if(grade.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
                     tabComplete.add(grade.getName().toLowerCase());
                 }
             }
