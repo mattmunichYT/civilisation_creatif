@@ -1,6 +1,7 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.mattmunich.civilisation_creatif.Main;
@@ -13,6 +14,8 @@ import org.bukkit.entity.Player;
 
 
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URI;
 import java.net.URL;
 
 
@@ -43,72 +46,51 @@ public class SkinManager {
         }
 
         GameProfile profile = ((CraftPlayer)p).getHandle().getBukkitEntity().getProfile();
-        PlayerConnection connection = ((CraftPlayer)p).getHandle().f;
-
         String[] textures = getSkin(nameOfTarget);
 
-        if(textures[0].equalsIgnoreCase("error") && textures[1].equalsIgnoreCase("not_found")) {
-            p.sendMessage(main.prefix + "§4Skin non trouvé !§e Vérifiez le nom du skin.");
-            return;
+        if(textures[0].equalsIgnoreCase("error")) {
+            if (textures[1].equalsIgnoreCase("not_found")) {
+                p.sendMessage(main.prefix + "§4Skin non trouvé !§e Vérifiez le nom du skin.");
+                return;
+            }
+
+            if (textures[1].equalsIgnoreCase("other_err")) {
+                p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
+                return;
+            }
         }
-        Bukkit.getOnlinePlayers().forEach(all -> {
-            all.hidePlayer(main, p);
-        });
+
+        Bukkit.getOnlinePlayers().forEach(all -> all.hidePlayer(main, p));
 
         profile.getProperties().removeAll("textures");
         profile.getProperties().put("textures", new Property("textures",textures[0], textures[1]));
 
-//        if(Objects.equals(ttextures.toString(), "CraftPlayerTextures [data=null]")) {
-//			p.sendMessage(main.prefix + "§4Une erreur s'est produite lors de la récupération du skin du joueur. §eVérifiez le nom du skin.");
-//			return;
-//		}
-
-
-//		profile.update();
-//		Bukkit.getConsoleSender().sendMessage("profile after update before clear : " + profile);
-//		profile.setTextures(null);
-//		Bukkit.getConsoleSender().sendMessage("profile after clear before set textures : " + profile);
-//		profile.setTextures(ttextures);
-//		Bukkit.getConsoleSender().sendMessage("profile after set textures : " + profile);
-//		profile.update();
-//		Bukkit.getConsoleSender().sendMessage("profile after set textures after update : " + profile);
-
-//		Bukkit.getConsoleSender().sendMessage("p.getPlayerProfile : " + p.getPlayerProfile().toString());
         p.sendMessage(main.prefix + "§2Le skin a été changé au skin de §6" + nameOfTarget + "§2 ! §8§o(Visible uniquement pour les autres joueurs)");
 
-        Bukkit.getOnlinePlayers().forEach(all -> {
-            all.showPlayer(main, p);
-        });
+        Bukkit.getOnlinePlayers().forEach(all -> all.showPlayer(main, p));
     }
 
     private String[] getSkin(String name) {
         try {
+            URL url_0 = URI.create("https://api.mojang.com/users/profiles/minecraft/" + name).toURL();
+            Reader reader_0 = new InputStreamReader(url_0.openStream());
+            String uuid;
+            try {
+                uuid = JsonParser.parseReader(reader_0).getAsJsonObject().get("id").getAsString();
+            } catch (JsonSyntaxException e) {
+                return new String[] {"error","not_found"};
+            }
 
-            URL url_0 = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
-            InputStreamReader reader_0 = new InputStreamReader(url_0.openStream());
-            String uuid = new JsonParser().parse(reader_0).getAsJsonObject().get("id").getAsString();
-
-            URL url_1 = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false");
-            InputStreamReader reader_1 = new InputStreamReader(url_1.openStream());
-            JsonObject textureProperty = new JsonParser().parse(reader_1).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+            URL url_1 = URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").toURL();
+            Reader reader_1 = new InputStreamReader(url_1.openStream());
+            JsonObject textureProperty = JsonParser.parseReader(reader_1).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
             String texture = textureProperty.get("value").getAsString();
             String signature = textureProperty.get("signature").getAsString();
 
             return new String[] {texture, signature};
-//			Bukkit.getConsoleSender().sendMessage("texture = " + texture + "\n signature = " + signature);
-//
-//
-//			byte[] bytedecoded = Base64.getDecoder().decode(texture);
-//			String decoded = new String(bytedecoded);
-//			JsonObject jsonObject = new JsonParser().parse(decoded).getAsJsonObject();
-//
-//			String url = jsonObject.get("textures").getAsJsonObject().get("SKIN").getAsJsonObject().get("url").getAsString();
-//			String capeUrl = jsonObject.get("textures").getAsJsonObject().get("CAPE").getAsJsonObject().get("url").getAsString();
-
-
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage("[AdminCmdsB] §cUne erreur s'est produite : §4" + e + "\nDetails : " + e.getMessage() + e.toString());
-            return new String[] {"error","not_found"};
+            main.logError("Couldn't getSkin() for player name " + name,e);
+            return new String[] {"error","other_err"};
         }
     }
 }
