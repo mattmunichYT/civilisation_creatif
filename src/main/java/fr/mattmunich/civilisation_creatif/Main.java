@@ -152,6 +152,7 @@ public final class Main extends JavaPlugin {
         getCommand("warp").setExecutor(new WarpCommand(this,warp));
         getCommand("setwarp").setExecutor(new WarpCommand(this,warp));
         getCommand("delwarp").setExecutor(new WarpCommand(this,warp));
+        getCommand("nick").setExecutor(new NickCommand(this));
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(this,territoryData,sidebarManager), this);

@@ -34,26 +34,29 @@ commands:
     description: §6Commande du plugin !
     usage: /civilisation [credits/reload]
   backup:
-    description: §6Commande pour faire une sauvegarde des mondes immédiatement !
+    description: §6Commande pour faire une §5sauvegarde des mondes §6immédiatement !
     usage: /backup
   territoire:
     description: §6Commande pour gérer son territoire !
     usage: /territoire
   warp:
-    description: §6Commande pour se §5téléporter à un warp§6 :)
+    description: §6Commande pour se §5téléporter à un warp §6!
     usage: /warp <warpName>
   setwarp:
-    description: §6Commande pour §5définir un warp ! §6(§cAdmin§4Cmd§6)
+    description: §6Commande pour §5définir un warp §6!
     usage: /setwarp <warpName> [permission]
   delwarp:
-    description: §6Commande pour §5suprimer un warp ! §6(§cAdmin§4Cmd§6)
+    description: §6Commande pour §5suprimer un warp §6!
     usage: /delwarp <warpName>
   sethome:
     usage: /sethome <HomeName>
-    description: §6Commande pour §5définir§6 un §5home §6:)
+    description: §6Commande pour §5définir§6 un §5home §6!
   home:
     usage: /home <HomeName>
-    description: §6Commande pour se §5téléporter §6à un §5home §6:)
+    description: §6Commande pour se §5téléporter §6à un §5home §6!
   delhome:
     usage: /delhome <HomeName>
-    description: §6Commande pour §5supprimer §6un §5home§6 :)
+    description: §6Commande pour §5supprimer §6un §5home §6!
+  nick:
+    usage: /nick <name/target> <grade/name> [grade]
+    description: §6Commande pour §5changer de nom §6!
