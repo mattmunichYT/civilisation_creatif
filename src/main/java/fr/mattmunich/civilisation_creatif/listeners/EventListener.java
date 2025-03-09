@@ -63,6 +63,7 @@ public class EventListener implements Listener {
     private final Map<UUID, Integer> moneyGained = new HashMap<>();
     private final Map<UUID, Integer> xpGained = new HashMap<>();
     private final Map<UUID, BukkitTask> resetTasks = new HashMap<>();
+    private final Map<Player, String> currentChunkOwner = new HashMap<>();
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
@@ -1025,26 +1026,33 @@ public class EventListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
+        Location loc = p.getLocation();
+        Chunk chunk = loc.getChunk();
+        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(chunk));
         if(main.seeTerritoryBorders.contains(p)) {
-//            p.sendMessage("Hey! Let's show you the nearby claimed chunks...");
-            Location loc = p.getLocation();
-            Chunk chunk = loc.getChunk();
             World world = loc.getWorld();
             int range = 10;
-//            p.sendMessage("Scanning for chunks...");
             for (int chunkX = chunk.getX() - range; chunkX < chunk.getX() + range; chunkX++) {
                 for (int chunkZ = chunk.getZ() - range; chunkZ < chunk.getZ() + range; chunkZ++) {
-//                    p.sendMessage("Checking chhunk" + chunkX + " ; " + chunkZ);
                     assert world != null;
                     Chunk chunkToShow = world.getChunkAt(chunkX,chunkZ);
                     Map<Integer,Integer> chunkTS = territoryData.getChunkMap(chunkToShow);
                     if (territoryData.getChunkOwner(chunkTS) != null && !territoryData.getChunkOwner(chunkTS).isEmpty()) {
-//                        p.sendMessage("Rendering chunk...");
                         ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkTS)).getColor();
                         territoryData.showChunkBorder(chunkToShow, chatColor, p);
                     }
-
                 }
+            }
+        }
+        if(!Objects.equals(currentChunkOwner.get(p), chunkOwner)) {
+            currentChunkOwner.put(p,chunkOwner);
+            p.resetTitle();
+            if(chunkOwner == null){
+                p.sendTitle("§2§lWilderness","",20,60,20);
+            } else {
+                Team chunkOwnerTeam = territoryData.getTerritoryTeam(chunkOwner);
+                ChatColor chunkOwnerTeamColor = chunkOwnerTeam.getColor();
+                p.sendTitle(chunkOwnerTeamColor + chunkOwnerTeam.getName(), chunkOwner.equals(territoryData.getPlayerTerritory(p)) ? "§a§oVotre territoire" : "",20,60,20);
             }
         }
     }
@@ -1145,17 +1153,17 @@ public class EventListener implements Listener {
         if (e.getClickedBlock() != null) {
             String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getClickedBlock().getChunk()));
-            if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                     e.setCancelled(true);
-                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser avec des blocs ici !");
                     return;
                 }
             }
             if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
                 if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                     e.setCancelled(true);
-                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas interagir avec des blocs ici !");
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer avec des blocs ici !");
                     return;
                 }
             }
@@ -1206,12 +1214,13 @@ public class EventListener implements Listener {
             territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
             territoryData.saveConfig();
             if (workerType!=null) {
-                WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
+                WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", "_"));
+                int tier = territoryData.getConfig().getInt("territories." + territoryName + ".workers." + workerUUID + ".tier");
                 if (type.getLifespan()==-1){
                     territoryData.spawnWorker(villager,e.getEntity().getLocation());
                     return;
                 } else {
-                    territoryData.removeOneAliveWorkerFromCount(territoryName,type);
+                    territoryData.removeAliveWorkerToCount(territoryName,type, 1 + tier);
                 }
             }
             territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");

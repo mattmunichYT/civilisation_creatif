@@ -1006,6 +1006,7 @@ public class TerritoryData {
                     "§2Membres: §a" + getTerritoryMembersUUID(terr).size(),
                     "§2XP:§a " + getTerritoryXP(terr),
                     "§2Argent:§a " + getTerritoryMoney(terr),
+                    "",
                     "§2Description:§a"
             ));
 
@@ -1070,6 +1071,7 @@ public class TerritoryData {
                 "§2Membres: §a" + getTerritoryMembersUUID(terr).size(),
                 "§2XP:§a " + getTerritoryXP(terr),
                 "§2Argent:§a " + getTerritoryMoney(terr),
+                "",
                 "§2Description:§a"
         ));
 
@@ -1497,7 +1499,7 @@ public class TerritoryData {
                     villager.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,PotionEffect.INFINITE_DURATION,1,false,true));
                     break;
             }
-            addOneAliveWorkerToCount(territoryName,workerType);
+            addAliveWorkerToCount(territoryName,workerType, 1 + tier);
             p.getInventory().remove(it);
             p.sendMessage(main.prefix + "§2L'employé a bien été spawn !");
         } catch (Exception e) {
@@ -1712,6 +1714,16 @@ public class TerritoryData {
         setAliveWorkerCount(territoryName, currentWorkerCount+1, workerType);
     }
 
+    public void addAliveWorkerToCount(String territoryName, WorkerType workerType, int count) {
+        int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
+        setAliveWorkerCount(territoryName, currentWorkerCount+count, workerType);
+    }
+
+    public void removeAliveWorkerToCount(String territoryName, WorkerType workerType, int count) {
+        int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
+        setAliveWorkerCount(territoryName, currentWorkerCount-count, workerType);
+    }
+
     public void removeOneAliveWorkerFromCount(String territoryName, WorkerType workerType) {
         int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
         setAliveWorkerCount(territoryName, currentWorkerCount-1, workerType);
@@ -1773,9 +1785,9 @@ public class TerritoryData {
         workerItem.setItemMeta(workerItemMeta);
         workerInv.setItem(4,workerItem);
         if(!workerAlive) {
-            workerInv.setItem(0,ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG,"§a➕ Obtenir l'œuf d'appaition du villageois"));
+            workerInv.setItem(0,ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG,"§a🥚 Obtenir l'œuf d'appaition du villageois"));
         } else {
-            workerInv.setItem(0,ItemBuilder.getItem(Material.IRON_SWORD,"§c➖ Faire disparaitre le villageois"));
+            workerInv.setItem(0,ItemBuilder.getItem(Material.IRON_SWORD,"§c\uD83D\uDDE1 Faire disparaitre le villageois"));
         }
         workerInv.setItem(8,ItemBuilder.getItem(Material.BARRIER,"§c❌ Fermer le menu"));
         p.openInventory(workerInv);

@@ -181,8 +181,23 @@ public final class Main extends JavaPlugin {
                 }
 
                 String worldname = getWorldname(all);
+                String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(all.getLocation().getChunk()));
+                Team chunkOwnerTeam = null;
+                ChatColor chunkOwnerColor = null;
+                if(chunkOwner!=null) {
+                    chunkOwnerTeam = territoryData.getTerritoryTeam(chunkOwner);
+                    chunkOwnerColor = chunkOwnerTeam.getColor();
+                }
 
-                all.setPlayerListFooter("\n§2Nombre de joueurs en ligne : §6" + ndj + "§r\n§2IP : §6§lcivilisation-mjep.mine.fun" + "§r\n§2Heure : §6" + h + "§e:§6" + m + "§r\n§2Monde : §6" + worldname + "§r§2,\n Position : §eX: §6" + all.getLocation().getBlockX() + "§r§2, §eY: §6" + all.getLocation().getBlockY() + "§r§2, §eZ: §6" + all.getLocation().getBlockZ());
+                all.setPlayerListFooter(
+                        "\n§2Nombre de joueurs en ligne : §6" + ndj +
+                        "§r\n§2IP : §6§lcivilisation-mjep.mine.fun" + "§r\n§2Heure : §6" + h + "§e:§6" + m +
+                        "§r\n§2Monde : §6" + worldname +
+                        "§r§2,\n Position : §eX: §6" + all.getLocation().getBlockX() +
+                        "§r§2, §eY: §6" + all.getLocation().getBlockY() +
+                        "§r§2, §eZ: §6" + all.getLocation().getBlockZ() +
+                        "§r§2, Territoire : " + (chunkOwnerTeam==null ? "§2§lWilderness" : chunkOwnerColor + chunkOwnerTeam.getName())
+                );
             }
         }, 1, 1);
 
