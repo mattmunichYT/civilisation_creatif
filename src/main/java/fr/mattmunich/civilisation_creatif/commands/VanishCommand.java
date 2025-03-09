@@ -1,7 +1,9 @@
 package fr.mattmunich.civilisation_creatif.commands;
 
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
+import fr.mattmunich.civilisation_creatif.helpers.SidebarManager;
 import org.bukkit.Bukkit;
+import org.bukkit.block.sign.Side;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -116,7 +118,6 @@ public class VanishCommand implements CommandExecutor, Listener {
     }
 
     public void vanish(Player sender) {
-        PlayerData playerData = new PlayerData(sender);
         main.vanished.add(sender);
 
         for(Player players : Bukkit.getOnlinePlayers()) {
@@ -127,32 +128,20 @@ public class VanishCommand implements CommandExecutor, Listener {
             }
         }
 
-        Grades grade = playerData.getRank();
-        if(grade == null) {
-            sender.sendMessage(main.prefix + "§4Une erreur s'est produite");
-            return;
-        }
-
-        String tPrefix = main.hex(grade.getPrefix());
-        String tSuffix = main.hex(grade.getSuffix());
-        sender.setPlayerListName(tPrefix + sender.getName() + tSuffix);
-        sender.setDisplayName(tPrefix + sender.getName() + tSuffix);
-
-
         sender.setCanPickupItems(false);
         sender.setInvulnerable(true);
 
-        sender.setPlayerListName(main.vanishNamePrefix + sender.getName());
         Bukkit.broadcastMessage(main.leaveMessage(sender));
 
-
+        sender.setPlayerListName(main.vanishNamePrefix + sender.getName());
         sender.setDisplayName(main.vanishNamePrefix + sender.getName());
+        sender.setCustomName(main.vanishNamePrefix + sender.getName());
 
+        SidebarManager.updateScoreboard(sender);
         sender.sendMessage(main.prefix + "§2Vous êtes désormais §6invisible aux yeux des autres joueurs !");
     }
 
     public void vanish(Player sender, Player target) {
-        PlayerData playerData = new PlayerData(target);
         main.vanished.add(target);
 
         for(Player players : Bukkit.getOnlinePlayers()) {
@@ -163,27 +152,17 @@ public class VanishCommand implements CommandExecutor, Listener {
             }
         }
 
-        Grades grade = playerData.getRank();
-        if(grade == null) {
-            sender.sendMessage(main.prefix + "§4Une erreur s'est produite");
-            return;
-        }
+        target.setCanPickupItems(false);
+        target.setInvulnerable(true);
 
-        String tPrefix = main.hex(grade.getPrefix());
-        String tSuffix = main.hex(grade.getSuffix());
-        sender.setPlayerListName(tPrefix + target.getName() + tSuffix);
-        sender.setDisplayName(tPrefix + target.getName() + tSuffix);
+        Bukkit.broadcastMessage(main.leaveMessage(target));
+
+        target.setPlayerListName(main.vanishNamePrefix + target.getName());
+        target.setDisplayName(main.vanishNamePrefix + target.getName());
+        target.setCustomName(main.vanishNamePrefix + target.getName());
 
 
-        sender.setCanPickupItems(false);
-        sender.setInvulnerable(true);
-
-        sender.setPlayerListName(main.vanishNamePrefix + sender.getName());
-        Bukkit.broadcastMessage(main.leaveMessage(sender));
-
-
-        sender.setDisplayName(main.vanishNamePrefix + sender.getName());
-        
+        SidebarManager.updateScoreboard(target);
         target.sendMessage(main.prefix + "§2Vous êtes désormais §6invisible aux yeux des autres joueurs !");
         sender.sendMessage(main.prefix + "§6" + target.getName() + "§2 est désormais §6invisible aux yeux des autres joueurs !");
     }
@@ -205,15 +184,16 @@ public class VanishCommand implements CommandExecutor, Listener {
         String tPrefix = main.hex(grade.getPrefix());
         String tSuffix = main.hex(grade.getSuffix());
 
-        sender.setPlayerListName(tPrefix + sender.getName() + tSuffix);
-        sender.setDisplayName(tPrefix + sender.getName() + tSuffix);
-
         sender.setCanPickupItems(true);
         sender.setInvulnerable(false);
+
+        sender.setPlayerListName(tPrefix + sender.getName() + tSuffix);
+        sender.setDisplayName(tPrefix + sender.getName() + tSuffix);
+        sender.setCustomName(sender.getPlayerListName());
+
         Bukkit.broadcastMessage(main.joinMessage(sender));
 
-
-        sender.setDisplayName(sender.getPlayerListName());
+        SidebarManager.updateScoreboard(sender);
         sender.sendMessage(main.prefix + "§cVous êtes désormais §6visible aux yeux des autres joueurs !");
     }
 
@@ -231,16 +211,18 @@ public class VanishCommand implements CommandExecutor, Listener {
             return;
         }
 
+        target.setCanPickupItems(true);
+        target.setInvulnerable(false);
+
         String tPrefix = main.hex(grade.getPrefix());
         String tSuffix = main.hex(grade.getSuffix());
 
         target.setPlayerListName(tPrefix + target.getName() + tSuffix);
         target.setDisplayName(tPrefix + target.getName() + tSuffix);
 
-        target.setCanPickupItems(true);
-        target.setInvulnerable(false);
         Bukkit.broadcastMessage(main.joinMessage(target));
 
+        SidebarManager.updateScoreboard(target);
 
         target.setDisplayName(target.getPlayerListName());
         target.sendMessage(main.prefix + "§cVous êtes désormais §6visible aux yeux des autres joueurs !");

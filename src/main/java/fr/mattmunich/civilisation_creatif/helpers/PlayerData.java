@@ -145,7 +145,7 @@ public final class PlayerData {
 				return grades;
 			}
 		}
-		return null;
+		return Grades.VAGABOND; //Lowest rank
 	}
 
 	public void setRank(Grades grade) {

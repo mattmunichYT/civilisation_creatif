@@ -5,7 +5,6 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
@@ -85,7 +84,7 @@ public class TerritoryData {
 
     public void createTerritory(Player chief, String territoryName, ChatColor territoryColor) {
         try {
-            if(config.contains(territoryName)) {
+            if(getTerritoriesList().contains(territoryName)) {
                 chief.sendMessage(main.prefix + "§4Impossible de créer le territoire, §cun territoire avec le même nom existe déjà !");
                 return;
             }
@@ -106,7 +105,7 @@ public class TerritoryData {
 
             addTerritoryToList(territoryName);
 
-            PlayerData data = new PlayerData(chief.getUniqueId());
+            PlayerData data = new PlayerData(chief);
             data.setTerritory(territoryName);
 
             boolean check = updateMemberInConfig(territoryName);
@@ -114,11 +113,18 @@ public class TerritoryData {
                 Bukkit.getConsoleSender().sendMessage(main.prefix + "§c§oUne erreur NON fatale s'est produite lors de la création du territoire " + territoryName);
             }
             saveConfig();
+
+            if(data.getRank().getId()<4){
+                data.setRank(Grades.CHEF);
+            }
+
+            SidebarManager.updateScoreboard(chief);
+
             chief.sendMessage(main.prefix + "§2Le territoire §6" + territory.getColor() + territory.getName() + "§2 a été créé avec succès !");
             Bukkit.broadcastMessage(main.prefix + "§6" + chief.getName() + "§a a créé le territoire " + territory.getColor() + territory.getName() + " §a!");
         } catch (Exception e) {
             chief.sendMessage(main.prefix + "§4Impossible de créer le territoire, §cveuillez signaler cela à un membre du staff.");
-            main.logError("Couldn't create territory " + territoryName + " from list",e);
+            main.logError("Couldn't create territory " + territoryName,e);
         }
     }
 
@@ -128,11 +134,14 @@ public class TerritoryData {
             config.set("territories." + territoryName, null);
             for(String entry : getTerritoryTeam(territoryName).getEntries()) {
                 Player p = Bukkit.getPlayer(entry);
-                if(p != null ) {
-                    PlayerData pdata = new PlayerData(p.getUniqueId());
+                if(p != null) {
+                    PlayerData pdata = new PlayerData(p);
                     pdata.setTerritory(null);
+                    if(pdata.getRank().getId()<4){
+                        pdata.setRank(Grades.VAGABOND);
+                    }
                     if(p.isOnline()) {
-                        pdata.setTerritory(null);
+                        SidebarManager.updateScoreboard(p);
                         if(pdata.getRank() == null) {
                             p.kickPlayer("§cVotre territoire a été supprimé \n§e et une erreur s'est produite lors de l'obtention de votre grade!");
                             return;
@@ -176,6 +185,10 @@ public class TerritoryData {
             membersUUID.remove(sender.getUniqueId().toString());
             PlayerData pdata = new PlayerData(sender.getUniqueId());
             pdata.setTerritory(null);
+            if(pdata.getRank().getId()<4){
+                pdata.setRank(Grades.VAGABOND);
+            }
+            SidebarManager.updateScoreboard(sender);
             sendAnouncementToTerritory(sTeam.getName(), "§c" + sender.getName() + "§4 a quitté le territoire.");
         } catch (Exception ignored) {}
         config.set("territories." + sTeam.getName() + ".membersUUID", membersUUID);
@@ -190,6 +203,10 @@ public class TerritoryData {
         try {
             PlayerData pdata = new PlayerData(p.getUniqueId());
             pdata.setTerritory(territoryName);
+            if(pdata.getRank().getId()<4){
+                pdata.setRank(Grades.MEMBRE);
+            }
+            SidebarManager.updateScoreboard(p);
             membersUUID.add(p.getUniqueId().toString());
             sendAnouncementToTerritory(territoryName, "§a" + p.getName() + "§2 a rejoin le territoire !");
         } catch (Exception ignored) {}
@@ -214,7 +231,7 @@ public class TerritoryData {
         }
     }
 
-    public void addOfficer(OfflinePlayer target, Player sender) {
+    public void makeOfficer(OfflinePlayer target, Player sender) {
         if(!target.hasPlayedBefore()){
             sender.sendMessage(main.prefix + "§4Le joueur ne s'est jamais connecté !");
             return;
@@ -242,8 +259,8 @@ public class TerritoryData {
         }
         officers.add(target.getUniqueId().toString());
         config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
-        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
         saveConfig();
+        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
         sender.sendMessage(main.prefix + "§2Le joueur §a" + target.getName() + "§2 a été ajouté aux officiers de votre territoire !");
         if(target.isOnline() && target.getPlayer() !=null){
             target.getPlayer().sendMessage(main.prefix + "§2Vous êtes désormais officier dans le territoire §a" + getPlayerTerritory(sender) + "§2 !");
@@ -274,8 +291,8 @@ public class TerritoryData {
         }
         officers.remove(target.getUniqueId().toString());
         config.set("territories." + getPlayerTerritory(sender) + ".officers",officers);
-        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
         saveConfig();
+        if (target.isOnline()) { SidebarManager.updateScoreboard(target.getPlayer()); }
     }
 
     public boolean isInTerritory(OfflinePlayer player, String territoryName) {

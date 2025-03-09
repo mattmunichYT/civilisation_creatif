@@ -134,7 +134,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-                territoryData.addOfficer(target,p);
+                territoryData.makeOfficer(target,p);
                 return true;
             }
             if (args[0].equalsIgnoreCase("removeOfficer")) {
