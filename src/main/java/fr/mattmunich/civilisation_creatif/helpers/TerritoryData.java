@@ -1009,7 +1009,7 @@ public class TerritoryData {
                     "§2Description:§a"
             ));
 
-            if (desc.isEmpty()) {
+            if (desc==null) {
                 lore.add("§8§oNon définie");
             } else {
                 lore.addAll(desc);
@@ -1031,7 +1031,8 @@ public class TerritoryData {
         return terrListInv_Layout;
     }
 
-    public List<String> splitDescription(String description, int maxLength) {
+    public @Nullable List<String> splitDescription(String description, int maxLength) {
+        if(description==null) { return null; }
         List<String> lines = new ArrayList<>();
         String[] words = description.split(" ");
         StringBuilder currentLine = new StringBuilder();
@@ -1072,7 +1073,7 @@ public class TerritoryData {
                 "§2Description:§a"
         ));
 
-        if (desc.isEmpty()) {
+        if (desc == null) {
             lore.add("§8§oNon définie");
         } else {
             lore.addAll(desc);
