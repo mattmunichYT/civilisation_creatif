@@ -3,7 +3,6 @@ package fr.mattmunich.civilisation_creatif.commands;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.SidebarManager;
 import org.bukkit.Bukkit;
-import org.bukkit.block.sign.Side;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -47,7 +46,7 @@ public class VanishCommand implements CommandExecutor, Listener {
                 if(!main.vanished.contains(p)) {
                     vanish(p);
                 } else {
-                    unvanish(p);
+                    unvanish(p, true);
                 }
                 return true;
             }else if(args.length == 1 || args.length == 2) {
@@ -64,7 +63,7 @@ public class VanishCommand implements CommandExecutor, Listener {
                         return true;
                     }
 
-                    unvanish(p);
+                    unvanish(p, true);
                     return true;
                 }
 
@@ -167,7 +166,7 @@ public class VanishCommand implements CommandExecutor, Listener {
         sender.sendMessage(main.prefix + "§6" + target.getName() + "§2 est désormais §6invisible aux yeux des autres joueurs !");
     }
 
-    public void unvanish(Player sender) {
+    public void unvanish(Player sender, boolean sendJoinMessage) {
         PlayerData playerData = new PlayerData(sender);
         main.vanished.remove(sender);
 
@@ -191,7 +190,7 @@ public class VanishCommand implements CommandExecutor, Listener {
         sender.setDisplayName(tPrefix + sender.getName() + tSuffix);
         sender.setCustomName(sender.getPlayerListName());
 
-        Bukkit.broadcastMessage(main.joinMessage(sender));
+        if(sendJoinMessage) { Bukkit.broadcastMessage(main.joinMessage(sender)); }
 
         SidebarManager.updateScoreboard(sender);
         sender.sendMessage(main.prefix + "§cVous êtes désormais §6visible aux yeux des autres joueurs !");
@@ -241,7 +240,11 @@ public class VanishCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        unvanish(e.getPlayer());
+        Player p = e.getPlayer();
+        if(main.vanished.contains(p)) {
+            unvanish(p, false);
+            e.setQuitMessage("");
+        }
     }
 }
 

@@ -2,6 +2,7 @@ package fr.mattmunich.civilisation_creatif.helpers;
 
 import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -883,6 +884,36 @@ public class TerritoryData {
         saveConfig();
     }
 
+    public void setTerritoryDescription(String territoryName, String description) {
+        config.set("territories." + territoryName + ".description", description);
+        saveConfig();
+    }
+
+    public String getTerritoryDescription(String territoryName) {
+        return config.getString("territories." + territoryName + ".description");
+    }
+
+    public void renameTerritory(String oldTerritoryName, String newTerritoryName) {
+        ConfigurationSection territoryData = config.getConfigurationSection("territories." + oldTerritoryName);
+        if(territoryData==null){
+            throw new NullPointerException("Couldn't rename territory " + oldTerritoryName + " because it's data was null.");
+        }
+
+        for (String memberUUIDasString : getTerritoryMembersUUID(oldTerritoryName)) {
+            UUID uuid = UUID.fromString(memberUUIDasString);
+            try {
+                PlayerData playerData = new PlayerData(uuid);
+                playerData.setTerritory(newTerritoryName);
+            } catch (Exception e) {
+                main.logError("Couldn't set player with UUID " + uuid + " territory when renaming territory",e);
+            }
+        }
+
+        config.set("territories." + oldTerritoryName, null);
+        config.createSection("territories." + newTerritoryName, territoryData.getValues(true));
+        saveConfig();
+    }
+
     public Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p,54,"§aListe des territoires §7- §ePage §6" + page);
         ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE,"");
@@ -967,11 +998,29 @@ public class TerritoryData {
                 chiefName = "§c§oNon trouvé";
             }
 
+            String descriptionString = getTerritoryDescription(terr);
+            List<String> desc = splitDescription(descriptionString, 30);
+            List<String> lore = new ArrayList<>(Arrays.asList(
+                    "§2Chef: §a" + chiefName,
+                    "§2Officiers: §a" + getTerritoryOfficers(terr).size(),
+                    "§2Membres: §a" + getTerritoryMembersUUID(terr).size(),
+                    "§2XP:§a " + getTerritoryXP(terr),
+                    "§2Argent:§a " + getTerritoryMoney(terr),
+                    "§2Description:§a"
+            ));
+
+            if (desc.isEmpty()) {
+                lore.add("§8§oNon définie");
+            } else {
+                lore.addAll(desc);
+            }
+
+
             ItemStack banner = getTerritoryBanner(terr);
             ItemMeta bannerMeta = banner.getItemMeta();
             assert bannerMeta != null;
             bannerMeta.setDisplayName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
+            bannerMeta.setLore(lore);
             banner.setItemMeta(bannerMeta);
 
             // Add the item to the next available slot
@@ -981,6 +1030,84 @@ public class TerritoryData {
         // Return the populated inventory for the specified page
         return terrListInv_Layout;
     }
+
+    public List<String> splitDescription(String description, int maxLength) {
+        List<String> lines = new ArrayList<>();
+        String[] words = description.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            if (currentLine.length() + word.length() + 1 > maxLength) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder();
+            }
+            if (!currentLine.isEmpty()) {
+                currentLine.append(" ");
+            }
+            currentLine.append(word);
+        }
+        if (!currentLine.isEmpty()) {
+            lines.add(currentLine.toString());
+        }
+        return lines;
+    }
+
+    public Inventory getTerrInv(Player p, Team territory) {
+        Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
+        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null);
+        for (int i = 0; i < 26; i++) {
+            terrInv.setItem(i, none);
+        }
+        String terr = territory.getName();
+        Player chief = Bukkit.getPlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
+        String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
+        String descriptionString = getTerritoryDescription(terr);
+        List<String> desc = splitDescription(descriptionString, 30);
+        List<String> lore = new ArrayList<>(Arrays.asList(
+                "§2Chef: §a" + chiefName,
+                "§2Officiers: §a" + getTerritoryOfficers(terr).size(),
+                "§2Membres: §a" + getTerritoryMembersUUID(terr).size(),
+                "§2XP:§a " + getTerritoryXP(terr),
+                "§2Argent:§a " + getTerritoryMoney(terr),
+                "§2Description:§a"
+        ));
+
+        if (desc.isEmpty()) {
+            lore.add("§8§oNon définie");
+        } else {
+            lore.addAll(desc);
+        }
+
+
+        ItemStack banner = getTerritoryBanner(terr);
+        BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
+        assert bannerMeta != null;
+        if (hasTerritory(p) && (isChief(p,terr))) {
+            bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
+        } else {
+            bannerMeta.setItemName(territory.getColor() + territory.getName());
+        }
+        bannerMeta.setLore(lore);
+        banner.setItemMeta(bannerMeta);
+        terrInv.setItem(4, banner);
+        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), lore));
+
+        if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
+            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎ Gérer les villageois"));
+            terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b👤➕ Inviter des joueurs"));
+        }
+        if (hasTerritory(p) && (isChief(p,terr))) {
+            terrInv.setItem(3, ItemBuilder.getItem(Material.WRITABLE_BOOK, "§a✎ Changer §5la description§a de votre territoire"));
+            terrInv.setItem(5, ItemBuilder.getItem(Material.OAK_SIGN, "§2✎ Changer §5le nom§2 de votre territoire"));
+            terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire"));
+            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎ Gérer les membres"));
+            terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire"));
+        }
+        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu"));
+        return terrInv;
+    }
+
+    //WORKERS
 
     public Inventory getTerrWorkersInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p,54,"§bGérer vos villageois §7- §ePage §6" + page);
@@ -1094,46 +1221,6 @@ public class TerritoryData {
         terrWorkersInv.setItem(8, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG,"§a💰 Acheter des villageois"));
         return terrWorkersInv;
     }
-
-
-    public Inventory getTerrInv(Player p, Team territory) {
-        Inventory terrInv = Bukkit.createInventory(p, 27, "§aTerritoire : " + territory.getColor() + territory.getName());
-        ItemStack none = ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null);
-        for (int i = 0; i < 26; i++) {
-            terrInv.setItem(i, none);
-        }
-        String terr = territory.getName();
-        Player chief = Bukkit.getPlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
-        String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
-
-        ItemStack banner = getTerritoryBanner(terr);
-        BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
-        assert bannerMeta != null;
-        if (hasTerritory(p) && (isChief(p,terr))) {
-            bannerMeta.setItemName("§r§dDéfinir la bannière du territoire");
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-            banner.setItemMeta(bannerMeta);
-        } else {
-            bannerMeta.setItemName(territory.getColor() + territory.getName());
-            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr)));
-            banner.setItemMeta(bannerMeta);
-        }
-        terrInv.setItem(4, banner);
-        terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), Arrays.asList("§2Chef: §a" + chiefName, "§2Officiers: §a" + getTerritoryOfficers(terr).size(),"§2Membres: §a" + getTerritoryMembersUUID(terr).size(), "§2XP:§a " + getTerritoryXP(terr), "§2Argent:§a " + getTerritoryMoney(terr))));
-        if (hasTerritory(p) && (isOfficer(p,terr) || isChief(p,terr))) {
-            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎ Gérer les villageois"));
-            terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b👤➕ Inviter des joueurs"));
-        }
-        if (hasTerritory(p) && (isChief(p,terr))) {
-            terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire"));
-            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎ Gérer les membres"));
-            terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire"));
-        }
-        terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu"));
-        return terrInv;
-    }
-
-    //WORKERS
 
     public List<String> getWorkerList() {
         return config.getStringList("workerList");

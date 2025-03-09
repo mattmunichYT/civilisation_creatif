@@ -44,6 +44,10 @@ public class EventListener implements Listener {
 
     private final ArrayList<Player> defTerritoryBanner = new ArrayList<>();
 
+    private final ArrayList<Player> enterNewTerritoryName = new ArrayList<>();
+
+    private final ArrayList<Player> enterNewTerritoryDescription = new ArrayList<>();
+
     private final Main main;
 
     private final Plugin plugin;
@@ -77,8 +81,8 @@ public class EventListener implements Listener {
                 Bukkit.getScheduler().runTask(main, () -> p.chat("/territory"));
                 return;
             }
-            if(e.getMessage().length() > 15) {
-                p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c15 caractères §4!");
+            if(e.getMessage().length() > 20) {
+                p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c20 caractères §4!");
                 return;
             }
             if(!e.getMessage().matches("[a-zA-Z0-9]+")) {
@@ -131,6 +135,55 @@ public class EventListener implements Listener {
             p.sendTitle("§a✅ Succès","§2§oLa bannière de votre territoire a été définie !", 20, 100, 20);
             p.sendMessage(main.prefix + "§2La bannière de votre territoire a été définie !");
             defTerritoryBanner.remove(p);
+            return;
+        }
+        if(enterNewTerritoryName.contains(p)) {
+            enterNewTerritoryName.remove(p);
+            e.setCancelled(true);
+            if(territoryData.getPlayerTerritory(p)==null || !territoryData.isChief(p,territoryData.getPlayerTerritory(p))) {
+                p.sendMessage(main.prefix + "§4Vous ne pouvez pas faire cela.");
+                return;
+            }
+            if(e.getMessage().equals("&")){
+                p.sendMessage(main.prefix + "§eOpération annulée.");
+                return;
+            }
+            if(e.getMessage().length() > 20) {
+                p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c20 caractères §4!");
+                return;
+            }
+            if(!e.getMessage().matches("[a-zA-Z0-9éèê]+")) {
+                p.sendMessage(main.prefix + "§4Le nom du territroire ne doit pas contenir de §ccaractères spéciaux §8§o(seulement a-Z et 0-9) §4!");
+                return;
+            }
+            ChatColor territoryColor = territoryData.getTerritoryTeam(territoryData.getPlayerTerritory(p)).getColor();
+            try {
+                territoryData.renameTerritory(territoryData.getPlayerTerritory(p),e.getMessage());
+            } catch (NullPointerException ex) {
+                p.sendMessage(main.prefix + "§4Une erreur s'est produite");
+            }
+            p.sendMessage(main.prefix + "§2Votre territoire a été renommé à " + territoryColor + e.getMessage() + "§2 !");
+            return;
+        }
+
+        if(enterNewTerritoryDescription.contains(p)) {
+            enterNewTerritoryDescription.remove(p);
+            e.setCancelled(true);
+            if(territoryData.getPlayerTerritory(p)==null || !territoryData.isChief(p,territoryData.getPlayerTerritory(p))) {
+                p.sendMessage(main.prefix + "§4Vous ne pouvez pas faire cela.");
+                return;
+            }
+            if(e.getMessage().equals("&")){
+                p.sendMessage(main.prefix + "§eOpération annulée.");
+                return;
+            }
+            if(e.getMessage().length() > 100) {
+                p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c100 caractères §4!");
+                return;
+            }
+            territoryData.setTerritoryDescription(territoryData.getPlayerTerritory(p),main.hex(e.getMessage()));
+            p.sendMessage(main.prefix + "§2La description de votre territoire a été définie à :");
+            p.sendMessage("§a" + main.hex(e.getMessage()));
             return;
         }
 
@@ -549,6 +602,22 @@ public class EventListener implements Listener {
                         //MANAGE MEMBERS
                         p.sendMessage(main.prefix + "§c§oEn développement!");
                         break;
+                    case WRITABLE_BOOK:
+                        p.closeInventory();
+                        p.sendMessage(main.prefix + "§2Envoyez la §ofuture §r§5description§2 de votre territoire dans le tchat. §e(§6§o& §r§epour annuler)");
+                        p.sendMessage(main.prefix + "§a§oℹ Vous pouvez entrer au maximum 100 caractères");
+                        p.sendTitle("§2Envoyez la description","§2§ldans le tchat",20,100,20);
+                        enterNewTerritoryDescription.add(p);
+                        break;
+                    case OAK_SIGN:
+                        p.sendMessage(main.prefix + "§cFonctionnalité désactivée.");
+                        break;
+//                        p.closeInventory();
+//                        p.sendMessage(main.prefix + "§2Envoyez le §ofutur §r§5nom§2 de votre territoire dans le tchat. §e(§6§o& §r§epour annuler)");
+//                        p.sendMessage(main.prefix + "§a§oℹ Vous pouvez entrer au maximum 20 caractères");
+//                        p.sendTitle("§2Envoyez le nom","§2§ldans le tchat",20,100,20);
+//                        enterNewTerritoryName.add(p);
+//                        break;
                     case BARRIER:
                         invView.close();
                         break;
