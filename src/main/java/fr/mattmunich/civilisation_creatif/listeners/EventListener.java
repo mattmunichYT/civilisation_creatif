@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -1138,7 +1139,7 @@ public class EventListener implements Listener {
                     xpGained.remove(playerId);
                     resetTasks.remove(playerId);
                 }
-            }.runTaskLater(main, 100L); // 100 ticks = 5 seconds
+            }.runTaskLater(main, 60L); // 60 ticks = 3 seconds
 
             resetTasks.put(playerId, resetTask);
 
@@ -1163,7 +1164,7 @@ public class EventListener implements Listener {
             if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
                 if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                     e.setCancelled(true);
-                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer avec des blocs ici !");
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer avec des blocs/intéragir ici !");
                     return;
                 }
             }
@@ -1192,6 +1193,22 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
+    public void onEntityDamagedByEntity(EntityDamageByEntityEvent e){
+        if(e.getDamager() instanceof Player p) {
+            String territoryName = territoryData.getPlayerTerritory(p);
+            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getEntity().getLocation().getChunk()));
+            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+                e.setCancelled(true);
+                if(e.getEntity() instanceof Player) {
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas attaquer d'autres joueurs ici !");
+                } else {
+                    p.sendMessage(main.prefix + "§4Vous ne pouvez pas attaquer d'entitées ici !");
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onVillagerDeath(EntityDeathEvent e) {
         if(e.getEntity() instanceof Villager villager) {
             UUID workerUUID = null;
@@ -1216,11 +1233,17 @@ public class EventListener implements Listener {
             if (workerType!=null) {
                 WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", "_"));
                 int tier = territoryData.getConfig().getInt("territories." + territoryName + ".workers." + workerUUID + ".tier");
+                for (String tag : villager.getScoreboardTags()) {
+                    if (tag.contains("tier=")) {
+                        tier = Integer.parseInt(tag.replace("tier=",""));
+                    }
+                }
+
                 if (type.getLifespan()==-1){
                     territoryData.spawnWorker(villager,e.getEntity().getLocation());
                     return;
                 } else {
-                    territoryData.removeAliveWorkerToCount(territoryName,type, 1 + tier);
+                    territoryData.removeAliveWorkerFromCount(territoryName,type, 1 + tier);
                 }
             }
             territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");

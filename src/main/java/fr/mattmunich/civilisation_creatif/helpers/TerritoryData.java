@@ -1209,6 +1209,7 @@ public class TerritoryData {
             String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
             String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
             String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysToLive < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
+            String tierString = "§aTier : §6" + tier;
 
             ItemStack workerItem = new ItemStack(workerItemType);
             ItemMeta workerItemMeta = workerItem.getItemMeta();
@@ -1216,7 +1217,7 @@ public class TerritoryData {
             PersistentDataContainer data = workerItemMeta.getPersistentDataContainer();
             data.set(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING,workerUUID);
             workerItemMeta.setDisplayName(tierColor+typeName);
-            workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan));
+            workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan,tierString));
             workerItem.setItemMeta(workerItemMeta);
             terrWorkersInv.addItem(workerItem);
         }
@@ -1394,6 +1395,7 @@ public class TerritoryData {
         villager.addScoreboardTag("workerUUID=" + workerUUID);
         villager.addScoreboardTag("workerType=" + type.name().toLowerCase());
         villager.addScoreboardTag("workerTerritory=" + getPlayerTerritory(p));
+        villager.addScoreboardTag("tier=" + tier);
         String workerName = formatType(type.name());
         villager.setProfession(type.getProfession());
         villager.setCustomName(tierColor + workerName);
@@ -1719,7 +1721,7 @@ public class TerritoryData {
         setAliveWorkerCount(territoryName, currentWorkerCount+count, workerType);
     }
 
-    public void removeAliveWorkerToCount(String territoryName, WorkerType workerType, int count) {
+    public void removeAliveWorkerFromCount(String territoryName, WorkerType workerType, int count) {
         int currentWorkerCount = getAliveWorkerCount(territoryName,workerType);
         setAliveWorkerCount(territoryName, currentWorkerCount-count, workerType);
     }
@@ -1731,6 +1733,30 @@ public class TerritoryData {
 
     public int getAliveWorkerCount(String territoryName, WorkerType workerType){
         return (config.get("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) == null ||  config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase()) < 0) ? 0 : config.getInt("territories." + territoryName + ".aliveWorkerCount." + workerType.name().toLowerCase());
+    }
+
+    //        |    ^
+    // TOTAL  |    |
+    //   |    | PER TYPE
+    //   V    |
+
+    public void setTotalAliveWorkerCount(String territoryName, int workerCount){
+        config.set("territories." + territoryName + ".aliveWorkerCount.total",workerCount);
+        saveConfig();
+    }
+
+    public void addOneTotalAliveWorkerToCount(String territoryName) {
+        int currentWorkerCount = getTotalAliveWorkerCount(territoryName);
+        setTotalAliveWorkerCount(territoryName, currentWorkerCount+1);
+    }
+
+    public void removeOneTotalAliveWorkerFromCount(String territoryName) {
+        int currentWorkerCount = getTotalAliveWorkerCount(territoryName);
+        setTotalAliveWorkerCount(territoryName, currentWorkerCount-1);
+    }
+
+    public int getTotalAliveWorkerCount(String territoryName){
+        return (config.get("territories." + territoryName + ".aliveWorkerCount.total") == null || config.getInt("territories." + territoryName + ".aliveWorkerCount.total") < 0) ? 0 : config.getInt("territories." + territoryName + ".aliveWorkerCount.total");
     }
 
     public void showWorkerInventory(Player p, String workerUUID, String territoryName) {
@@ -1774,6 +1800,7 @@ public class TerritoryData {
         String workerAliveString = "§aEn vie/activité : " + (workerAlive ? "§2Oui" : "§cNon");
         String incomeString = "§aRevenus : §6" + income + main.moneySign + "§a/mois";
         String lifespan = "§aDurée de vie restante : " + (workerType.getLifespan()==-1 ? "§b§oInvincible" : (daysToLive < 10 ? "§4" : daysToLive<30 ? "§c" : daysToLive<45 ? "§e" : daysToLive<90 ? "§6" : "§1") + daysToLive + "§a jours");
+        String tierString = "§aTier : §6" + tier;
 
         ItemStack workerItem = new ItemStack(workerItemType);
         ItemMeta workerItemMeta = workerItem.getItemMeta();
@@ -1781,7 +1808,7 @@ public class TerritoryData {
         PersistentDataContainer data = workerItemMeta.getPersistentDataContainer();
         data.set(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING,workerUUID);
         workerItemMeta.setDisplayName(tierColor+typeName);
-        workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan));
+        workerItemMeta.setLore(Arrays.asList(workerAliveString, incomeString, lifespan,tierString));
         workerItem.setItemMeta(workerItemMeta);
         workerInv.setItem(4,workerItem);
         if(!workerAlive) {

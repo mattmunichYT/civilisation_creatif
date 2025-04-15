@@ -57,7 +57,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
             PlayerData data;
             try {
-                data = new PlayerData(Utility.getUUIDFromName(player.getName()));
+                data = new PlayerData(player);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -104,7 +104,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
             PlayerData rldata;
             try {
-                rldata = new PlayerData(Utility.getUUIDFromName(player.getName()));
+                rldata = new PlayerData(player);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -122,7 +122,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
             PlayerData data;
             try {
-                data = new PlayerData(Utility.getUUIDFromName(player.getName()));
+                data = new PlayerData(player);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -215,7 +215,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 
             PlayerData data;
             try {
-                data = new PlayerData(Utility.getUUIDFromName(player.getName()));
+                data = new PlayerData(player);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
