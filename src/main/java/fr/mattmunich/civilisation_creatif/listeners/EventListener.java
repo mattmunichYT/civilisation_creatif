@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -970,19 +971,21 @@ public class EventListener implements Listener {
                                         territoryData.removeOneAliveWorkerFromCount(territoryName,type);
                                     }
                                 }
-                                territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                                if(territoryData.getAliveWorkerCount(territoryName,WorkerType.POLICIER) > 1) {
+                                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été despawn par le menu du territoire !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu du territoire !");
+                                } else {
+                                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                                }
+                                Inventory workersTerrInv = territoryData.getTerritoryWorkersInventory(p,territoryName,1);
+                                p.openInventory(workersTerrInv);
                             } else {
                                 p.sendMessage(main.prefix + "§cLe villageois n'existe pas.");
-                                return;
                             }
                         }else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
-                            return;
                         }
                     }
-                    case BARRIER -> {
-                        p.closeInventory();
-                    }
+                    case BARRIER -> p.closeInventory();
                 }
             }
         }
@@ -1246,7 +1249,95 @@ public class EventListener implements Listener {
                     territoryData.removeAliveWorkerFromCount(territoryName,type, 1 + tier);
                 }
             }
-            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+            if(territoryData.getAliveWorkerCount(territoryName,WorkerType.POLICIER) > 1) {
+                try {
+                    if(e.getDamageSource().getCausingEntity()!=null) {
+                        Entity damager = e.getDamageSource().getCausingEntity();
+                        if(damager instanceof Player p) {
+                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué par §c" + p.getName() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par §c" + p.getName() + " §4!");
+
+                        } else {
+                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué par un/une §c" + damager.getType() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par un/une §c" + damager.getType() + " §4!");
+                        }
+                        return;
+                    } else if (e.getDamageSource().getDamageType() != null) {
+                        String damageTypeMessage = getDamageType(e);
+                        if(damageTypeMessage==null) {
+                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                            return;
+                        }
+                        if(damageTypeMessage.equals("COMMAND")) {
+                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé à été despawn par le menu des villageois !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu des villageois !");
+                            return;
+                        }
+                        territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé est mort §c" + damageTypeMessage + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4est mort §c" + damageTypeMessage + " §4!");
+                        return;
+                    } else {
+                        territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                        return;
+                    }
+                } catch (Exception ex) {
+                    main.logError("Couldn't find out worker's death reason",ex);
+                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                    return;
+                }
+            } else {
+                territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                return;
+            }
+        }
+    }
+
+    private String getDamageType(EntityDeathEvent e) {
+        DamageType damageType  = e.getDamageSource().getDamageType();
+        if(damageType.equals(DamageType.FALL)) {
+            return "de dégats de chute";
+        } else if(damageType.equals(DamageType.CAMPFIRE)) {
+            return "d'un feu de camp'";
+        } else if(damageType.equals(DamageType.CACTUS)) {
+            return "d'un cactus";
+        } else if(damageType.equals(DamageType.CRAMMING)) {
+            return "d'Entity Cramming";
+        }  else if(damageType.equals(DamageType.DROWN)) {
+            return "de noyade";
+        } else if(damageType.equals(DamageType.EXPLOSION)) {
+            return "à cause d'une explosion";
+        } else if(damageType.equals(DamageType.FALLING_ANVIL)) {
+            return "à cause d'une enclume";
+        } else if(damageType.equals(DamageType.FALLING_BLOCK)) {
+            return "de suffocation";
+        } else if(damageType.equals(DamageType.FALLING_STALACTITE)) {
+            return "à cause d'une stalactite";
+        } else if(damageType.equals(DamageType.FIREBALL)) {
+            return "à cause d'une boule de feu";
+        } else if(damageType.equals(DamageType.FREEZE)) {
+            return "de froid";
+        } else if(damageType.equals(DamageType.ON_FIRE)) {
+            return "de feu";
+        } else if(damageType.equals(DamageType.OUT_OF_WORLD)) {
+            return "d'une chute dans le vide";
+        } else if(damageType.equals(DamageType.MAGIC)) {
+            return "d'une potion";
+        } else if(damageType.equals(DamageType.FIREWORKS)) {
+            return "à cause de feux d'artifice";
+        } else if(damageType.equals(DamageType.LAVA)) {
+            return "car il a essayé de nager dans de la lave";
+        } else if(damageType.equals(DamageType.THORNS)) {
+            return "à cause de l'enchantement Épines";
+        } else if(damageType.equals(DamageType.WIND_CHARGE)) {
+            return "d'une charge de vent";
+        } else if(damageType.equals(DamageType.HOT_FLOOR)) {
+            return "à cause de magma";
+        } else if(damageType.equals(DamageType.SWEET_BERRY_BUSH)) {
+            return "à cause d'un buisson de Sweet Berries";
+        } else if(damageType.equals(DamageType.LIGHTNING_BOLT)) {
+            return "à cause d'un éclair...§6 c'est quoi la proba??";
+        } else if(damageType.equals(DamageType.GENERIC)) {
+            return "COMMAND";
+        } else if(damageType.equals(DamageType.GENERIC_KILL)) {
+            return "COMMAND";
+        } else {
+            return null;
         }
     }
 }

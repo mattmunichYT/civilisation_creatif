@@ -5,15 +5,15 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Villager;
 
-public enum WorkerType {//                                                                                                      //UTILITÉS
+public enum WorkerType {//                                                                                                                                                      //UTILITÉS
     //UTILITAIRES/COPETENCES *** IMMORTELS (=-1)
     PILOTE_AVION(3500,3000,-1,Material.DIAMOND_HELMET,ChatColor.DARK_RED, Villager.Profession.CARTOGRAPHER,Sound.ENTITY_BREEZE_IDLE_GROUND,0), //AEROPTORT
     PILOTE_TRAIN(3500,3000,-1,Material.RAIL,ChatColor.DARK_RED, Villager.Profession.CARTOGRAPHER,Sound.ENTITY_MINECART_RIDING,1.5f),           //TRAIN
-    NAVIGATEUR(3500,3000,-1,Material.OAK_BOAT,ChatColor.DARK_RED, Villager.Profession.CARTOGRAPHER,Sound.ENTITY_DOLPHIN_JUMP,1),         //PORT
+    NAVIGATEUR(3500,3000,-1,Material.OAK_BOAT,ChatColor.DARK_RED, Villager.Profession.CARTOGRAPHER,Sound.ENTITY_DOLPHIN_JUMP,1),               //PORT
     //BONUS JOUEUR
-    INGENIEUR(1000,3000,120,Material.CRAFTER,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.BLOCK_PISTON_CONTRACT,1),          //VOYAGES PRIX REDUITS
-    JARDINIER(750,1000,60,Material.FLOWERING_AZALEA,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.BLOCK_GRASS_BREAK,1),          //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
-    BUCHERON(750,1000,60,Material.SPRUCE_LOG,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1),           //+ARGENT QUAND BLOCK BOIS PLACE
+    INGENIEUR(1000,3000,120,Material.CRAFTER,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.BLOCK_PISTON_CONTRACT,1),              //VOYAGES PRIX REDUITS
+    JARDINIER(750,1000,60,Material.FLOWERING_AZALEA,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.BLOCK_GRASS_BREAK,1),           //+ARGENT QUAND BLOCK NATUREL(=/= bois) PLACE
+    BUCHERON(750,1000,60,Material.SPRUCE_LOG,ChatColor.DARK_PURPLE, Villager.Profession.LIBRARIAN,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1),   //+ARGENT QUAND BLOCK BOIS PLACE
     //ALIMENTATION VILLAGEOIS => + BIEN-ÊTRE => + ARGENT
     BOULANGER(2000,2000,90,Material.BREAD,ChatColor.YELLOW, Villager.Profession.FARMER,Sound.ENTITY_GENERIC_EAT,1),
     BOUCHER(1200,1000,60,Material.SMOKER,ChatColor.GOLD, Villager.Profession.BUTCHER,Sound.ENTITY_VILLAGER_WORK_BUTCHER,1),
