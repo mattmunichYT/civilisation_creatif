@@ -127,25 +127,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-//            CAN NOW USE PLAYER MANAGMENT INV
-//            if (args[0].equalsIgnoreCase("makeOfficer")) {
-//                if(args.length!=2) {
-//                    p.sendMessage(main.wrongUsage + "/territoire makeOfficer <player>");
-//                    return true;
-//                }
-//                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-//                territoryData.makeOfficer(target,p);
-//                return true;
-//            }
-//            if (args[0].equalsIgnoreCase("removeOfficer")) {
-//                if(args.length!=2) {
-//                    p.sendMessage(main.wrongUsage + "/territoire removeOfficer <player>");
-//                    return true;
-//                }
-//                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-//                territoryData.removeOfficer(target, p);
-//                return true;
-//            }
             if (args[0].equalsIgnoreCase("buyWorker")) {
                 if (!territoryData.isChief(p, territoryData.getPlayerTerritory(p)) && !territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
                     p.sendMessage(main.prefix + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
@@ -440,10 +421,6 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 tabComplete.add("depositMoney");
                 tabComplete.add("withdrawMoney");
                 tabComplete.add("buyWorker");
-            }
-            if(s instanceof Player && territoryData.isChief((Player) s, territoryData.getPlayerTerritory((Player) s))){
-                tabComplete.add("makeOfficer");
-                tabComplete.add("removeOfficer");
             }
             if(s instanceof Player p) {
                 PlayerData playerData = new PlayerData(p);
