@@ -2,6 +2,7 @@ package fr.mattmunich.civilisation_creatif.helpers;
 
 import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
+import org.bukkit.block.Skull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -27,6 +29,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1114,6 +1117,153 @@ public class TerritoryData {
         return terrInv;
     }
 
+    public Inventory getTerrMemebersInv_Layout(Player p, int page, int pageNum) {
+        Inventory terrListInv = Bukkit.createInventory(p, 54, "§bGérer les membres §7- §ePage §6" + page);
+        ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
+        for (int i = 0; i < 53; i++) {
+            terrListInv.setItem(i, none);
+        }
+        //Borders
+        terrListInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(1, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(7, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(9, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(17, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(36, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(44, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(45, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(46, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(52, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        terrListInv.setItem(53, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, ""));
+        //Borders
+        //Inner part
+        int[] ranges = {10, 16, 19, 25, 28, 34, 37, 43};
+
+        for (int i = 0; i < ranges.length; i += 2) {
+            for (int slot = ranges[i]; slot <= ranges[i + 1]; slot++) {
+                terrListInv.setItem(slot, null);
+            }
+        }
+        //Inner part
+        //Navigation bar
+        if (page != 1) {
+            terrListInv.setItem(47, ItemBuilder.getItem(Material.RED_STAINED_GLASS_PANE, "§c§l←", false, false, null, null, null));
+        }
+        terrListInv.setItem(49, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
+        if (page != pageNum) {
+            terrListInv.setItem(51, ItemBuilder.getItem(Material.LIME_STAINED_GLASS_PANE, "§a§l→", false, false, null, null, null));
+        }
+        //Navigation bar
+        return terrListInv;
+    }
+
+    public void showTerritoryMembersInventory(Player p, String territoryName, int page) {
+        int itemsPerPage = 28;
+        List<String> memberList = getTerritoryMembersUUID(territoryName);
+        int totalPages = (int) Math.ceil((double) memberList.size() / itemsPerPage);
+
+        if (page < 1 || page > totalPages) {
+            page = 1;
+        }
+
+        Inventory terrMembersInv = getTerrMemebersInv_Layout(p, page, totalPages);
+
+        int startIndex = (page - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, memberList.size());
+
+        //LOAD INV WITHOUT PLAYER SKIN ON SKULL
+        for (int i = startIndex; i < endIndex; i++) {
+            String memberUUID = memberList.get(i);
+            OfflinePlayer member = Bukkit.getOfflinePlayer(UUID.fromString(memberUUID));
+            if(!member.hasPlayedBefore()) {
+                Bukkit.getLogger().warning("Removed member " + memberUUID + " in territory " + territoryName + " from terrMember menu because it has never played before");
+                continue;
+            }
+            boolean memberOnline = member.isOnline();
+            boolean isChief = isChief(member,territoryName);
+            boolean isOfficer = isOfficer(member,territoryName);
+
+            String rankString = "§aGrade : " + (isChief ? "§6§lChef" : (isOfficer ? "§2Officier" : "§7Membre"));
+            String onlineString = "§aEn ligne : " + (memberOnline ? "§2§lOui" : "§cNon");
+            String tipPromote = (!isChief ? "§7§oCLIC GAUCHE pour promouvoir à " + (isOfficer ? "§6§lChef" : "§2Officier") : null);
+            String tipDemote = (isChief || isOfficer ? "§7§oCLIC DROIT pour rétrograder à " + (isChief ? "§2Officier" : "§7Membre" ) : null);
+
+            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta playerHeadMeta = (SkullMeta) playerHead.getItemMeta();
+            assert playerHeadMeta != null;
+            PersistentDataContainer data = playerHeadMeta.getPersistentDataContainer();
+            data.set(new NamespacedKey(plugin,"memberUUID"),PersistentDataType.STRING,member.getUniqueId().toString());
+            playerHeadMeta.setDisplayName(p == member ? member.getName() + "§8 - §a§aVous" : member.getName());
+            playerHeadMeta.setOwnerProfile(member.getPlayerProfile());
+            playerHeadMeta.setLore(Arrays.asList(rankString, onlineString, "", tipPromote,tipDemote));
+            playerHead.setItemMeta(playerHeadMeta);
+            terrMembersInv.addItem(playerHead);
+        }
+        terrMembersInv.setItem(0, ItemBuilder.getItem(Material.PAPER, "§bℹ Informations",
+                Arrays.asList(
+                        "    §bIci, vous pouvez gérer les",
+                        "    §bmembres de votre territoire :",
+                        "    §aCLIC GAUCHE : promouvoir le membre",
+                        "    §aCLIC DROIT : rétrograder le membre"
+                )));
+        terrMembersInv.setItem(4, ItemBuilder.getItem(Material.SUNFLOWER, "§bℹ Les membres de votre territoire",
+                Arrays.asList(
+                        "§aNombre de membres : §6" + memberList.size()
+                )
+        ));
+        terrMembersInv.setItem(8, ItemBuilder.getItem(Material.END_CRYSTAL, "§bInviter des joueurs"));
+        p.openInventory(terrMembersInv);
+
+        //LOAD INV WITH PLAYER SKIN ON SKULL
+        terrMembersInv = getTerrMemebersInv_Layout(p, page, totalPages);
+
+        // Populate the inventory with items for the current page
+        for (int i = startIndex; i < endIndex; i++) {
+            String memberUUID = memberList.get(i);
+            OfflinePlayer member = Bukkit.getOfflinePlayer(UUID.fromString(memberUUID));
+            if(!member.hasPlayedBefore()) {
+                Bukkit.getLogger().warning("Removed member " + memberUUID + " in territory " + territoryName + " from terrMember menu because it has never played before");
+                continue;
+            }
+            boolean memberOnline = member.isOnline();
+            boolean isChief = isChief(member,territoryName);
+            boolean isOfficer = isOfficer(member,territoryName);
+            PlayerData playerData = new PlayerData(p);
+
+            String rankString = "§aGrade : " + (isChief ? "§6§lChef" : (isOfficer ? "§2Officier" : "§7Membre"));
+            String onlineString = "§aEn ligne : " + (memberOnline ? "§2§lOui" : "§cNon");
+            String tipPromote = (!isChief ? "§7§oCLIC GAUCHE pour promouvoir à " + (isOfficer ? "§6§lChef" : "§2Officier") : null);
+            String tipDemote = (isOfficer ? "§7§oCLIC DROIT pour rétrograder à " + (isChief ? "§2Officier" : "§7Membre" ) : null);
+
+            ItemStack playerHead = playerData.getSkull(p);
+            SkullMeta playerHeadMeta = (SkullMeta) playerHead.getItemMeta();
+            assert playerHeadMeta != null;
+            PersistentDataContainer data = playerHeadMeta.getPersistentDataContainer();
+            data.set(new NamespacedKey(plugin,"memberUUID"),PersistentDataType.STRING,member.getUniqueId().toString());
+            playerHeadMeta.setDisplayName(member.getName());
+            playerHeadMeta.setOwnerProfile(member.getPlayerProfile());
+            playerHeadMeta.setLore(Arrays.asList(rankString, onlineString, "", tipPromote,tipDemote));
+            playerHead.setItemMeta(playerHeadMeta);
+            terrMembersInv.addItem(playerHead);
+        }
+        terrMembersInv.setItem(0, ItemBuilder.getItem(Material.PAPER, "§bℹ Informations",
+                Arrays.asList(
+                        "    §bIci, vous pouvez gérer les",
+                        "    §bmembres de votre territoire :",
+                        "    §aCLIC GAUCHE : promouvoir le membre",
+                        "    §aCLIC DROIT : rétrograder le membre"
+                )
+        ));
+        terrMembersInv.setItem(4, ItemBuilder.getItem(Material.SUNFLOWER, "§bℹ Les membres de votre territoire",
+                Arrays.asList(
+                        "§aNombre de membres : §6" + memberList.size()
+                )
+        ));
+        terrMembersInv.setItem(8, ItemBuilder.getItem(Material.END_CRYSTAL, "§bInviter des joueurs"));
+        p.openInventory(terrMembersInv);
+    }
+
     //WORKERS
 
     public Inventory getTerrWorkersInv_Layout(Player p, int page, int pageNum) {
@@ -1180,7 +1330,6 @@ public class TerritoryData {
             WorkerType workerType = WorkerType.valueOf(Objects.requireNonNull(config.getString(pathToWorker + ".type")).toUpperCase());
             int daysToLive = config.getInt(pathToWorker + ".daysToLive");
             int daysLived = config.getInt(pathToWorker + ".daysLived") + 1;
-            config.set(pathToWorker + ".daysLived", daysLived);
             int income = workerType.getIncome();
             ChatColor tierColor = ChatColor.DARK_GRAY;
             switch (tier) {
@@ -1234,7 +1383,7 @@ public class TerritoryData {
                         "    §achaque mois. Certains ont",
                         "    §amême d'autres utilités..."
                 )));
-        terrWorkersInv.setItem(0, ItemBuilder.getItem(Material.SUNFLOWER, "§bℹ Vos villageois",
+        terrWorkersInv.setItem(4, ItemBuilder.getItem(Material.SUNFLOWER, "§bℹ Vos villageois",
                 Arrays.asList(
                         "§aNombre de villageois actifs : §6" + getTotalAliveWorkerCount(territoryName)
                 )));

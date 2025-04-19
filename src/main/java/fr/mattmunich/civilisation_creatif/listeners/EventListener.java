@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -601,9 +602,9 @@ public class EventListener implements Listener {
                         p.openInventory(territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), 1));
                         break;
                     case PLAYER_HEAD:
-                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if(!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
                         //MANAGE MEMBERS
-                        p.sendMessage(main.prefix + "§c§oEn développement!");
+                        territoryData.showTerritoryMembersInventory(p, territoryData.getPlayerTerritory(p), 1);
                         break;
                     case WRITABLE_BOOK:
                         p.closeInventory();
@@ -986,6 +987,102 @@ public class EventListener implements Listener {
                         }
                     }
                     case BARRIER -> p.closeInventory();
+                }
+            } else if (invView.getTitle().contains("§bGérer les membres")){
+                e.setCancelled(true);
+                if(it==null) {return;}
+                if(it.getType().equals(Material.PLAYER_HEAD)) {
+                    if(it.getItemMeta() == null) {
+                        p.sendMessage(main.prefix + "§4Joueur non trouvé !");
+                        return;
+                    }
+                    String uuidString = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"memberUUID"),PersistentDataType.STRING);
+                    if(uuidString == null) {
+                        p.sendMessage(main.prefix + "§4Joueur non trouvé !");
+                        return;
+                    }
+                    UUID memberUUID = UUID.fromString(uuidString);
+                    Player t = Bukkit.getPlayer(memberUUID);
+                    if(t == null) {
+                        p.sendMessage(main.prefix + "§4Joueur non trouvé !");
+                        return;
+                    }
+                    String territoryName = territoryData.getPlayerTerritory(p);
+                    if(!territoryData.getPlayerTerritory(t).equalsIgnoreCase(territoryName)){
+                        p.sendMessage(main.prefix + "§4Le joueur n'est pas dans votre territoire");
+                        return;
+                    }
+                    if(e.getClick().equals(ClickType.LEFT)) {
+                        if(territoryData.isChief(t,territoryName)){
+                            if(p.equals(t)) {
+                                p.sendMessage(main.prefix + "§eVous êtes le chef de ce territoire, §cvous avez donc le grade le plus élevé.");
+                            } else {
+                                p.sendMessage(main.prefix + "§cVous ne pouvez pas promouvoir le chef de votre territoire, §eil a le grade le plus élevé.");
+                            }
+                            return;
+                        }
+                        if(territoryData.isOfficer(t,territoryName)) {
+                            p.sendMessage(main.prefix + "§cIl ne peut que y avoir un seul chef dans un territoire !");
+                            return;
+                        }
+                        territoryData.makeOfficer(t,p);
+                        p.closeInventory();
+                        territoryData.showTerritoryMembersInventory(p,territoryName,1);
+                        return;
+                    }
+                    if(e.getClick().equals(ClickType.RIGHT)) {
+                        if(territoryData.isChief(t,territoryName)){
+                            if(p.equals(t)) {
+                                p.sendMessage(main.prefix + "§eVous êtes le chef de ce territoire, §cvous ne pouvez pas être rétrogradé.");
+                            } else {
+                                p.sendMessage(main.prefix + "§cVous ne pouvez pas rétrograder le chef de votre territoire, §esinon, qui serait le chef ?");
+                            }
+                            return;
+                        }
+                        territoryData.removeOfficer(t,p);
+                        p.closeInventory();
+                        territoryData.showTerritoryMembersInventory(p,territoryName,1);
+                        return;
+                    }
+                } else if(it.getType().equals(Material.END_CRYSTAL)) {
+                    Inventory preInviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
+
+                    preInviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
+                    for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+                        PlayerData playerData = new PlayerData(all.getUniqueId());
+                        PlayerData senderData = new PlayerData(p.getUniqueId());
+
+                        if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                            continue;
+                        }
+                        ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
+                        SkullMeta skullMeta = (SkullMeta) playerSkull.getItemMeta();
+                        skullMeta.setOwnerProfile(all.getPlayerProfile());
+                        skullMeta.setLore(Collections.singletonList("§bCliquez pour inviter le joueur §5"));
+                        skullMeta.setDisplayName(all.getName());
+                        playerSkull.setItemMeta(skullMeta);
+                        preInviteInv.addItem(playerSkull);
+                    }
+                    p.openInventory(preInviteInv);
+                    Inventory inviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
+
+                    inviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
+                    for (OfflinePlayer all : Bukkit.getOfflinePlayers()) {
+                        PlayerData playerData = new PlayerData(all.getUniqueId());
+                        PlayerData senderData = new PlayerData(p.getUniqueId());
+
+                        if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                            continue;
+                        }
+
+                        inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
+                    }
+                    p.closeInventory();
+                    p.openInventory(inviteInv);
+                    return;
+                } else if(it.getType().equals(Material.BARRIER)) {
+                    p.closeInventory();
+                    return;
                 }
             }
         }

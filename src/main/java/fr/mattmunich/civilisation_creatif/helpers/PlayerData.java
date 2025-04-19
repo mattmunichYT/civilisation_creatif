@@ -3,6 +3,8 @@ package fr.mattmunich.civilisation_creatif.helpers;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -469,6 +471,28 @@ public final class PlayerData {
 		phm.setOwnerProfile(playerProfile);
 		phm.setDisplayName(player.getName());
 		phm.setLore(Collections.singletonList(lore));
+		pHead.setItemMeta(phm);
+		return  pHead;
+	}
+
+	public ItemStack getSkull(OfflinePlayer player) {
+		UUID uuid = player.getUniqueId();
+
+		PlayerProfile playerProfile = null;
+		try {
+			playerProfile = Bukkit.getServer().createPlayerProfile(uuid);
+			PlayerTextures textures = playerProfile.getTextures();
+			textures.setSkin(new URI(getSkin()).toURL());
+			playerProfile.setTextures(textures);
+		} catch (MalformedURLException | URISyntaxException e) {
+			logError("Couldn't get player Skull",e);
+		}
+
+        ItemStack pHead = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta phm = (SkullMeta) pHead.getItemMeta();
+		assert phm != null;
+		phm.setOwnerProfile(playerProfile);
+		phm.setDisplayName(player.getName());
 		pHead.setItemMeta(phm);
 		return  pHead;
 	}

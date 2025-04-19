@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.*;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +75,8 @@ public final class Main extends JavaPlugin {
     public String moneySign = "¢";
     public String playerNotFound(String name) {return prefix + "§4Impossible de trouver le joueur §c" + name;}
     public void logError(String message,Exception error) {
-        Bukkit.getConsoleSender().sendMessage(prefix + "§4" + hex(message) + " because of §eerror: \n§r" + error + Arrays.toString(error.getStackTrace()).replace(",", ",\n"));
+        Bukkit.getConsoleSender().sendMessage(prefix + "§4" + hex(message) + " because of §eerror:");
+        Bukkit.getLogger().severe(error + Arrays.toString(error.getStackTrace()).replace(",", ",\n"));
     }
     public String joinMessage(Player p) { return "§7[§a+§7] §e" + p.getDisplayName(); }
     public String leaveMessage(Player p) { return "§7[§c-§7] §e" + p.getDisplayName(); }

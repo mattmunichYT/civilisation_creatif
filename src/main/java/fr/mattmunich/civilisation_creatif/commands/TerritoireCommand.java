@@ -8,7 +8,6 @@ import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
 import fr.mattmunich.civilisation_creatif.helpers.WorkerType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,7 +38,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
 
         PlayerData playerData = new PlayerData(p);
 
-        if(args.length==1 || args.length==2) {
+        if(args.length>=1 && args.length<=3) {
             int mapRenderRange = 4;
 //            if(args.length==2){
 //                if(args[0].matches("1-9")){
@@ -70,10 +69,10 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                             owners.add(chunkOwner);
                             ownerCount+=1;
                             ownerID.put(chunkOwner,ownerCount);
-                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
 //                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
                         } else {
-                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + String.valueOf(ownerID.get(chunkOwner)) + " ");
+                            chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
 //                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
                         }
                     }
@@ -128,24 +127,25 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            if (args[0].equalsIgnoreCase("makeOfficer")) {
-                if(args.length!=2) {
-                    p.sendMessage(main.wrongUsage + "/territoire makeOfficer <player>");
-                    return true;
-                }
-                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-                territoryData.makeOfficer(target,p);
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("removeOfficer")) {
-                if(args.length!=2) {
-                    p.sendMessage(main.wrongUsage + "/territoire removeOfficer <player>");
-                    return true;
-                }
-                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-                territoryData.removeOfficer(target, p);
-                return true;
-            }
+//            CAN NOW USE PLAYER MANAGMENT INV
+//            if (args[0].equalsIgnoreCase("makeOfficer")) {
+//                if(args.length!=2) {
+//                    p.sendMessage(main.wrongUsage + "/territoire makeOfficer <player>");
+//                    return true;
+//                }
+//                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+//                territoryData.makeOfficer(target,p);
+//                return true;
+//            }
+//            if (args[0].equalsIgnoreCase("removeOfficer")) {
+//                if(args.length!=2) {
+//                    p.sendMessage(main.wrongUsage + "/territoire removeOfficer <player>");
+//                    return true;
+//                }
+//                OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+//                territoryData.removeOfficer(target, p);
+//                return true;
+//            }
             if (args[0].equalsIgnoreCase("buyWorker")) {
                 if (!territoryData.isChief(p, territoryData.getPlayerTerritory(p)) && !territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
                     p.sendMessage(main.prefix + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
@@ -162,21 +162,17 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 } else {
                     p.openInventory(hasTerritory_Menu(p));
                 }
-            }
-
-            if (args[0].equalsIgnoreCase("territory-menu") || args[0].equalsIgnoreCase("terrMenu")) {
+            } else if (args[0].equalsIgnoreCase("territory-menu") || args[0].equalsIgnoreCase("terrMenu")) {
                 if(territoryData.getTerritoryTeamOfPlayer(p) == null){
                     p.sendMessage(main.prefix + "§4Vous n'avez pas de territoire !");
                 }
                 p.openInventory(territoryData.getTerrInv(p,territoryData.getTerritoryTeamOfPlayer(p)));
                 return true;
-            }
-            if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("liste")) {
+            } else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("liste")) {
                 p.openInventory(territoryData.getTerritoryListInventory(p,1));
                 return true;
 
-            }
-            if(args[0].equalsIgnoreCase("withdrawMoney")) {
+            } else if(args[0].equalsIgnoreCase("withdrawMoney") || args[0].equalsIgnoreCase("retirerArgent")) {
                 String terr = territoryData.getPlayerTerritory(p);
                 if(!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
                     p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4récupérer de l'argent §cde la banque de votre territoire !");
@@ -186,7 +182,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     p.sendMessage(main.wrongUsage + "/territoire withdrawMoney <moneyAmount>");
                     return true;
                 }
-                int amount = 0;
+                int amount;
                 try {
                     amount = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
@@ -208,9 +204,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     main.logError("Couldn't withdraw money from territory",e);
                     return true;
                 }
-            }
-
-            if(args[0].equalsIgnoreCase("depositMoney")) {
+            } else if(args[0].equalsIgnoreCase("depositMoney") || args[0].equalsIgnoreCase("deposerArgent")) {
                 String terr = territoryData.getPlayerTerritory(p);
                 if(!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
                     p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4déposer de l'argent §cdans la banque de votre territoire !");
@@ -220,7 +214,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     p.sendMessage(main.wrongUsage + "/territoire depositMoney <moneyAmount>");
                     return true;
                 }
-                int amount = 0;
+                int amount;
                 try {
                     amount = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
@@ -243,51 +237,56 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     main.logError("Couldn't deposit money to territory",e);
                     return true;
                 }
-            }
-            if(args[0].equalsIgnoreCase("runWorkerCeckup")){
-                if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
-                if(args.length==1) {
-                    try {
-                        territoryData.runWorkerCheckup();
-                        p.sendMessage(main.prefix + "§2Success!");
-                        return true;
-
-                    } catch (Exception e) {
-                        p.sendMessage(main.prefix + "§4Une erreur s'est produite");
-                        return true;
-                    }
-                } else {
-                    int nOfRun;
-                    try {
-                        nOfRun = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        p.sendMessage(main.prefix + "Veuillez entrer un nombre !");
-                        return true;
-                    }
-                    try {
-                        for (int i = 0 ; i < nOfRun; i++) {
+            } else if(args[0].equalsIgnoreCase("admin") && playerData.getRank().equals(Grades.ADMIN)) {
+                if(args.length == 1) {
+                    p.sendMessage(main.wrongUsage + "/territoires admin <runWorkerCheckup/bypassClaims>");
+                    return true;
+                }
+                if(args[1].equalsIgnoreCase("runWorkerCeckup")){
+                    if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
+                    if(args.length==2) {
+                        try {
                             territoryData.runWorkerCheckup();
+                            p.sendMessage(main.prefix + "§2Success!");
+                            return true;
+
+                        } catch (Exception e) {
+                            p.sendMessage(main.prefix + "§4Une erreur s'est produite");
+                            return true;
                         }
-                        p.sendMessage(main.prefix + "§2Success §6- §aran WorkerCheckup §6"  + nOfRun + "§a times ");
-                    } catch (Exception e) {
-                        p.sendMessage(main.prefix + "§4Une erreur s'est produite");
-                        return true;
+                    } else {
+                        int nOfRun;
+                        try {
+                            nOfRun = Integer.parseInt(args[2]);
+                        } catch (NumberFormatException e) {
+                            p.sendMessage(main.prefix + "Veuillez entrer un nombre !");
+                            return true;
+                        }
+                        try {
+                            for (int i = 0 ; i < nOfRun; i++) {
+                                territoryData.runWorkerCheckup();
+                            }
+                            p.sendMessage(main.prefix + "§2Success §6- §aran WorkerCheckup §6"  + nOfRun + "§a times ");
+                        } catch (Exception e) {
+                            p.sendMessage(main.prefix + "§4Une erreur s'est produite");
+                            return true;
+                        }
                     }
                 }
-            }
-            if (args[0].equalsIgnoreCase("bypassClaims")){
-                if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
-                if(main.bypassClaims.contains(p)){
-                    main.bypassClaims.remove(p);
-                    p.sendTitle("§eBypass Claims : §c§lOFF","",20,60,20);
-                    p.sendMessage(main.prefix + "§cVous n'ignorez plus protections des claims !");
-                } else {
-                    main.bypassClaims.add(p);
-                    p.sendTitle("§eBypass Claims : §a§lON","",20,60,20);
-                    p.sendMessage(main.prefix + "§aVous ignorez désormais les protections des claims !");
-                }
-                return true;
+                if (args[1].equalsIgnoreCase("bypassClaims")){
+                    if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
+                    if(main.bypassClaims.contains(p)){
+                        main.bypassClaims.remove(p);
+                        p.sendTitle("§eBypass Claims : §c§lOFF","",20,60,20);
+                        p.sendMessage(main.prefix + "§cVous n'ignorez plus protections des claims !");
+                    } else {
+                        main.bypassClaims.add(p);
+                        p.sendTitle("§eBypass Claims : §a§lON","",20,60,20);
+                        p.sendMessage(main.prefix + "§aVous ignorez désormais les protections des claims !");
+                    }
+                    return true;
 
+                }
             }
         }
 
@@ -449,8 +448,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
             if(s instanceof Player p) {
                 PlayerData playerData = new PlayerData(p);
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
-                    tabComplete.add("bypassClaims");
-                    tabComplete.add("runWorkerCeckup");
+                    tabComplete.add("admin");
                 }
             }
         }
@@ -469,6 +467,13 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     }
                 }
 
+            }
+            if(s instanceof Player p) {
+                PlayerData playerData = new PlayerData(p);
+                if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
+                    tabComplete.add("bypassClaims");
+                    tabComplete.add("runWorkerCeckup");
+                }
             }
         }
 
