@@ -223,7 +223,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     p.sendMessage(main.wrongUsage + "/territoires admin <runWorkerCheckup/bypassClaims>");
                     return true;
                 }
-                if(args[1].equalsIgnoreCase("runWorkerCeckup")){
+                if(args[1].equalsIgnoreCase("runWorkerCheckup")){
                     if(!playerData.getRank().equals(Grades.ADMIN)) { return true;}
                     if(args.length==2) {
                         try {
@@ -449,7 +449,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 PlayerData playerData = new PlayerData(p);
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
                     tabComplete.add("bypassClaims");
-                    tabComplete.add("runWorkerCeckup");
+                    tabComplete.add("runWorkerCheckup");
                 }
             }
         }

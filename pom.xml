@@ -6,7 +6,7 @@
 
     <groupId>fr.mattmunich</groupId>
     <artifactId>civilisation-creatif</artifactId>
-    <version>0.5-SNAPSHOT-2</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>civilisation-creatif</name>
