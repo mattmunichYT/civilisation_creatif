@@ -487,6 +487,8 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
                     tabComplete.add("bypassClaims");
                     tabComplete.add("runWorkerCheckup");
+                    tabComplete.add("setTerritory");
+                    tabComplete.add("makeOfficer");
                 }
             }
         }
