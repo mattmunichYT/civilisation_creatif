@@ -273,7 +273,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
 
-                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[3]);
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
 
                     String territoryName = "";
                     for (String terr : territoryData.getTerritoriesList()) {
@@ -296,12 +296,12 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 }
                 if (args[1].equalsIgnoreCase("makeOfficer")) {
                     if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
-                    if(args.length!=4) {
+                    if(args.length!=3) {
                         p.sendMessage(main.wrongUsage + "/territoire admin makeOfficer <target>");
                         return true;
                     }
 
-                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[3]);
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
                     territoryData.ADMIN_makeOfficer(target,p,args[2]);
                     return true;
                 }
