@@ -201,24 +201,25 @@ public class TerritoryData {
         sender.sendMessage(main.prefix + "§eVous avez quitté votre territoire !");
     }
 
-    public void joinTerritory(Player p, String territoryName) {
+    public void joinTerritory(OfflinePlayer p, String territoryName) {
+        if(p.getName()==null) { return; }
         Team territory = getTerritoryTeam(territoryName);
         territory.addEntry(p.getName());
         List<String> membersUUID = getTerritoryMembersUUID(territoryName);
         try {
-            PlayerData pdata = new PlayerData(p.getUniqueId());
+            PlayerData pdata = new PlayerData(p);
             pdata.setTerritory(territoryName);
             if (pdata.getRank().getId() < 4) {
                 pdata.setRank(Grades.MEMBRE);
             }
-            SidebarManager.updateScoreboard(p);
+            if(p.getPlayer()!=null) { SidebarManager.updateScoreboard(p.getPlayer()); }
             membersUUID.add(p.getUniqueId().toString());
             sendAnouncementToTerritory(territoryName, "§a" + p.getName() + "§2 a rejoin le territoire !");
         } catch (Exception ignored) {
         }
         config.set("territories." + territory.getName() + ".membersUUID", membersUUID);
         saveConfig();
-        p.sendMessage(main.prefix + "§2Vous avez rejoint le territoire " + territory.getColor() + territory.getName() + "§2 !");
+        if(p.getPlayer()!=null) { p.getPlayer().sendMessage(main.prefix + "§2Vous avez rejoint le territoire " + territory.getColor() + territory.getName() + "§2 !"); }
     }
 
     public List<String> getTerritoryMembersUUID(String territoryName) {
@@ -272,6 +273,38 @@ public class TerritoryData {
         sender.sendMessage(main.prefix + "§2Le joueur §a" + target.getName() + "§2 a été ajouté aux officiers de votre territoire !");
         if (target.isOnline() && target.getPlayer() != null) {
             target.getPlayer().sendMessage(main.prefix + "§2Vous êtes désormais officier dans le territoire §a" + getPlayerTerritory(sender) + "§2 !");
+        }
+    }
+
+    public void ADMIN_makeOfficer(OfflinePlayer target, Player sender, String territoryName) {
+        if (target.getName()==null || !target.hasPlayedBefore() || getPlayerTerritory(target)==null) {
+            sender.sendMessage(main.prefix + "§4Joueur non trouvé.");
+            return;
+        }
+        if (!getPlayerTerritory(target).equalsIgnoreCase(territoryName)) {
+            sender.sendMessage(main.prefix + "§4La cible doit être dans le territoire donné pour faire cela !");
+            sender.sendMessage(main.prefix + "§7§oInfo: Vous pouvez définir le territoire de la cible avec §a/territoire admin setTerritory <joueur> <territoire>");
+            return;
+        }
+        territoryName=getPlayerTerritory(target);
+        List<String> officers = getTerritoryOfficers(getPlayerTerritory(sender));
+        if (officers.contains(target.getUniqueId().toString())) {
+            sender.sendMessage(main.prefix + "§4La cible est déjà un officier dans le territoire !");
+            return;
+        }
+        if (isChief(target,territoryName)) {
+            sender.sendMessage(main.prefix + "§4La cible est déjà chef(fe) de son territoire !");
+            return;
+        }
+        officers.add(target.getUniqueId().toString());
+        config.set("territories." + getPlayerTerritory(sender) + ".officers", officers);
+        saveConfig();
+        if (target.isOnline()) {
+            SidebarManager.updateScoreboard(target.getPlayer());
+        }
+        sender.sendMessage(main.prefix + "§2Le joueur §6" + target.getName() + "§2 a été ajouté aux officiers du territoire §6" + territoryName + "!");
+        if (target.isOnline() && target.getPlayer() != null) {
+            target.getPlayer().sendMessage(main.prefix + "§2Vous êtes désormais officier dans le territoire §6" + getPlayerTerritory(sender) + "§2 !");
         }
     }
 

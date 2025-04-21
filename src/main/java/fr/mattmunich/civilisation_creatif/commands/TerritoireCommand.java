@@ -2,12 +2,10 @@ package fr.mattmunich.civilisation_creatif.commands;
 
 import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
-import fr.mattmunich.civilisation_creatif.helpers.Grades;
-import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
-import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
-import fr.mattmunich.civilisation_creatif.helpers.WorkerType;
+import fr.mattmunich.civilisation_creatif.helpers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +36,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
 
         PlayerData playerData = new PlayerData(p);
 
-        if(args.length>=1 && args.length<=3) {
+        if(args.length>=1 && args.length<=4) {
             int mapRenderRange = 4;
 //            if(args.length==2){
 //                if(args[0].matches("1-9")){
@@ -267,6 +265,45 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     }
                     return true;
 
+                }
+                if (args[1].equalsIgnoreCase("setTerritory")) {
+                    if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
+                    if(args.length!=4) {
+                        p.sendMessage(main.wrongUsage + "/territoire admin setTerritory <target> <territory>");
+                        return true;
+                    }
+
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[3]);
+
+                    String territoryName = "";
+                    for (String terr : territoryData.getTerritoriesList()) {
+                        if(terr.equalsIgnoreCase(args[3])) {
+                            territoryName=terr;
+                        }
+                    }
+                    if(territoryName.isEmpty()) {
+                        p.sendMessage(main.prefix + "§4Territoire non trouvé !");
+                        return true;
+                    }
+
+                    territoryData.joinTerritory(target,territoryName);
+                    if(target.getPlayer() != null && target.getPlayer().equals(p)) {
+                        p.sendMessage(main.prefix + "§2Votre territoire a été défini à " + territoryName + "§2 !");
+                    } else {
+                        p.sendMessage(main.prefix + "§2Le territoire de §6" + target.getName() + "§2 a été défini à §6" + territoryName + "§2 !");
+                    }
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("makeOfficer")) {
+                    if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
+                    if(args.length!=4) {
+                        p.sendMessage(main.wrongUsage + "/territoire admin makeOfficer <target>");
+                        return true;
+                    }
+
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[3]);
+                    territoryData.ADMIN_makeOfficer(target,p,args[2]);
+                    return true;
                 }
             }
         }

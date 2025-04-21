@@ -35,7 +35,7 @@ public final class PlayerData {
 	private FileConfiguration config;
 	private File file;
 
-	private Player p = null;
+	private OfflinePlayer p = null;
 
     public PlayerData(Plugin plugin, Main main) {
 		this.plugin = plugin;
@@ -75,7 +75,7 @@ public final class PlayerData {
 		saveConfig();
 	}
 
-	public PlayerData(Player p){
+	public PlayerData(OfflinePlayer p){
 		if(!f.exists()) {
 			f.mkdirs();
 		}
@@ -103,7 +103,7 @@ public final class PlayerData {
         assert name != null;
         Score xp = Objects.requireNonNull(scoreboard.getObjective("xp")).getScore(name);
 		xp.setScore(setXP);
-		if(p!=null) {SidebarManager.updateScoreboard(p);}
+		if(p.getPlayer()!=null) {SidebarManager.updateScoreboard(p.getPlayer());}
 	}
 
 	private void setMoneyScore(int setMoney) {
@@ -112,7 +112,7 @@ public final class PlayerData {
         assert name != null;
         Score money = Objects.requireNonNull(scoreboard.getObjective("money")).getScore(name);
 		money.setScore(setMoney);
-		if(p!=null) {SidebarManager.updateScoreboard(p);}
+		if(p.getPlayer()!=null) {SidebarManager.updateScoreboard(p.getPlayer());}
 	}
 
 	public int getXPScore() {
@@ -251,7 +251,7 @@ public final class PlayerData {
 
 	public void setTerritory(String territoryName) {
 		config.set("civilisation.territories.territory",territoryName);
-		if(p!=null) {SidebarManager.updateScoreboard(p);}
+		if(p.getPlayer()!=null) {SidebarManager.updateScoreboard(p.getPlayer());}
 		saveConfig();
 	}
 
