@@ -276,17 +276,12 @@ public class TerritoryData {
         }
     }
 
-    public void ADMIN_makeOfficer(OfflinePlayer target, Player sender, String territoryName) {
+    public void ADMIN_makeOfficer(OfflinePlayer target, Player sender) {
         if (target.getName()==null || !target.hasPlayedBefore() || getPlayerTerritory(target)==null) {
             sender.sendMessage(main.prefix + "§4Joueur non trouvé.");
             return;
         }
-        if (!getPlayerTerritory(target).equalsIgnoreCase(territoryName)) {
-            sender.sendMessage(main.prefix + "§4La cible doit être dans le territoire donné pour faire cela !");
-            sender.sendMessage(main.prefix + "§7§oInfo: Vous pouvez définir le territoire de la cible avec §a/territoire admin setTerritory <joueur> <territoire>");
-            return;
-        }
-        territoryName=getPlayerTerritory(target);
+        String territoryName=getPlayerTerritory(target);
         List<String> officers = getTerritoryOfficers(getPlayerTerritory(sender));
         if (officers.contains(target.getUniqueId().toString())) {
             sender.sendMessage(main.prefix + "§4La cible est déjà un officier dans le territoire !");

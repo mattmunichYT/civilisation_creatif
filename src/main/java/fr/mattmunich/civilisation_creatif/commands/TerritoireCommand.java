@@ -302,7 +302,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     }
 
                     OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
-                    territoryData.ADMIN_makeOfficer(target,p,args[2]);
+                    territoryData.ADMIN_makeOfficer(target,p);
                     return true;
                 }
             }
