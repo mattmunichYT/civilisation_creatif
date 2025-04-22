@@ -285,7 +285,9 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         p.sendMessage(main.prefix + "§4Territoire non trouvé !");
                         return true;
                     }
-
+                    if(territoryData.getPlayerTerritory(target) != null) {
+                        territoryData.ADMIN_leaveTerritory(target);
+                    }
                     territoryData.joinTerritory(target,territoryName);
                     if(target.getPlayer() != null && target.getPlayer().equals(p)) {
                         p.sendMessage(main.prefix + "§2Votre territoire a été défini à " + territoryName + "§2 !");

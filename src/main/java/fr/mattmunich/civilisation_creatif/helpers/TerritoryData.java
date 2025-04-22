@@ -276,6 +276,26 @@ public class TerritoryData {
         }
     }
 
+    public void ADMIN_leaveTerritory(OfflinePlayer sender) {
+        if(sender.getPlayer() != null) {
+            Team sTeam = getTerritoryTeamOfPlayer(sender.getPlayer());
+            sTeam.removeEntry(sender.getPlayer().getName());
+        }
+        List<String> membersUUID = getTerritoryMembersUUID(getPlayerTerritory(sender));
+        try {
+            membersUUID.remove(sender.getUniqueId().toString());
+            PlayerData pdata = new PlayerData(sender);
+            pdata.setTerritory(null);
+            if (pdata.getRank().getId() < 4) {
+                pdata.setRank(Grades.VAGABOND);
+            }
+            if(sender.getPlayer() != null) { SidebarManager.updateScoreboard(sender.getPlayer()); }
+        } catch (Exception ignored) {}
+        config.set("territories." + getPlayerTerritory(sender) + ".membersUUID", membersUUID);
+        saveConfig();
+        if(sender.getPlayer() != null) { sender.getPlayer().sendMessage(main.prefix + "§eVous avez quitté votre territoire !"); }
+    }
+
     public void ADMIN_makeOfficer(OfflinePlayer target, Player sender) {
         if (target.getName()==null || !target.hasPlayedBefore() || getPlayerTerritory(target)==null) {
             sender.sendMessage(main.prefix + "§4Joueur non trouvé.");
@@ -1076,6 +1096,8 @@ public class TerritoryData {
                 lore.addAll(desc);
             }
 
+            lore.add("");
+
 
             ItemStack banner = getTerritoryBanner(terr);
             ItemMeta bannerMeta = banner.getItemMeta();
@@ -1123,8 +1145,13 @@ public class TerritoryData {
             terrInv.setItem(i, none);
         }
         String terr = territory.getName();
-        Player chief = Bukkit.getPlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
-        String chiefName = (chief == null) ? "§c§oNon trouvé" : chief.getName();
+        String chiefName;
+        try {
+            OfflinePlayer chief = Bukkit.getOfflinePlayer(UUID.fromString(getTerritoryChiefUUID(terr)));
+            chiefName = chief.getName();
+        } catch (NullPointerException e) {
+            chiefName = "§c§oNon trouvé";
+        }
         String descriptionString = getTerritoryDescription(terr);
         List<String> desc = splitDescription(descriptionString, 30);
         List<String> lore = new ArrayList<>(Arrays.asList(
@@ -1143,6 +1170,8 @@ public class TerritoryData {
             lore.addAll(desc);
         }
 
+        lore.add("");
+
 
         ItemStack banner = getTerritoryBanner(terr);
         BannerMeta bannerMeta = (BannerMeta) banner.getItemMeta();
@@ -1158,14 +1187,14 @@ public class TerritoryData {
         terrInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Menu du territoire " + territory.getColor() + territory.getName(), lore));
 
         if (hasTerritory(p) && (isOfficer(p, terr) || isChief(p, terr))) {
-            terrInv.setItem(11, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎ Gérer les villageois"));
+            terrInv.setItem(9, ItemBuilder.getItem(Material.VILLAGER_SPAWN_EGG, "§b\uD83D\uDEE0✎ Gérer les villageois"));
             terrInv.setItem(12, ItemBuilder.getItem(Material.END_CRYSTAL, "§b👤➕ Inviter des joueurs"));
+            terrInv.setItem(17, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎ Gérer les membres"));
         }
         if (hasTerritory(p) && (isChief(p, terr))) {
             terrInv.setItem(3, ItemBuilder.getItem(Material.WRITABLE_BOOK, "§a✎ Changer §5la description§a de votre territoire"));
             terrInv.setItem(5, ItemBuilder.getItem(Material.OAK_SIGN, "§2✎ Changer §5le nom§2 de votre territoire"));
             terrInv.setItem(14, ItemBuilder.getItem(Material.CYAN_STAINED_GLASS, "§3Changer la couleur de votre territoire"));
-            terrInv.setItem(15, ItemBuilder.getItem(Material.PLAYER_HEAD, "§b👤✎ Gérer les membres"));
             terrInv.setItem(22, ItemBuilder.getItem(Material.RED_DYE, "§4❌ Supprimer le territoire"));
         }
         terrInv.setItem(26, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu"));
