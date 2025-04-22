@@ -303,6 +303,33 @@ public class TerritoryData {
         }
     }
 
+    public void ADMIN_removeOfficer(OfflinePlayer target, Player sender) {
+        if (target.getName()==null || !target.hasPlayedBefore() || getPlayerTerritory(target)==null) {
+            sender.sendMessage(main.prefix + "§4Joueur non trouvé.");
+            return;
+        }
+        String territoryName=getPlayerTerritory(target);
+        List<String> officers = getTerritoryOfficers(getPlayerTerritory(sender));
+        if (!officers.contains(target.getUniqueId().toString())) {
+            sender.sendMessage(main.prefix + "§4La cible n'est pas un officier dans le territoire !");
+            return;
+        }
+        if (isChief(target,territoryName)) {
+            sender.sendMessage(main.prefix + "§4La cible est chef(fe) de son territoire !");
+            return;
+        }
+        officers.remove(target.getUniqueId().toString());
+        config.set("territories." + getPlayerTerritory(sender) + ".officers", officers);
+        saveConfig();
+        if (target.isOnline()) {
+            SidebarManager.updateScoreboard(target.getPlayer());
+        }
+        sender.sendMessage(main.prefix + "§2Le joueur §6" + target.getName() + "§2 a été §cretiré§2 aux officiers du territoire §6" + territoryName + " §2!");
+        if (target.isOnline() && target.getPlayer() != null) {
+            target.getPlayer().sendMessage(main.prefix + "§cVous n'êtes désormais plus officier dans le territoire §6" + getPlayerTerritory(sender) + "§c !");
+        }
+    }
+
     public void removeOfficer(OfflinePlayer target, Player sender) {
         if (!target.hasPlayedBefore()) {
             sender.sendMessage(main.prefix + "§4Le joueur ne s'est jamais connecté !");

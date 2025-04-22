@@ -305,6 +305,17 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     territoryData.ADMIN_makeOfficer(target,p);
                     return true;
                 }
+                if (args[1].equalsIgnoreCase("removeOfficer")) {
+                    if(!Objects.equals(playerData.getRank(), Grades.ADMIN)) { return true;}
+                    if(args.length!=3) {
+                        p.sendMessage(main.wrongUsage + "/territoire admin removeOfficer <target>");
+                        return true;
+                    }
+
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
+                    territoryData.ADMIN_removeOfficer(target,p);
+                    return true;
+                }
             }
         }
 
@@ -489,6 +500,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                     tabComplete.add("runWorkerCheckup");
                     tabComplete.add("setTerritory");
                     tabComplete.add("makeOfficer");
+                    tabComplete.add("removeOfficer");
                 }
             }
         }
