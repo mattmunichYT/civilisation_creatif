@@ -11,6 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.*;
 
+import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -169,6 +170,8 @@ public final class Main extends JavaPlugin {
         pm.registerEvents(new EventListener(this,this, territoryData), this);
         pm.registerEvents(new AntiSpeed(this), this);
         pm.registerEvents(new VanishCommand(this,this), this);
+
+        Bukkit.getServerLinks().addLink("§x§0§8§4§C§F§BD§x§0§7§6§5§F§Ci§x§0§5§7§D§F§Cs§x§0§4§9§6§F§Dc§x§0§3§A§E§F§Eo§x§0§1§C§7§F§Er§x§0§0§D§F§F§Fd",URI.create("https://dsc.gg/mjep"));
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             for(Player all : Bukkit.getOnlinePlayers()) {
                 all.setPlayerListHeader("§2§lBienvenue " + all.getDisplayName() +  "§2§l\n sur §6le serveur " + fullName + " !\n");
