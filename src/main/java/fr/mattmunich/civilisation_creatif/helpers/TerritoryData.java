@@ -247,7 +247,7 @@ public class TerritoryData {
             sender.sendMessage(main.prefix + "§4Vous devez être dans un territoire pour faire cela !");
             return;
         }
-        if (!isChief(sender, getPlayerTerritory(sender)) || !isOfficer(sender, getPlayerTerritory(sender))) {
+        if (!isChief(sender, getPlayerTerritory(sender)) && !isOfficer(sender, getPlayerTerritory(sender))) {
             sender.sendMessage(main.prefix + "§4Vous devez être le chef/un officer de votre territoire pour faire cela !");
             return;
         }
