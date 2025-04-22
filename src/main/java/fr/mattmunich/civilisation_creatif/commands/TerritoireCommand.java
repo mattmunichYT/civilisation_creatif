@@ -498,11 +498,40 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
             if(s instanceof Player p) {
                 PlayerData playerData = new PlayerData(p);
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
-                    tabComplete.add("bypassClaims");
-                    tabComplete.add("runWorkerCheckup");
-                    tabComplete.add("setTerritory");
-                    tabComplete.add("makeOfficer");
-                    tabComplete.add("removeOfficer");
+                    if(args[0].equalsIgnoreCase("admin")) {
+                        tabComplete.add("bypassClaims");
+                        tabComplete.add("runWorkerCheckup");
+                        tabComplete.add("setTerritory");
+                        tabComplete.add("makeOfficer");
+                        tabComplete.add("removeOfficer");
+                    }
+                }
+            }
+        }
+        if (args.length == 3) {
+            if(s instanceof Player p) {
+                PlayerData playerData = new PlayerData(p);
+                if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
+                    if(args[0].equalsIgnoreCase("admin") && (args[1].equalsIgnoreCase("setTerritory") || args[1].equalsIgnoreCase("makeOfficer") || args[1].equalsIgnoreCase("removeOfficer"))) {
+                        for (Player online : Bukkit.getOnlinePlayers()) {
+                            tabComplete.add(online.getName());
+                        }
+                        for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+                            if(offline.getName()!=null && offline.hasPlayedBefore()) {
+                                tabComplete.add(offline.getName());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (args.length == 4) {
+            if(s instanceof Player p) {
+                PlayerData playerData = new PlayerData(p);
+                if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
+                    if(args[0].equalsIgnoreCase("admin") && (args[1].equalsIgnoreCase("setTerritory"))) {
+                        tabComplete.addAll(territoryData.getTerritoriesList());
+                    }
                 }
             }
         }
