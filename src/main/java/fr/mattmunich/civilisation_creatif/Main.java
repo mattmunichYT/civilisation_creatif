@@ -186,7 +186,7 @@ public final class Main extends JavaPlugin {
                 }
 
                 String worldname = getWorldname(all);
-                String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(all.getLocation().getChunk()));
+                String chunkOwner = territoryData.getChunkOwner(all.getLocation().getChunk());
                 Team chunkOwnerTeam = null;
                 ChatColor chunkOwnerColor = null;
                 if(chunkOwner!=null) {

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -54,8 +55,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                 for (int chunkX = x- mapRenderRange; chunkX < x+ mapRenderRange; chunkX++) {
                     for (int chunkZ = z-mapRenderRange; chunkZ < z+ mapRenderRange; chunkZ++) {
 //                        p.sendMessage("Checking for chunk " + chunkX + "," + chunkZ);
-                        Map<Integer,Integer> chunk = new HashMap<>();
-                        chunk.put(chunkX,chunkZ);
+                        Chunk chunk = p.getWorld().getChunkAt(chunkX,chunkZ);
                         String chunkOwner = territoryData.getChunkOwner(chunk);
 //                        p.sendMessage("chunk owner:" + chunkOwner);
                         if(chunkOwner==null) {
@@ -343,12 +343,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4claim des chunk §cpour votre territoire !");
                         return true;
                     }
-
-                    int x = p.getLocation().getChunk().getX();
-                    int z = p.getLocation().getChunk().getZ();
-                    Map<Integer,Integer> chunk = new HashMap<>();
-                    chunk.put(x,z);
-                    territoryData.claimChunk(p, territoryData.getPlayerTerritory(p), chunk);
+                    territoryData.claimChunk(p, territoryData.getPlayerTerritory(p), p.getLocation().getChunk());
 
                     return true;
                 }
@@ -358,11 +353,7 @@ public class TerritoireCommand implements CommandExecutor, TabCompleter {
                         p.sendMessage(main.prefix + "§cVous n'avez pas §4la permission §cde §4unclaim des chunk §cpour votre territoire !");
                         return true;
                     }
-                    int x = p.getLocation().getChunk().getX();
-                    int z = p.getLocation().getChunk().getZ();
-                    Map<Integer,Integer> chunk = new HashMap<>();
-                    chunk.put(x,z);
-                    territoryData.unclaimChunk(p, territoryData.getPlayerTerritory(p), chunk);
+                    territoryData.unclaimChunk(p, territoryData.getPlayerTerritory(p), p.getLocation().getChunk());
                     return true;
                 }
             }

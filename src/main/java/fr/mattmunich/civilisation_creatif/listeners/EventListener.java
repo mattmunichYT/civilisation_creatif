@@ -1129,7 +1129,7 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         Location loc = p.getLocation();
         Chunk chunk = loc.getChunk();
-        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(chunk));
+        String chunkOwner = territoryData.getChunkOwner(chunk);
         if(main.seeTerritoryBorders.contains(p)) {
             World world = loc.getWorld();
             int range = 10;
@@ -1137,9 +1137,8 @@ public class EventListener implements Listener {
                 for (int chunkZ = chunk.getZ() - range; chunkZ < chunk.getZ() + range; chunkZ++) {
                     assert world != null;
                     Chunk chunkToShow = world.getChunkAt(chunkX,chunkZ);
-                    Map<Integer,Integer> chunkTS = territoryData.getChunkMap(chunkToShow);
-                    if (territoryData.getChunkOwner(chunkTS) != null && !territoryData.getChunkOwner(chunkTS).isEmpty()) {
-                        ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkTS)).getColor();
+                    if (territoryData.getChunkOwner(chunkToShow) != null && !territoryData.getChunkOwner(chunkToShow).isEmpty()) {
+                        ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkToShow)).getColor();
                         territoryData.showChunkBorder(chunkToShow, chatColor, p);
                     }
                 }
@@ -1166,7 +1165,7 @@ public class EventListener implements Listener {
         try {
             PlayerData playerData = new PlayerData(p);
             String territoryName = territoryData.getPlayerTerritory(p);
-            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
+            String chunkOwner = territoryData.getChunkOwner(e.getBlock().getChunk());
             if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                 e.setCancelled(true);
                 p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer de blocks ici !");
@@ -1253,7 +1252,7 @@ public class EventListener implements Listener {
         Player p = e.getPlayer();
         if (e.getClickedBlock() != null) {
             String territoryName = territoryData.getPlayerTerritory(p);
-            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getClickedBlock().getChunk()));
+            String chunkOwner = territoryData.getChunkOwner(e.getClickedBlock().getChunk());
             if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                     e.setCancelled(true);
@@ -1284,7 +1283,7 @@ public class EventListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e){
         Player p = e.getPlayer();
         String territoryName = territoryData.getPlayerTerritory(p);
-        String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getBlock().getChunk()));
+        String chunkOwner = territoryData.getChunkOwner(e.getBlock().getChunk());
         if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
             e.setCancelled(true);
             p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser de blocs ici !");
@@ -1296,7 +1295,7 @@ public class EventListener implements Listener {
     public void onEntityDamagedByEntity(EntityDamageByEntityEvent e){
         if(e.getDamager() instanceof Player p) {
             String territoryName = territoryData.getPlayerTerritory(p);
-            String chunkOwner = territoryData.getChunkOwner(territoryData.getChunkMap(e.getEntity().getLocation().getChunk()));
+            String chunkOwner = territoryData.getChunkOwner(e.getEntity().getLocation().getChunk());
             if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
                 e.setCancelled(true);
                 if(e.getEntity() instanceof Player) {

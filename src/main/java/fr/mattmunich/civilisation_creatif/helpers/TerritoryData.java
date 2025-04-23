@@ -1,5 +1,6 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
+import com.sk89q.worldguard.WorldGuard;
 import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
 import org.bukkit.block.Skull;
@@ -636,13 +637,14 @@ public class TerritoryData {
         }
     }
 
-    public void claimChunk(Player sender, String territoryName, Map<Integer, Integer> chunk) {
+    public void claimChunk(Player sender, String territoryName, Chunk chunk) {
         try {
+            Map<Integer,Integer> chunkMap = getChunkMap(chunk);
             Team territory = getTerritoryTeam(territoryName);
-            List<Map<?, ?>> terrClaims = config.getMapList("territories." + territory.getName() + ".claims");
-            List<Map<?, ?>> globalClaims = config.getMapList("claims");
-            if (globalClaims.contains(chunk)) {
-                if (terrClaims.contains(chunk)) {
+            List<Map<?, ?>> terrClaims = config.getMapList("territories." + territory.getName() + "." + chunk.getWorld().getName() + ".claims");
+            List<Map<?, ?>> globalClaims = config.getMapList("claims" + "." + chunk.getWorld().getName());
+            if (globalClaims.contains(chunkMap)) {
+                if (terrClaims.contains(chunkMap)) {
                     sender.sendMessage(main.prefix + "§eVous avez déjà claim ce chunk !");
                 } else {
                     sender.sendMessage(main.prefix + "§cVous ne pouvez pas claim un chunk car il est §4déjà claim §cpar le territoire §4" + getChunkOwner(chunk) + " §c!");
@@ -653,13 +655,13 @@ public class TerritoryData {
                 sender.sendMessage(main.prefix + "§4Iln'y a pas assez d'argent dans la banque du territoire !");
                 return;
             }
-            terrClaims.add(chunk);
-            globalClaims.add(chunk);
-            config.set("territories." + territory.getName() + ".claims", terrClaims);
-            config.set("claims", globalClaims);
+            terrClaims.add(chunkMap);
+            globalClaims.add(chunkMap);
+            config.set("territories." + territory.getName() + chunk.getWorld().getName() + ".claims", terrClaims);
+            config.set("claims" + chunk.getWorld().getName(), globalClaims);
             saveConfig();
             removeTerritoryMoney(territoryName, getChunkPrice(territoryName));
-            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[", "").replace("]", "") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[", "").replace("]", "") + " §apour §e" + getChunkPrice(territoryName) + main.moneySign + "§a!");
+            sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.getX() + "§a,§e " + chunk.getZ() + " §apour §e" + getChunkPrice(territoryName) + main.moneySign + "§a!");
             addOneClaimedChunkToCount(territoryName);
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors du claim du chunk !");
@@ -690,22 +692,23 @@ public class TerritoryData {
         return config.get("territories." + territoryName + ".claimedChunkCount") == null ? 0 : config.getInt("territories." + territoryName + ".claimedChunkCount");
     }
 
-    public void unclaimChunk(Player sender, String territoryName, Map<Integer, Integer> chunk) {
+    public void unclaimChunk(Player sender, String territoryName, Chunk chunk) {
         try {
+            Map<Integer,Integer> chunkMap = getChunkMap(chunk);
             Team territory = getTerritoryTeam(territoryName);
-            List<Map<?, ?>> claims = config.getMapList("territories." + territory.getName() + ".claims");
-            if (claims.contains(chunk)) {
-                claims.remove(chunk);
-                config.set("territories." + territory.getName() + ".claims", claims);
+            List<Map<?, ?>> claims = config.getMapList("territories." + territory.getName() + chunk.getWorld().getName() + ".claims");
+            if (claims.contains(chunkMap)) {
+                claims.remove(chunkMap);
+                config.set("territories." + territory.getName() + chunk.getWorld().getName() + ".claims", claims);
 
-                List<Map<?, ?>> globalClaims = config.getMapList("claims");
-                globalClaims.remove(chunk);
-                config.set("claims", globalClaims);
+                List<Map<?, ?>> globalClaims = config.getMapList("claims" + chunk.getWorld().getName());
+                globalClaims.remove(chunkMap);
+                config.set("claims" + chunk.getWorld().getName(), globalClaims);
                 saveConfig();
-                sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[", "").replace("]", "") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
+                sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.getX() + "§a,§e " + chunk.getZ());
                 removeOneClaimedChunkFromCount(territoryName);
             } else {
-                sender.sendMessage(main.prefix + "§cVous n'avez pas claim le chunk §e" + chunk.keySet().stream().findFirst().toString().replace("Optional[", "").replace("]", "") + "§a,§e " + chunk.values().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
+                sender.sendMessage(main.prefix + "§cVous n'avez pas claim le chunk §e" + chunk.getX() + "§a,§e " + chunk.getZ());
             }
         } catch (Exception e) {
             sender.sendMessage(main.prefix + "§4Une erreur s'est produite lors de l'unclaim du chunk !");
@@ -713,13 +716,20 @@ public class TerritoryData {
         }
     }
 
-    public List<Map<?, ?>> getTerritoryChunks(String territoryName) {
+    public List<Chunk> getTerritoryChunks(String territoryName) {
         try {
             Team territory = getTerritoryTeam(territoryName);
+            List<Chunk> territoryClaims = new ArrayList<>();
             try {
-                return config.getMapList("territories." + territory.getName() + ".claims");
+                for (World world : Bukkit.getWorlds()) {
+                    List<Map<?,?>> claims = config.getMapList("territories." + territory.getName() + world.getName() + ".claims");
+                    for (Map<?,?> chunk : claims) {
+                        territoryClaims.add(getChunkFromMap((Map<Integer, Integer>) chunk,world));
+                    }
+                }
+                return territoryClaims;
             } catch (ClassCastException e) {
-                main.logError("Couldn't cast List<Map<?, ?>> for chunks of territory " + territoryName, e);
+                main.logError("Couldn't cast Map<Integer, Integer> for chunks of territory " + territoryName, e);
                 return null;
             }
         } catch (Exception e) {
@@ -729,27 +739,27 @@ public class TerritoryData {
         }
     }
 
-    public boolean chunkClaimed(Map<Integer, Integer> chunk) {
+    public boolean chunkClaimed(Chunk chunk) {
         try {
-            List<Map<?, ?>> globalClaims = config.getMapList("claims");
-            return globalClaims.contains(chunk);
+            List<Map<?, ?>> globalClaims = config.getMapList("claims" + chunk.getWorld().getName());
+            return globalClaims.contains(getChunkMap(chunk));
         } catch (Exception e) {
-            main.logError("Couldn't check if chunk §c was claimed", e);
+            main.logError("Couldn't check if chunk was claimed", e);
             return false;
 
         }
     }
 
-    public String getChunkOwner(Map<Integer, Integer> chunk) {
+    public String getChunkOwner(Chunk chunk) {
         try {
             if (!chunkClaimed(chunk)) {
                 return null;
             }
             try {
                 for (String key : Objects.requireNonNull(config.getConfigurationSection("territories")).getKeys(false)) {
-                    List<Map<?, ?>> territoryClaims = getTerritoryChunks(key);
+                    List<Chunk> territoryClaims = getTerritoryChunks(key);
                     try {
-                        for (Map<?, ?> territoryClaim : territoryClaims) {
+                        for (Chunk territoryClaim : territoryClaims) {
                             if (territoryClaim.equals(chunk)) {
                                 return key;
                             }
@@ -780,7 +790,7 @@ public class TerritoryData {
 
     public Chunk getChunkFromMap(Map<Integer, Integer> chunkMap, World world) {
         int x = Integer.parseInt(chunkMap.entrySet().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
-        int z = Integer.parseInt(chunkMap.values().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
+        int z = Integer.parseInt(chunkMap.keySet().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
         return world.getChunkAt(x, z);
     }
 
@@ -796,28 +806,28 @@ public class TerritoryData {
         Chunk north = world.getChunkAt(chunkX, chunkZ - 1);
 
 
-        if (!Objects.equals(getChunkOwner(getChunkMap(north)), getChunkOwner(getChunkMap(chunk)))) {
+        if (!Objects.equals(getChunkOwner(north), getChunkOwner(chunk))) {
             for (int x = minX; x < minX + 16; x++) {
                 player.spawnParticle(Particle.DUST, x, y, minZ, 1, dustOptions);
             }
         }
 
         Chunk south = world.getChunkAt(chunkX, chunkZ + 1);
-        if (!Objects.equals(getChunkOwner(getChunkMap(south)), getChunkOwner(getChunkMap(chunk)))) {
+        if (!Objects.equals(getChunkOwner(south), getChunkOwner(chunk))) {
             for (int x = minX; x < minX + 16; x++) {
                 player.spawnParticle(Particle.DUST, x, y, minZ + 16, 1, dustOptions);
             }
         }
 
         Chunk west = world.getChunkAt(chunkX - 1, chunkZ);
-        if (!Objects.equals(getChunkOwner(getChunkMap(west)), getChunkOwner(getChunkMap(chunk)))) {
+        if (!Objects.equals(getChunkOwner(west), getChunkOwner(chunk))) {
             for (int z = minZ; z < minZ + 16; z++) {
                 player.spawnParticle(Particle.DUST, minX, y, z, 1, dustOptions);
             }
         }
 
         Chunk east = world.getChunkAt(chunkX + 1, chunkZ);
-        if (!Objects.equals(getChunkOwner(getChunkMap(east)), getChunkOwner(getChunkMap(chunk)))) {
+        if (!Objects.equals(getChunkOwner(east), getChunkOwner(chunk))) {
             for (int z = minZ; z < minZ + 16; z++) {
                 player.spawnParticle(Particle.DUST, minX + 16, y, z, 1, dustOptions);
             }

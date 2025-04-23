@@ -2,6 +2,9 @@ name: civilisation_creatif
 version: '0.5'
 main: fr.mattmunich.civilisation_creatif.Main
 api-version: '1.21'
+depend:
+  - WorldGuard
+  - FastAsyncWorldEdit
 commands:
   minijeuxentrepotes:
     description: §6Commande pour retourner sur le serveur principal!
