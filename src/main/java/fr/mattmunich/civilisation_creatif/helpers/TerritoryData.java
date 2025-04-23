@@ -1,9 +1,7 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 
-import com.sk89q.worldguard.WorldGuard;
 import fr.mattmunich.civilisation_creatif.Main;
 import org.bukkit.*;
-import org.bukkit.block.Skull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -30,7 +28,6 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

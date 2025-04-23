@@ -1,5 +1,15 @@
 package fr.mattmunich.civilisation_creatif.listeners;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.block.BlockState;
 import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.*;
 import fr.mattmunich.civilisation_creatif.helpers.Utility;
@@ -1435,5 +1445,53 @@ public class EventListener implements Listener {
         } else {
             return null;
         }
+    }
+
+    //WORLDEDIT
+    @Subscribe
+    public void onEdit(EditSessionEvent event) {
+        if (event.getStage() != EditSession.Stage.BEFORE_CHANGE) return;
+
+        Extent original = event.getExtent();
+        Actor actor = event.getActor();
+
+        if (!(actor instanceof BukkitPlayer bukkitPlayer)) return;
+
+        Player player = bukkitPlayer.getPlayer();
+
+        Extent wrappedExtent = new Extent() {
+            @Override
+            public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+                return false;
+            }
+
+            @Override
+            public BlockVector3 getMinimumPoint() {
+                return null;
+            }
+
+            @Override
+            public BlockVector3 getMaximumPoint() {
+                return null;
+            }
+
+            public boolean setBlock(int x, int y, int z, BlockState block) throws WorldEditException {
+                int chunkX = x >> 4;
+                int chunkZ = z >> 4;
+                Chunk bukkitChunk = player.getWorld().getChunkAt(chunkX, chunkZ);
+
+                String chunkOwner = territoryData.getChunkOwner(bukkitChunk);
+                String playerTerritory = territoryData.getPlayerTerritory(player);
+
+                if (!playerTerritory.equals(chunkOwner) && !main.bypassClaims.contains(player)) {
+                    player.sendMessage(main.prefix + "§4Vous ne pouvez pas utiliser WorldEdit dans un territoire qui ne vous appartient pas !");
+                    return false;
+                }
+
+                return setBlock(x, y, z, block);
+            }
+        };
+
+        event.setExtent(wrappedExtent);
     }
 }
