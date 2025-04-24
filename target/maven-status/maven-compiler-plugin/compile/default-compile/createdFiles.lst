@@ -7,4 +7,5 @@ fr/mattmunich/civilisation_creatif/helpers/TerritoryData$1.class
 fr/mattmunich/civilisation_creatif/helpers/TerritoryData.class
 fr/mattmunich/civilisation_creatif/listeners/EventListener.class
 fr/mattmunich/civilisation_creatif/helpers/SkinManager.class
+fr/mattmunich/civilisation_creatif/listeners/WorldEditListener.class
 fr/mattmunich/civilisation_creatif/Main.class

@@ -8,7 +8,7 @@ import fr.mattmunich.civilisation_creatif.Main;
 
 import org.bukkit.Bukkit;
 
-import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 

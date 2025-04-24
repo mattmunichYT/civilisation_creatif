@@ -638,8 +638,8 @@ public class TerritoryData {
         try {
             Map<Integer,Integer> chunkMap = getChunkMap(chunk);
             Team territory = getTerritoryTeam(territoryName);
-            List<Map<?, ?>> terrClaims = config.getMapList("territories." + territory.getName() + "." + chunk.getWorld().getName() + ".claims");
-            List<Map<?, ?>> globalClaims = config.getMapList("claims" + "." + chunk.getWorld().getName());
+            List<Map<?, ?>> terrClaims = config.getMapList("territories." + territory.getName() + ".claims." + chunk.getWorld().getName());
+            List<Map<?, ?>> globalClaims = config.getMapList("claims." + chunk.getWorld().getName());
             if (globalClaims.contains(chunkMap)) {
                 if (terrClaims.contains(chunkMap)) {
                     sender.sendMessage(main.prefix + "§eVous avez déjà claim ce chunk !");
@@ -654,8 +654,8 @@ public class TerritoryData {
             }
             terrClaims.add(chunkMap);
             globalClaims.add(chunkMap);
-            config.set("territories." + territory.getName() + chunk.getWorld().getName() + ".claims", terrClaims);
-            config.set("claims" + chunk.getWorld().getName(), globalClaims);
+            config.set("territories." + territory.getName() + ".claims." + chunk.getWorld().getName(), terrClaims);
+            config.set("claims." + chunk.getWorld().getName(), globalClaims);
             saveConfig();
             removeTerritoryMoney(territoryName, getChunkPrice(territoryName));
             sender.sendMessage(main.prefix + "§aVous avez §2claim §ale chunk §e" + chunk.getX() + "§a,§e " + chunk.getZ() + " §apour §e" + getChunkPrice(territoryName) + main.moneySign + "§a!");
@@ -693,14 +693,14 @@ public class TerritoryData {
         try {
             Map<Integer,Integer> chunkMap = getChunkMap(chunk);
             Team territory = getTerritoryTeam(territoryName);
-            List<Map<?, ?>> claims = config.getMapList("territories." + territory.getName() + chunk.getWorld().getName() + ".claims");
+            List<Map<?, ?>> claims = config.getMapList("territories." + territory.getName() + ".claims." + chunk.getWorld().getName());
             if (claims.contains(chunkMap)) {
                 claims.remove(chunkMap);
-                config.set("territories." + territory.getName() + chunk.getWorld().getName() + ".claims", claims);
+                config.set("territories." + territory.getName() + ".claims." + chunk.getWorld().getName(), claims);
 
-                List<Map<?, ?>> globalClaims = config.getMapList("claims" + chunk.getWorld().getName());
+                List<Map<?, ?>> globalClaims = config.getMapList("claims." + chunk.getWorld().getName());
                 globalClaims.remove(chunkMap);
-                config.set("claims" + chunk.getWorld().getName(), globalClaims);
+                config.set("claims." + chunk.getWorld().getName(), globalClaims);
                 saveConfig();
                 sender.sendMessage(main.prefix + "§aVous avez §cunclaim §ale chunk §e" + chunk.getX() + "§a,§e " + chunk.getZ());
                 removeOneClaimedChunkFromCount(territoryName);
@@ -719,7 +719,7 @@ public class TerritoryData {
             List<Chunk> territoryClaims = new ArrayList<>();
             try {
                 for (World world : Bukkit.getWorlds()) {
-                    List<Map<?,?>> claims = config.getMapList("territories." + territory.getName() + world.getName() + ".claims");
+                    List<Map<?,?>> claims = config.getMapList("territories." + territory.getName() + ".claims." + world.getName());
                     for (Map<?,?> chunk : claims) {
                         territoryClaims.add(getChunkFromMap((Map<Integer, Integer>) chunk,world));
                     }
@@ -738,7 +738,7 @@ public class TerritoryData {
 
     public boolean chunkClaimed(Chunk chunk) {
         try {
-            List<Map<?, ?>> globalClaims = config.getMapList("claims" + chunk.getWorld().getName());
+            List<Map<?, ?>> globalClaims = config.getMapList("claims." + chunk.getWorld().getName());
             return globalClaims.contains(getChunkMap(chunk));
         } catch (Exception e) {
             main.logError("Couldn't check if chunk was claimed", e);
@@ -786,8 +786,9 @@ public class TerritoryData {
     }
 
     public Chunk getChunkFromMap(Map<Integer, Integer> chunkMap, World world) {
-        int x = Integer.parseInt(chunkMap.entrySet().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
-        int z = Integer.parseInt(chunkMap.keySet().stream().findFirst().toString().replace("Optional[", "").replace("]", ""));
+        Map.Entry<Integer, Integer> entry = chunkMap.entrySet().iterator().next();
+        int x = entry.getKey();
+        int z = entry.getValue();
         return world.getChunkAt(x, z);
     }
 

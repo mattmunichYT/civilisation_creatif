@@ -88,57 +88,57 @@ public class EventListener implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
 
-        if(enterTerritoryName.contains(p)) {
+        if (enterTerritoryName.contains(p)) {
             enterTerritoryName.remove(p);
             e.setCancelled(true);
-            if(e.getMessage().contains("&")) {
+            if (e.getMessage().contains("&")) {
                 Bukkit.getScheduler().runTask(main, () -> p.chat("/territory"));
                 return;
             }
-            if(e.getMessage().length() > 20) {
+            if (e.getMessage().length() > 20) {
                 p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c20 caractères §4!");
                 return;
             }
-            if(!e.getMessage().matches("[a-zA-Z0-9]+")) {
+            if (!e.getMessage().matches("[a-zA-Z0-9]+")) {
                 p.sendMessage(main.prefix + "§4Le nom du territroire ne doit pas contenir de §ccaractères spéciaux §8§o(seulement a-Z et 0-9) §4!");
                 return;
             }
 
-            Inventory chooseColorInv = Bukkit.createInventory(p, 27,"§aCouleur du territoire " + e.getMessage());
-            chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null,null,null));
-            chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null,null,null));
-            chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null,null,null));
-            chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null,null,null));
-            chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null,null,null));
-            chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null,null,null));
-            chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null,null,null));
-            chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null,null,null));
-            chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null,null,null));
-            chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null,null,null));
-            chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-            chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null,null,null));
-            chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null,null,null));
-            chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null,null,null));
-            chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null,null,null));
-            chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null,null,null));
-            chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null,null,null));
-            chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null,null,null));
-            chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+            Inventory chooseColorInv = Bukkit.createInventory(p, 27, "§aCouleur du territoire " + e.getMessage());
+            chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null, null, null));
+            chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null, null, null));
+            chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null, null, null));
+            chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null, null, null));
+            chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null, null, null));
+            chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null, null, null));
+            chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null, null, null));
+            chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null, null, null));
+            chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null, null, null));
+            chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null, null, null));
+            chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+            chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null, null, null));
+            chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null, null, null));
+            chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null, null, null));
+            chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null, null, null));
+            chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null, null, null));
+            chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null, null, null));
+            chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null, null, null));
+            chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
             Bukkit.getScheduler().runTask(main, () -> p.openInventory(chooseColorInv));
             return;
         }
-        if(defTerritoryBanner.contains(p) && e.getMessage().toLowerCase().contains("go")){
+        if (defTerritoryBanner.contains(p) && e.getMessage().toLowerCase().contains("go")) {
             e.setMessage("");
             e.setCancelled(true);
-            if(!(p.getInventory().getItemInMainHand().getItemMeta() instanceof BannerMeta)) {
+            if (!(p.getInventory().getItemInMainHand().getItemMeta() instanceof BannerMeta)) {
                 p.sendMessage(main.prefix + "§4Cet objet n'est pas une bannière !");
                 Bukkit.getScheduler().runTask(main, () -> p.openInventory(territoryData.getTerrInv(p, territoryData.getTerritoryTeamOfPlayer(p))));
                 defTerritoryBanner.remove(p);
@@ -146,33 +146,33 @@ public class EventListener implements Listener {
             }
             ItemStack banner = p.getInventory().getItemInMainHand();
             territoryData.setTerritoryBanner(territoryData.getPlayerTerritory(p), banner);
-            p.sendTitle("§a✅ Succès","§2§oLa bannière de votre territoire a été définie !", 20, 100, 20);
+            p.sendTitle("§a✅ Succès", "§2§oLa bannière de votre territoire a été définie !", 20, 100, 20);
             p.sendMessage(main.prefix + "§2La bannière de votre territoire a été définie !");
             defTerritoryBanner.remove(p);
             return;
         }
-        if(enterNewTerritoryName.contains(p)) {
+        if (enterNewTerritoryName.contains(p)) {
             enterNewTerritoryName.remove(p);
             e.setCancelled(true);
-            if(territoryData.getPlayerTerritory(p)==null || !territoryData.isChief(p,territoryData.getPlayerTerritory(p))) {
+            if (territoryData.getPlayerTerritory(p) == null || !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
                 p.sendMessage(main.prefix + "§4Vous ne pouvez pas faire cela.");
                 return;
             }
-            if(e.getMessage().equals("&")){
+            if (e.getMessage().equals("&")) {
                 p.sendMessage(main.prefix + "§eOpération annulée.");
                 return;
             }
-            if(e.getMessage().length() > 20) {
+            if (e.getMessage().length() > 20) {
                 p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c20 caractères §4!");
                 return;
             }
-            if(!e.getMessage().matches("[a-zA-Z0-9éèê]+")) {
+            if (!e.getMessage().matches("[a-zA-Z0-9éèê]+")) {
                 p.sendMessage(main.prefix + "§4Le nom du territroire ne doit pas contenir de §ccaractères spéciaux §8§o(seulement a-Z et 0-9) §4!");
                 return;
             }
             ChatColor territoryColor = territoryData.getTerritoryTeam(territoryData.getPlayerTerritory(p)).getColor();
             try {
-                territoryData.renameTerritory(territoryData.getPlayerTerritory(p),e.getMessage());
+                territoryData.renameTerritory(territoryData.getPlayerTerritory(p), e.getMessage());
             } catch (NullPointerException ex) {
                 p.sendMessage(main.prefix + "§4Une erreur s'est produite");
             }
@@ -180,22 +180,22 @@ public class EventListener implements Listener {
             return;
         }
 
-        if(enterNewTerritoryDescription.contains(p)) {
+        if (enterNewTerritoryDescription.contains(p)) {
             enterNewTerritoryDescription.remove(p);
             e.setCancelled(true);
-            if(territoryData.getPlayerTerritory(p)==null || !territoryData.isChief(p,territoryData.getPlayerTerritory(p))) {
+            if (territoryData.getPlayerTerritory(p) == null || !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
                 p.sendMessage(main.prefix + "§4Vous ne pouvez pas faire cela.");
                 return;
             }
-            if(e.getMessage().equals("&")){
+            if (e.getMessage().equals("&")) {
                 p.sendMessage(main.prefix + "§eOpération annulée.");
                 return;
             }
-            if(e.getMessage().length() > 100) {
+            if (e.getMessage().length() > 100) {
                 p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c100 caractères §4!");
                 return;
             }
-            territoryData.setTerritoryDescription(territoryData.getPlayerTerritory(p),main.hex(e.getMessage()));
+            territoryData.setTerritoryDescription(territoryData.getPlayerTerritory(p), main.hex(e.getMessage()));
             p.sendMessage(main.prefix + "§2La description de votre territoire a été définie à :");
             p.sendMessage("§a" + main.hex(e.getMessage()));
             return;
@@ -212,7 +212,7 @@ public class EventListener implements Listener {
         }
 
         Grades pRank = data.getRank();
-        if(pRank == null) {
+        if (pRank == null) {
             p.sendMessage(main.prefix + "§4Une erreur s'est produite lors de l'envoi de se message ! §cEssayez de vous déconnecter et de vous reconnecter.");
             e.setCancelled(true);
             return;
@@ -227,13 +227,13 @@ public class EventListener implements Listener {
     public void onKick(PlayerKickEvent e) {
         e.setCancelled(true);
         Player p = e.getPlayer();
-        p.sendTitle("§4§lVous avez été kick","§e§oTransfert vers §4M.§cJ.§6E.§eP.",20,100,20);
+        p.sendTitle("§4§lVous avez été kick", "§e§oTransfert vers §4M.§cJ.§6E.§eP.", 20, 100, 20);
         p.sendMessage("§e(§6!§e) §4Vous avez été kick du serveur Civlisation Créatif avec la raison : §c" + e.getReason());
-        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS,120,255,false,false,false);
+        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 120, 255, false, false, false);
         p.addPotionEffect(blindness);
         Bukkit.getScheduler().runTaskLater(main, () -> {
             p.transfer("91.197.6.60", 25599);
-        },120);
+        }, 120);
     }
 
     @EventHandler
@@ -275,8 +275,8 @@ public class EventListener implements Listener {
     public void onRespawnAnchorExplosion(BlockExplodeEvent e) {
         Block block = e.getBlock();
         ArrayList<String> suspects = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()){
-            if(player.getLocation().distance(block.getLocation()) < 8) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getLocation().distance(block.getLocation()) < 8) {
                 suspects.add(player.getName());
             }
         }
@@ -290,7 +290,7 @@ public class EventListener implements Listener {
 
         e.setCancelled(true);
         try {
-            for(Block b : e.blockList()) {
+            for (Block b : e.blockList()) {
                 b.getWorld().setBlockData(b.getLocation(), b.getBlockData());
             }
         } catch (Exception err) {
@@ -301,13 +301,15 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onInvInteract(InventoryClickEvent e) throws Exception {
-        if(e.getWhoClicked() instanceof Player p) {
+        if (e.getWhoClicked() instanceof Player p) {
             InventoryView invView = e.getView();
             Inventory inv = e.getInventory();
             ItemStack it = e.getCurrentItem();
             if (invView.getTitle().equalsIgnoreCase("§6Menu §7- §a/territoire §7(§8§oAucun§7)")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (Objects.requireNonNull(it).getType()) {
                     case CRAFTING_TABLE:
                         //CREATE TERRITORY
@@ -320,7 +322,7 @@ public class EventListener implements Listener {
                         PlayerData data = new PlayerData(p.getUniqueId());
                         try {
                             data.getInvitesToTerritory();
-                            if(data.getInvitesToTerritory().isEmpty()) {
+                            if (data.getInvitesToTerritory().isEmpty()) {
                                 //NO INVITES
                                 Inventory invitesInv = Bukkit.createInventory(p, 54, "§bInvitations à rejoindre un territoire");
                                 invitesInv.setItem(22, ItemBuilder.getItem(Material.PAPER, "§b§oVous n'avez aucune invitation à rejoindre un territoire...", true, false, null, null, null));
@@ -388,7 +390,9 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().contains("§6Menu §7- §a/territoire §7(")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (Objects.requireNonNull(it).getType()) {
                     case RED_DYE:
                         invView.close();
@@ -406,7 +410,7 @@ public class EventListener implements Listener {
                         p.openInventory(terrInv);
                         break;
                     case SPYGLASS:
-                        Inventory terrListInv = territoryData.getTerritoryListInventory(p,1);
+                        Inventory terrListInv = territoryData.getTerritoryListInventory(p, 1);
                         p.openInventory(terrListInv);
                         break;
                     case BARRIER:
@@ -417,7 +421,9 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().equalsIgnoreCase("§cQuitter votre territoire ?")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (Objects.requireNonNull(it).getType()) {
                     case LIME_CONCRETE:
                         //LEAVE
@@ -432,10 +438,12 @@ public class EventListener implements Listener {
                     default:
                         break;
                 }
-            } else if(invView.getTitle().contains("§aCouleur du territoire ")){
+            } else if (invView.getTitle().contains("§aCouleur du territoire ")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
-                String terrName = invView.getTitle().replace("§aCouleur du territoire ","");
+                if (it == null) {
+                    return;
+                }
+                String terrName = invView.getTitle().replace("§aCouleur du territoire ", "");
                 switch (Objects.requireNonNull(it).getType()) {
                     case BLUE_CONCRETE:
                         territoryData.createTerritory(p, terrName, ChatColor.DARK_BLUE);
@@ -506,10 +514,14 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().contains("§aTerritoire : ")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (Objects.requireNonNull(it).getType()) {
                     case END_CRYSTAL:
-                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
+                            return;
+                        }
                         //INVITE PLAYER
                         invView.close();
 //                        p.sendTitle("§2§o🚀 Chargement du menu...","",20,500,20);
@@ -520,7 +532,7 @@ public class EventListener implements Listener {
                             PlayerData playerData = new PlayerData(all.getUniqueId());
                             PlayerData senderData = new PlayerData(p.getUniqueId());
 
-                            if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                            if (playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())) {
                                 continue;
                             }
                             ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
@@ -539,80 +551,88 @@ public class EventListener implements Listener {
                             PlayerData playerData = new PlayerData(all.getUniqueId());
                             PlayerData senderData = new PlayerData(p.getUniqueId());
 
-                            if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                            if (playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())) {
                                 continue;
                             }
 
-                            inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
+                            inviteInv.addItem(playerData.getSkull(all, "§bCliquez pour inviter le joueur §5" + all.getName()));
                         }
                         p.closeInventory();
                         p.openInventory(inviteInv);
                         break;
                     case CYAN_STAINED_GLASS:
-                        if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
+                            return;
+                        }
                         //CHANGE COLOR
-                        Inventory chooseColorInv = Bukkit.createInventory(p, 27,"§2Couleur du territoire " + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName());
-                        chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null,null,null));
-                        chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null,null,null));
-                        chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null,null,null));
-                        chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null,null,null));
-                        chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null,null,null));
-                        chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null,null,null));
-                        chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null,null,null));
-                        chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null,null,null));
-                        chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null,null,null));
-                        chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null,null,null));
-                        chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
-                        chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null,null,null));
-                        chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null,null,null));
-                        chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null,null,null));
-                        chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null,null,null));
-                        chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null,null,null));
-                        chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null,null,null));
-                        chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null,null,null));
-                        chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null,null,null));
+                        Inventory chooseColorInv = Bukkit.createInventory(p, 27, "§2Couleur du territoire " + territoryData.getTerritoryTeamOfPlayer(p).getColor() + territoryData.getTerritoryTeamOfPlayer(p).getName());
+                        chooseColorInv.setItem(0, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(1, ItemBuilder.getItem(Material.BLUE_CONCRETE, "§1Bleu foncé", false, false, null, null, null));
+                        chooseColorInv.setItem(2, ItemBuilder.getItem(Material.BLUE_WOOL, "§9Bleu clair", false, false, null, null, null));
+                        chooseColorInv.setItem(3, ItemBuilder.getItem(Material.LIGHT_BLUE_CONCRETE, "§bAqua", false, false, null, null, null));
+                        chooseColorInv.setItem(4, ItemBuilder.getItem(Material.CYAN_CONCRETE, "§3Cyan", false, false, null, null, null));
+                        chooseColorInv.setItem(5, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aVert clair", false, false, null, null, null));
+                        chooseColorInv.setItem(6, ItemBuilder.getItem(Material.GREEN_CONCRETE, "§2Vert", false, false, null, null, null));
+                        chooseColorInv.setItem(7, ItemBuilder.getItem(Material.ORANGE_CONCRETE, "§6Orange/Or", false, false, null, null, null));
+                        chooseColorInv.setItem(8, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(9, ItemBuilder.getItem(Material.BLACK_CONCRETE, "§0Noir", false, false, null, null, null));
+                        chooseColorInv.setItem(10, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(11, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(12, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(13, ItemBuilder.getItem(Material.PAPER, "§a§oℹ Choisissez la couleur pour votre territoire", false, false, null, null, null));
+                        chooseColorInv.setItem(14, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(15, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(16, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(17, ItemBuilder.getItem(Material.YELLOW_CONCRETE, "§eJaune", false, false, null, null, null));
+                        chooseColorInv.setItem(18, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
+                        chooseColorInv.setItem(19, ItemBuilder.getItem(Material.RED_WOOL, "§cRouge clair", false, false, null, null, null));
+                        chooseColorInv.setItem(20, ItemBuilder.getItem(Material.RED_CONCRETE, "§4Rouge foncé", false, false, null, null, null));
+                        chooseColorInv.setItem(21, ItemBuilder.getItem(Material.PURPLE_CONCRETE, "§5Voilet", false, false, null, null, null));
+                        chooseColorInv.setItem(22, ItemBuilder.getItem(Material.PINK_CONCRETE, "§dRose", false, false, null, null, null));
+                        chooseColorInv.setItem(23, ItemBuilder.getItem(Material.WHITE_CONCRETE, "§rBlanc", false, false, null, null, null));
+                        chooseColorInv.setItem(24, ItemBuilder.getItem(Material.LIGHT_GRAY_CONCRETE, "§7Gris clair", false, false, null, null, null));
+                        chooseColorInv.setItem(25, ItemBuilder.getItem(Material.GRAY_CONCRETE, "§8Gris foncé", false, false, null, null, null));
+                        chooseColorInv.setItem(26, ItemBuilder.getItem(Material.GRAY_STAINED_GLASS_PANE, null, false, false, null, null, null));
                         p.openInventory(chooseColorInv);
                         break;
                     case RED_DYE:
-                        if(territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
+                            return;
+                        }
                         invView.close();
                         //DELETE TERRITORY
-                       try {
-                           String territoryName = territoryData.getPlayerTerritory(p);
-                           if(territoryData.isChief(p,territoryName)) {
-                               Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
-                               confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
-                               confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
-                               confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
-                               p.openInventory(confirmInv);
-                           } else {
-                               p.sendMessage(main.prefix + "§4Vous n'avez pas la permission de supprimer ce territoire !");
-                           }
-                       } catch(NullPointerException exception) {
-                           Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
-                           confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
-                           confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
-                           confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
-                           p.openInventory(confirmInv);
-                           Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get territory chief to verify a player's permission. §cAllowed " + p.getName() + " to delete territory " + territoryData.getTerritoryTeamOfPlayer(p).getName());
-                       }
+                        try {
+                            String territoryName = territoryData.getPlayerTerritory(p);
+                            if (territoryData.isChief(p, territoryName)) {
+                                Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
+                                confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
+                                confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
+                                confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
+                                p.openInventory(confirmInv);
+                            } else {
+                                p.sendMessage(main.prefix + "§4Vous n'avez pas la permission de supprimer ce territoire !");
+                            }
+                        } catch (NullPointerException exception) {
+                            Inventory confirmInv = Bukkit.createInventory(p, 9, "§4Supprimer votre territoire ?");
+                            confirmInv.setItem(3, ItemBuilder.getItem(Material.LIME_CONCRETE, "§aConfirmer", false, false, null, null, null));
+                            confirmInv.setItem(4, ItemBuilder.getItem(Material.PAPER, "§c§oℹ Êtes-vous sûr de vouloir supprimer votre territoire ?", true, false, null, null, null));
+                            confirmInv.setItem(5, ItemBuilder.getItem(Material.RED_CONCRETE, "§cAnnuler", false, false, null, null, null));
+                            p.openInventory(confirmInv);
+                            Bukkit.getConsoleSender().sendMessage(main.prefix + "§4Couldn't get territory chief to verify a player's permission. §cAllowed " + p.getName() + " to delete territory " + territoryData.getTerritoryTeamOfPlayer(p).getName());
+                        }
                         return;
                     case VILLAGER_SPAWN_EGG:
-                        if(!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
+                            return;
+                        }
                         //MANAGER WORKERS
                         p.closeInventory();
                         p.openInventory(territoryData.getTerritoryWorkersInventory(p, territoryData.getPlayerTerritory(p), 1));
                         break;
                     case PLAYER_HEAD:
-                        if(!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (!territoryData.isOfficer(p, territoryData.getPlayerTerritory(p)) && !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
+                            return;
+                        }
                         //MANAGE MEMBERS
                         territoryData.showTerritoryMembersInventory(p, territoryData.getPlayerTerritory(p), 1);
                         break;
@@ -620,7 +640,7 @@ public class EventListener implements Listener {
                         p.closeInventory();
                         p.sendMessage(main.prefix + "§2Envoyez la §ofuture §r§5description§2 de votre territoire dans le tchat. §e(§6§o& §r§epour annuler)");
                         p.sendMessage(main.prefix + "§a§oℹ Vous pouvez entrer au maximum 100 caractères");
-                        p.sendTitle("§2Envoyez la description","§2§ldans le tchat",20,100,20);
+                        p.sendTitle("§2Envoyez la description", "§2§ldans le tchat", 20, 100, 20);
                         enterNewTerritoryDescription.add(p);
                         break;
                     case OAK_SIGN:
@@ -636,13 +656,15 @@ public class EventListener implements Listener {
                         invView.close();
                         break;
                     default:
-                        if(Tag.BANNERS.isTagged(it.getType())){
-                            if(territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {return;}
+                        if (Tag.BANNERS.isTagged(it.getType())) {
+                            if (territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
+                                return;
+                            }
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
-                            p.sendTitle("§2Prenez la bannière","§2§ldans votre main",20,100,20);
+                            p.sendTitle("§2Prenez la bannière", "§2§ldans votre main", 20, 100, 20);
                             p.sendMessage(main.prefix + "§2Prenez la §5future§2 bannière de territoire §2§ldans votre main§r§2.");
                             Bukkit.getScheduler().runTaskLaterAsynchronously(main, () -> {
-                                p.sendTitle("§rQuand c'est fait","§2§lentrez §r§2\"GO\"§2§l dans le tchat",20,60,20);
+                                p.sendTitle("§rQuand c'est fait", "§2§lentrez §r§2\"GO\"§2§l dans le tchat", 20, 60, 20);
                                 p.sendMessage(main.prefix + "§2Lorsque c'est fait, entrez \"GO\" dans le tchat.");
                                 defTerritoryBanner.add(p);
                             }, 100);
@@ -650,9 +672,11 @@ public class EventListener implements Listener {
                         }
                         break;
                 }
-            } else if(invView.getTitle().contains("§2Couleur du territoire ")){
+            } else if (invView.getTitle().contains("§2Couleur du territoire ")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 Team territory = territoryData.getTerritoryTeamOfPlayer(p);
                 switch (Objects.requireNonNull(it).getType()) {
                     case BLUE_CONCRETE:
@@ -740,12 +764,14 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().equalsIgnoreCase("§4Supprimer votre territoire ?")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (Objects.requireNonNull(it).getType()) {
                     case LIME_CONCRETE:
                         //LEAVE
                         invView.close();
-                        territoryData.deleteTerritory(p,territoryData.getTerritoryTeamOfPlayer(p).getName());
+                        territoryData.deleteTerritory(p, territoryData.getTerritoryTeamOfPlayer(p).getName());
                         break;
                     case RED_CONCRETE:
                         //CANCEL
@@ -757,7 +783,9 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().equalsIgnoreCase("§bInviter un joueur au territoire")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 if (it.getType().equals(Material.BARRIER)) {
                     invView.close();
                 } else {
@@ -768,7 +796,9 @@ public class EventListener implements Listener {
                 }
             } else if (invView.getTitle().equalsIgnoreCase("§bInvitations à rejoindre un territoire")) {
                 e.setCancelled(true);
-                if(it ==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 if (Objects.requireNonNull(it).getType() == Material.BARRIER) {
                     invView.close();
                 } else {
@@ -778,9 +808,11 @@ public class EventListener implements Listener {
                     territoryData.removeInvite(name, p);
                     invView.close();
                 }
-            } else if (invView.getTitle().contains("§aListe des territoires")){
+            } else if (invView.getTitle().contains("§aListe des territoires")) {
                 e.setCancelled(true);
-                if(it==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (it.getType()) {
                     case BARRIER -> {
                         invView.close();
@@ -806,7 +838,7 @@ public class EventListener implements Listener {
                         Team territory = territoryData.getTerritoryTeamFromItem(it);
                         if (territory != null) {
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
-                            Inventory terrInv = territoryData.getTerrInv(p,territory);
+                            Inventory terrInv = territoryData.getTerrInv(p, territory);
                             Bukkit.getScheduler().runTask(main, () -> p.openInventory(terrInv));
                             break;
                         } else {
@@ -817,21 +849,25 @@ public class EventListener implements Listener {
                         break;
                     }
                 }
-            } else if (invView.getTitle().contains("§6Acheter un villegeois")){
+            } else if (invView.getTitle().contains("§6Acheter un villegeois")) {
                 e.setCancelled(true);
-                if(it == null || it.getType()==Material.GRAY_STAINED_GLASS_PANE) { return; }
+                if (it == null || it.getType() == Material.GRAY_STAINED_GLASS_PANE) {
+                    return;
+                }
                 if (it.getType() == Material.BARRIER) {
                     invView.close();
                     return;
                 } else {
                     WorkerType workerType = null;
-                    for (WorkerType checkWorkerType : WorkerType.values()){
-                        if(it.getType().equals(checkWorkerType.getItem())){
+                    for (WorkerType checkWorkerType : WorkerType.values()) {
+                        if (it.getType().equals(checkWorkerType.getItem())) {
                             workerType = checkWorkerType;
                             break;
                         }
                     }
-                    if(workerType==null) { return; }
+                    if (workerType == null) {
+                        return;
+                    }
                     invView.close();
                     territoryData.openChooseTierInv(p, workerType);
                     return;
@@ -841,58 +877,60 @@ public class EventListener implements Listener {
                 if (it == null || it.getType() == Material.GRAY_STAINED_GLASS_PANE) {
                     return;
                 }
-                if(invView.getItem(13)==null){
+                if (invView.getItem(13) == null) {
                     p.sendMessage(main.prefix + "§4Une erreur s'est produite !");
                     return;
                 }
                 WorkerType type = null;
-                String parsedType=invView.getItem(13).getItemMeta().getDisplayName().replace("§aℹ Choisissez le tier de votre villageois ","").replace(" ","_").toUpperCase();
+                String parsedType = invView.getItem(13).getItemMeta().getDisplayName().replace("§aℹ Choisissez le tier de votre villageois ", "").replace(" ", "_").toUpperCase();
                 try {
                     type = WorkerType.valueOf(parsedType);
                 } catch (IllegalArgumentException ex) {
                     p.sendMessage(main.prefix + "§4Une erreur s'est produite !");
-                    main.logError("Couldn't get WorkerType from Paper Item. Tried valueOf(" + parsedType + "). This was ",ex);
+                    main.logError("Couldn't get WorkerType from Paper Item. Tried valueOf(" + parsedType + "). This was ", ex);
                     return;
                 }
-                switch (it.getType()){
+                switch (it.getType()) {
                     case BARRIER -> {
                         invView.close();
                         break;
                     }
                     case COAL_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,0);
+                        territoryData.buyWorker(p, type, 0);
                         break;
                     }
                     case IRON_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,1);
+                        territoryData.buyWorker(p, type, 1);
                         break;
                     }
                     case GOLD_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,2);
+                        territoryData.buyWorker(p, type, 2);
                         break;
                     }
                     case EMERALD_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,3);
+                        territoryData.buyWorker(p, type, 3);
                         break;
                     }
                     case DIAMOND_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,4);
+                        territoryData.buyWorker(p, type, 4);
                         break;
                     }
                     case NETHERITE_BLOCK -> {
                         invView.close();
-                        territoryData.buyWorker(p,type,5);
+                        territoryData.buyWorker(p, type, 5);
                         break;
                     }
                 }
             } else if (invView.getTitle().contains("§bGérer vos villageois §7- §ePage §6")) {
                 e.setCancelled(true);
-                if(it==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (it.getType()) {
                     case BARRIER -> invView.close();
                     case RED_STAINED_GLASS -> {
@@ -912,24 +950,26 @@ public class EventListener implements Listener {
                         territoryData.showBuyWorkerInv(p);
                     }
                     default -> {
-                        if(it.getItemMeta() != null && it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                        if (it.getItemMeta() != null && it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING) != null) {
                             p.closeInventory();
-                            String workerUUID = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING);
-                            territoryData.showWorkerInventory(p,workerUUID,territoryData.getPlayerTerritory(p));
+                            String workerUUID = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
+                            territoryData.showWorkerInventory(p, workerUUID, territoryData.getPlayerTerritory(p));
                         }
                     }
                 }
             } else if (invView.getTitle().contains("§bGérer le villageois")) {
                 e.setCancelled(true);
-                if(it==null) {return;}
+                if (it == null) {
+                    return;
+                }
                 switch (it.getType()) {
                     case VILLAGER_SPAWN_EGG -> {
                         //GIVE SPAWNEGG
                         ItemStack workerItem = inv.getItem(4);
-                        if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                        if (workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING) != null) {
                             p.closeInventory();
                             String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
-                            if(!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive")){
+                            if (!territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive")) {
                                 ItemStack workerSpawnEgg = territoryData.getConfig().getItemStack("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".spawnEgg");
                                 p.getInventory().addItem(workerSpawnEgg);
                                 p.sendMessage(main.prefix + "§aVous avez reçu l'œuf d'apparition du villageois !");
@@ -943,118 +983,122 @@ public class EventListener implements Listener {
                         }
                     }
                     case IRON_SWORD -> {
-                        if(e.getSlot()!=0) {return;}
+                        if (e.getSlot() != 0) {
+                            return;
+                        }
                         //KILL VILLAGER
                         ItemStack workerItem = inv.getItem(4);
-                        if(workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"workerUUID"),PersistentDataType.STRING) != null) {
+                        if (workerItem != null && workerItem.getItemMeta() != null && workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING) != null) {
                             p.closeInventory();
                             String workerUUID = workerItem.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "workerUUID"), PersistentDataType.STRING);
                             String villagerUUID = territoryData.getConfig().getString("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".villagerUUID");
                             boolean workerAlive = territoryData.getConfig().getBoolean("territories." + territoryData.getPlayerTerritory(p) + ".workers." + workerUUID + ".alive");
-                            if(workerAlive && villagerUUID != null){
+                            if (workerAlive && villagerUUID != null) {
                                 Villager villager = (Villager) Bukkit.getEntity(UUID.fromString(villagerUUID));
-                                if(villager==null) {
+                                if (villager == null) {
                                     p.sendMessage(main.prefix + "§cVillageois non trouvé.");
                                     return;
                                 }
                                 villager.remove();
 
-                                if(workerUUID == null || !territoryData.getWorkerList().contains(workerUUID)) {
+                                if (workerUUID == null || !territoryData.getWorkerList().contains(workerUUID)) {
                                     p.sendMessage(main.prefix + "§cLe villageois est invalide.");
                                     return;
                                 }
                                 String workerType = null;
                                 for (String tag : villager.getScoreboardTags()) {
                                     if (tag.contains("workerType=")) {
-                                        workerType = tag.replace("workerType=","");
+                                        workerType = tag.replace("workerType=", "");
                                     }
                                 }
                                 String territoryName = territoryData.getWorkerTerritory(villager);
                                 territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".alive", false);
                                 territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
                                 territoryData.saveConfig();
-                                if (workerType!=null) {
+                                if (workerType != null) {
                                     WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", ""));
-                                    if (type.getLifespan()==-1){
-                                        territoryData.spawnWorker(villager,villager.getLocation());
+                                    if (type.getLifespan() == -1) {
+                                        territoryData.spawnWorker(villager, villager.getLocation());
                                         return;
                                     } else {
-                                        territoryData.removeOneAliveWorkerFromCount(territoryName,type);
+                                        territoryData.removeOneAliveWorkerFromCount(territoryName, type);
                                     }
                                 }
-                                if(territoryData.getAliveWorkerCount(territoryName,WorkerType.POLICIER) > 1) {
-                                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été despawn par le menu du territoire !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu du territoire !");
+                                if (territoryData.getAliveWorkerCount(territoryName, WorkerType.POLICIER) > 1) {
+                                    territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été despawn par le menu du territoire !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu du territoire !");
                                 } else {
-                                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                                    territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
                                 }
-                                Inventory workersTerrInv = territoryData.getTerritoryWorkersInventory(p,territoryName,1);
+                                Inventory workersTerrInv = territoryData.getTerritoryWorkersInventory(p, territoryName, 1);
                                 p.openInventory(workersTerrInv);
                             } else {
                                 p.sendMessage(main.prefix + "§cLe villageois n'existe pas.");
                             }
-                        }else {
+                        } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
                         }
                     }
                     case BARRIER -> p.closeInventory();
                 }
-            } else if (invView.getTitle().contains("§bGérer les membres")){
+            } else if (invView.getTitle().contains("§bGérer les membres")) {
                 e.setCancelled(true);
-                if(it==null) {return;}
-                if(it.getType().equals(Material.PLAYER_HEAD)) {
-                    if(it.getItemMeta() == null) {
+                if (it == null) {
+                    return;
+                }
+                if (it.getType().equals(Material.PLAYER_HEAD)) {
+                    if (it.getItemMeta() == null) {
                         p.sendMessage(main.prefix + "§4Joueur non trouvé !");
                         return;
                     }
-                    String uuidString = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"memberUUID"),PersistentDataType.STRING);
-                    if(uuidString == null) {
+                    String uuidString = it.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin, "memberUUID"), PersistentDataType.STRING);
+                    if (uuidString == null) {
                         p.sendMessage(main.prefix + "§4Joueur non trouvé !");
                         return;
                     }
                     UUID memberUUID = UUID.fromString(uuidString);
                     Player t = Bukkit.getPlayer(memberUUID);
-                    if(t == null) {
+                    if (t == null) {
                         p.sendMessage(main.prefix + "§4Joueur non trouvé !");
                         return;
                     }
                     String territoryName = territoryData.getPlayerTerritory(p);
-                    if(!territoryData.getPlayerTerritory(t).equalsIgnoreCase(territoryName)){
+                    if (!territoryData.getPlayerTerritory(t).equalsIgnoreCase(territoryName)) {
                         p.sendMessage(main.prefix + "§4Le joueur n'est pas dans votre territoire");
                         return;
                     }
-                    if(e.getClick().equals(ClickType.LEFT)) {
-                        if(territoryData.isChief(t,territoryName)){
-                            if(p.equals(t)) {
+                    if (e.getClick().equals(ClickType.LEFT)) {
+                        if (territoryData.isChief(t, territoryName)) {
+                            if (p.equals(t)) {
                                 p.sendMessage(main.prefix + "§eVous êtes le chef de ce territoire, §cvous avez donc le grade le plus élevé.");
                             } else {
                                 p.sendMessage(main.prefix + "§cVous ne pouvez pas promouvoir le chef de votre territoire, §eil a le grade le plus élevé.");
                             }
                             return;
                         }
-                        if(territoryData.isOfficer(t,territoryName)) {
+                        if (territoryData.isOfficer(t, territoryName)) {
                             p.sendMessage(main.prefix + "§cIl ne peut que y avoir un seul chef dans un territoire !");
                             return;
                         }
-                        territoryData.makeOfficer(t,p);
+                        territoryData.makeOfficer(t, p);
                         p.closeInventory();
-                        territoryData.showTerritoryMembersInventory(p,territoryName,1);
+                        territoryData.showTerritoryMembersInventory(p, territoryName, 1);
                         return;
                     }
-                    if(e.getClick().equals(ClickType.RIGHT)) {
-                        if(territoryData.isChief(t,territoryName)){
-                            if(p.equals(t)) {
+                    if (e.getClick().equals(ClickType.RIGHT)) {
+                        if (territoryData.isChief(t, territoryName)) {
+                            if (p.equals(t)) {
                                 p.sendMessage(main.prefix + "§eVous êtes le chef de ce territoire, §cvous ne pouvez pas être rétrogradé.");
                             } else {
                                 p.sendMessage(main.prefix + "§cVous ne pouvez pas rétrograder le chef de votre territoire, §esinon, qui serait le chef ?");
                             }
                             return;
                         }
-                        territoryData.removeOfficer(t,p);
+                        territoryData.removeOfficer(t, p);
                         p.closeInventory();
-                        territoryData.showTerritoryMembersInventory(p,territoryName,1);
+                        territoryData.showTerritoryMembersInventory(p, territoryName, 1);
                         return;
                     }
-                } else if(it.getType().equals(Material.END_CRYSTAL)) {
+                } else if (it.getType().equals(Material.END_CRYSTAL)) {
                     Inventory preInviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
 
                     preInviteInv.setItem(53, ItemBuilder.getItem(Material.BARRIER, "§c❌ Fermer le menu", false, false, null, null, null));
@@ -1062,7 +1106,7 @@ public class EventListener implements Listener {
                         PlayerData playerData = new PlayerData(all.getUniqueId());
                         PlayerData senderData = new PlayerData(p.getUniqueId());
 
-                        if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                        if (playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())) {
                             continue;
                         }
                         ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
@@ -1081,23 +1125,22 @@ public class EventListener implements Listener {
                         PlayerData playerData = new PlayerData(all.getUniqueId());
                         PlayerData senderData = new PlayerData(p.getUniqueId());
 
-                        if(playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())){
+                        if (playerData.getTerritory() != null || all.getUniqueId() == p.getUniqueId() || Objects.equals(playerData.getTerritory(), senderData.getTerritory())) {
                             continue;
                         }
 
-                        inviteInv.addItem(playerData.getSkull(all,"§bCliquez pour inviter le joueur §5" + all.getName()));
+                        inviteInv.addItem(playerData.getSkull(all, "§bCliquez pour inviter le joueur §5" + all.getName()));
                     }
                     p.closeInventory();
                     p.openInventory(inviteInv);
                     return;
-                } else if(it.getType().equals(Material.BARRIER)) {
+                } else if (it.getType().equals(Material.BARRIER)) {
                     p.closeInventory();
                     return;
                 }
             }
         }
     }
-
 
 
     @EventHandler
@@ -1115,7 +1158,7 @@ public class EventListener implements Listener {
             try {
                 ArmorStand as = (ArmorStand) entity;
                 String name = as.getName();
-                if(name.contains("D") && name.contains("y") && name.contains("n") && name.contains("M") && name.contains("a") && name.contains("p")) {
+                if (name.contains("D") && name.contains("y") && name.contains("n") && name.contains("M") && name.contains("a") && name.contains("p")) {
                     //[{"text":"[","color":"yellow"},{"text":"Civilisation","color":"dark_green"},{"text":"] ","color":"yellow"},{"text":"{","color":"dark_purple","clickEvent":{"action":"open_url","value":"https://livemap.minestrator.com/s/40eb63e5-13e2-41c9-bb87-ee1b79ab0d54/"}},{"text":"Cliquez ici pour voir la DynMap","color":"light_purple","clickEvent":{"action":"open_url","value":"https://livemap.minestrator.com/s/40eb63e5-13e2-41c9-bb87-ee1b79ab0d54/"}},{"text":"}","color":"dark_purple","clickEvent":{"action":"open_url","value":"https://livemap.minestrator.com/s/40eb63e5-13e2-41c9-bb87-ee1b79ab0d54/"}}]
                     BaseComponent prefix =
                             new ComponentBuilder("[").color(net.md_5.bungee.api.ChatColor.YELLOW)
@@ -1126,7 +1169,7 @@ public class EventListener implements Listener {
                                     .append("Cliquez pour voir la DynMap").color(net.md_5.bungee.api.ChatColor.LIGHT_PURPLE)
                                     .append("}").color(net.md_5.bungee.api.ChatColor.DARK_PURPLE).build();
                     link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://livemap.minestrator.com/s/40eb63e5-13e2-41c9-bb87-ee1b79ab0d54/"));
-                    p.spigot().sendMessage(prefix,link);
+                    p.spigot().sendMessage(prefix, link);
                 }
             } catch (Exception ex) {
                 Bukkit.getConsoleSender().sendMessage(ex.getMessage() + Arrays.toString(ex.getStackTrace()).replace(",", ",\n"));
@@ -1140,13 +1183,13 @@ public class EventListener implements Listener {
         Location loc = p.getLocation();
         Chunk chunk = loc.getChunk();
         String chunkOwner = territoryData.getChunkOwner(chunk);
-        if(main.seeTerritoryBorders.contains(p)) {
+        if (main.seeTerritoryBorders.contains(p)) {
             World world = loc.getWorld();
             int range = 10;
             for (int chunkX = chunk.getX() - range; chunkX < chunk.getX() + range; chunkX++) {
                 for (int chunkZ = chunk.getZ() - range; chunkZ < chunk.getZ() + range; chunkZ++) {
                     assert world != null;
-                    Chunk chunkToShow = world.getChunkAt(chunkX,chunkZ);
+                    Chunk chunkToShow = world.getChunkAt(chunkX, chunkZ);
                     if (territoryData.getChunkOwner(chunkToShow) != null && !territoryData.getChunkOwner(chunkToShow).isEmpty()) {
                         ChatColor chatColor = territoryData.getTerritoryTeam(territoryData.getChunkOwner(chunkToShow)).getColor();
                         territoryData.showChunkBorder(chunkToShow, chatColor, p);
@@ -1154,18 +1197,19 @@ public class EventListener implements Listener {
                 }
             }
         }
-        if(!Objects.equals(currentChunkOwner.get(p), chunkOwner)) {
-            currentChunkOwner.put(p,chunkOwner);
+        if (!Objects.equals(currentChunkOwner.get(p), chunkOwner)) {
+            currentChunkOwner.put(p, chunkOwner);
             p.resetTitle();
-            if(chunkOwner == null){
-                p.sendTitle("§2§lWilderness","",20,60,20);
+            if (chunkOwner == null) {
+                p.sendTitle("§2§lWilderness", "", 20, 60, 20);
             } else {
                 Team chunkOwnerTeam = territoryData.getTerritoryTeam(chunkOwner);
                 ChatColor chunkOwnerTeamColor = chunkOwnerTeam.getColor();
-                p.sendTitle(chunkOwnerTeamColor + chunkOwnerTeam.getName(), chunkOwner.equals(territoryData.getPlayerTerritory(p)) ? "§a§oVotre territoire" : "",20,60,20);
+                p.sendTitle(chunkOwnerTeamColor + chunkOwnerTeam.getName(), chunkOwner.equals(territoryData.getPlayerTerritory(p)) ? "§a§oVotre territoire" : "", 20, 60, 20);
             }
         }
     }
+
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
@@ -1176,7 +1220,7 @@ public class EventListener implements Listener {
             PlayerData playerData = new PlayerData(p);
             String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(e.getBlock().getChunk());
-            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
                 e.setCancelled(true);
                 p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer de blocks ici !");
                 return;
@@ -1189,18 +1233,18 @@ public class EventListener implements Listener {
             int moneyGain = 1;
             int xpGain = 1;
 
-            if(Tag.LOGS.isTagged(placedBlockType)) {
-                moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
-                xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.BUCHERON);
+            if (Tag.LOGS.isTagged(placedBlockType)) {
+                moneyGain = moneyGain + territoryData.getAliveWorkerCount(territoryName, WorkerType.BUCHERON);
+                xpGain = xpGain + territoryData.getAliveWorkerCount(territoryName, WorkerType.BUCHERON);
                 playerData.addMoney(moneyGain);
                 moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + moneyGain);
                 if (isInOwnTerritory) {
                     territoryData.addTerritoryXP(territoryData.getPlayerTerritory(p), xpGain);
                     xpGained.put(playerId, xpGained.getOrDefault(playerId, 0) + xpGain);
                 }
-            } else if(CustomPlantTag.isCustomPlant(placedBlockType)) {
-                moneyGain=moneyGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
-                xpGain=xpGain+territoryData.getAliveWorkerCount(territoryName,WorkerType.JARDINIER);
+            } else if (CustomPlantTag.isCustomPlant(placedBlockType)) {
+                moneyGain = moneyGain + territoryData.getAliveWorkerCount(territoryName, WorkerType.JARDINIER);
+                xpGain = xpGain + territoryData.getAliveWorkerCount(territoryName, WorkerType.JARDINIER);
                 playerData.addMoney(moneyGain);
                 moneyGained.put(playerId, moneyGained.getOrDefault(playerId, 0) + moneyGain);
                 if (isInOwnTerritory) {
@@ -1263,15 +1307,15 @@ public class EventListener implements Listener {
         if (e.getClickedBlock() != null) {
             String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(e.getClickedBlock().getChunk());
-            if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            if (e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+                if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
                     e.setCancelled(true);
                     p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser avec des blocs ici !");
                     return;
                 }
             }
-            if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
-                if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
                     e.setCancelled(true);
                     p.sendMessage(main.prefix + "§4Vous ne pouvez pas placer avec des blocs/intéragir ici !");
                     return;
@@ -1283,18 +1327,19 @@ public class EventListener implements Listener {
             e.setCancelled(true);
             try {
                 SpawnEggMeta meta = (SpawnEggMeta) e.getItem().getItemMeta();
-                territoryData.spawnWorker(p,meta,e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation(), e.getItem());
+                territoryData.spawnWorker(p, meta, e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation(), e.getItem());
                 return;
-            } catch (ClassCastException ignored) {}
+            } catch (ClassCastException ignored) {
+            }
         }
     }
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent e){
+    public void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
         String territoryName = territoryData.getPlayerTerritory(p);
         String chunkOwner = territoryData.getChunkOwner(e.getBlock().getChunk());
-        if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+        if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
             e.setCancelled(true);
             p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser de blocs ici !");
             return;
@@ -1302,13 +1347,13 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamagedByEntity(EntityDamageByEntityEvent e){
-        if(e.getDamager() instanceof Player p) {
+    public void onEntityDamagedByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player p) {
             String territoryName = territoryData.getPlayerTerritory(p);
             String chunkOwner = territoryData.getChunkOwner(e.getEntity().getLocation().getChunk());
-            if(!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)){
+            if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
                 e.setCancelled(true);
-                if(e.getEntity() instanceof Player) {
+                if (e.getEntity() instanceof Player) {
                     p.sendMessage(main.prefix + "§4Vous ne pouvez pas attaquer d'autres joueurs ici !");
                 } else {
                     p.sendMessage(main.prefix + "§4Vous ne pouvez pas attaquer d'entitées ici !");
@@ -1319,179 +1364,131 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onVillagerDeath(EntityDeathEvent e) {
-        if(e.getEntity() instanceof Villager villager) {
+        if (e.getEntity() instanceof Villager villager) {
             UUID workerUUID = null;
             for (String tag : villager.getScoreboardTags()) {
                 if (tag.contains("workerUUID=")) {
-                    workerUUID = UUID.fromString(tag.replace("workerUUID=",""));
+                    workerUUID = UUID.fromString(tag.replace("workerUUID=", ""));
                 }
             }
-            if(workerUUID == null || !territoryData.getWorkerList().contains(workerUUID.toString())) {
+            if (workerUUID == null || !territoryData.getWorkerList().contains(workerUUID.toString())) {
                 return;
             }
             String workerType = null;
             for (String tag : villager.getScoreboardTags()) {
                 if (tag.contains("workerType=")) {
-                    workerType = tag.replace("workerType=","");
+                    workerType = tag.replace("workerType=", "");
                 }
             }
             String territoryName = territoryData.getWorkerTerritory(villager);
             territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".alive", false);
             territoryData.getConfig().set("territories." + territoryName + ".workers." + workerUUID + ".villagerUUID", null);
             territoryData.saveConfig();
-            if (workerType!=null) {
+            if (workerType != null) {
                 WorkerType type = WorkerType.valueOf(workerType.toUpperCase().replace(" ", "_"));
                 int tier = territoryData.getConfig().getInt("territories." + territoryName + ".workers." + workerUUID + ".tier");
                 for (String tag : villager.getScoreboardTags()) {
                     if (tag.contains("tier=")) {
-                        tier = Integer.parseInt(tag.replace("tier=",""));
+                        tier = Integer.parseInt(tag.replace("tier=", ""));
                     }
                 }
 
-                if (type.getLifespan()==-1){
-                    territoryData.spawnWorker(villager,e.getEntity().getLocation());
+                if (type.getLifespan() == -1) {
+                    territoryData.spawnWorker(villager, e.getEntity().getLocation());
                     return;
                 } else {
-                    territoryData.removeAliveWorkerFromCount(territoryName,type, 1 + tier);
+                    territoryData.removeAliveWorkerFromCount(territoryName, type, 1 + tier);
                 }
             }
-            if(territoryData.getAliveWorkerCount(territoryName,WorkerType.POLICIER) > 1) {
+            if (territoryData.getAliveWorkerCount(territoryName, WorkerType.POLICIER) > 1) {
                 try {
-                    if(e.getDamageSource().getCausingEntity()!=null) {
+                    if (e.getDamageSource().getCausingEntity() != null) {
                         Entity damager = e.getDamageSource().getCausingEntity();
-                        if(damager instanceof Player p) {
-                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué par §c" + p.getName() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par §c" + p.getName() + " §4!");
+                        if (damager instanceof Player p) {
+                            territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué par §c" + p.getName() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par §c" + p.getName() + " §4!");
 
                         } else {
-                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué par un/une §c" + damager.getType() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par un/une §c" + damager.getType() + " §4!");
+                            territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué par un/une §c" + damager.getType() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par un/une §c" + damager.getType() + " §4!");
                         }
                         return;
                     } else if (e.getDamageSource().getDamageType() != null) {
                         String damageTypeMessage = getDamageType(e);
-                        if(damageTypeMessage==null) {
-                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                        if (damageTypeMessage == null) {
+                            territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
                             return;
                         }
-                        if(damageTypeMessage.equals("COMMAND")) {
-                            territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé à été despawn par le menu des villageois !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu des villageois !");
+                        if (damageTypeMessage.equals("COMMAND")) {
+                            territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé à été despawn par le menu des villageois !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été despawn par le menu des villageois !");
                             return;
                         }
-                        territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé est mort §c" + damageTypeMessage + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4est mort §c" + damageTypeMessage + " §4!");
+                        territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé est mort §c" + damageTypeMessage + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4est mort §c" + damageTypeMessage + " §4!");
                         return;
                     } else {
-                        territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                        territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
                         return;
                     }
                 } catch (Exception ex) {
-                    main.logError("Couldn't find out worker's death reason",ex);
-                    territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                    main.logError("Couldn't find out worker's death reason", ex);
+                    territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
                     return;
                 }
             } else {
-                territoryData.sendAnouncementToTerritory(territoryName,workerType==null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
+                territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
                 return;
             }
         }
     }
 
     private String getDamageType(EntityDeathEvent e) {
-        DamageType damageType  = e.getDamageSource().getDamageType();
-        if(damageType.equals(DamageType.FALL)) {
+        DamageType damageType = e.getDamageSource().getDamageType();
+        if (damageType.equals(DamageType.FALL)) {
             return "de dégats de chute";
-        } else if(damageType.equals(DamageType.CAMPFIRE)) {
+        } else if (damageType.equals(DamageType.CAMPFIRE)) {
             return "d'un feu de camp'";
-        } else if(damageType.equals(DamageType.CACTUS)) {
+        } else if (damageType.equals(DamageType.CACTUS)) {
             return "d'un cactus";
-        } else if(damageType.equals(DamageType.CRAMMING)) {
+        } else if (damageType.equals(DamageType.CRAMMING)) {
             return "d'Entity Cramming";
-        }  else if(damageType.equals(DamageType.DROWN)) {
+        } else if (damageType.equals(DamageType.DROWN)) {
             return "de noyade";
-        } else if(damageType.equals(DamageType.EXPLOSION)) {
+        } else if (damageType.equals(DamageType.EXPLOSION)) {
             return "à cause d'une explosion";
-        } else if(damageType.equals(DamageType.FALLING_ANVIL)) {
+        } else if (damageType.equals(DamageType.FALLING_ANVIL)) {
             return "à cause d'une enclume";
-        } else if(damageType.equals(DamageType.FALLING_BLOCK)) {
+        } else if (damageType.equals(DamageType.FALLING_BLOCK)) {
             return "de suffocation";
-        } else if(damageType.equals(DamageType.FALLING_STALACTITE)) {
+        } else if (damageType.equals(DamageType.FALLING_STALACTITE)) {
             return "à cause d'une stalactite";
-        } else if(damageType.equals(DamageType.FIREBALL)) {
+        } else if (damageType.equals(DamageType.FIREBALL)) {
             return "à cause d'une boule de feu";
-        } else if(damageType.equals(DamageType.FREEZE)) {
+        } else if (damageType.equals(DamageType.FREEZE)) {
             return "de froid";
-        } else if(damageType.equals(DamageType.ON_FIRE)) {
+        } else if (damageType.equals(DamageType.ON_FIRE)) {
             return "de feu";
-        } else if(damageType.equals(DamageType.OUT_OF_WORLD)) {
+        } else if (damageType.equals(DamageType.OUT_OF_WORLD)) {
             return "d'une chute dans le vide";
-        } else if(damageType.equals(DamageType.MAGIC)) {
+        } else if (damageType.equals(DamageType.MAGIC)) {
             return "d'une potion";
-        } else if(damageType.equals(DamageType.FIREWORKS)) {
+        } else if (damageType.equals(DamageType.FIREWORKS)) {
             return "à cause de feux d'artifice";
-        } else if(damageType.equals(DamageType.LAVA)) {
+        } else if (damageType.equals(DamageType.LAVA)) {
             return "car il a essayé de nager dans de la lave";
-        } else if(damageType.equals(DamageType.THORNS)) {
+        } else if (damageType.equals(DamageType.THORNS)) {
             return "à cause de l'enchantement Épines";
-        } else if(damageType.equals(DamageType.WIND_CHARGE)) {
+        } else if (damageType.equals(DamageType.WIND_CHARGE)) {
             return "d'une charge de vent";
-        } else if(damageType.equals(DamageType.HOT_FLOOR)) {
+        } else if (damageType.equals(DamageType.HOT_FLOOR)) {
             return "à cause de magma";
-        } else if(damageType.equals(DamageType.SWEET_BERRY_BUSH)) {
+        } else if (damageType.equals(DamageType.SWEET_BERRY_BUSH)) {
             return "à cause d'un buisson de Sweet Berries";
-        } else if(damageType.equals(DamageType.LIGHTNING_BOLT)) {
+        } else if (damageType.equals(DamageType.LIGHTNING_BOLT)) {
             return "à cause d'un éclair...§6 c'est quoi la proba??";
-        } else if(damageType.equals(DamageType.GENERIC)) {
+        } else if (damageType.equals(DamageType.GENERIC)) {
             return "COMMAND";
-        } else if(damageType.equals(DamageType.GENERIC_KILL)) {
+        } else if (damageType.equals(DamageType.GENERIC_KILL)) {
             return "COMMAND";
         } else {
             return null;
         }
-    }
-
-    //WORLDEDIT
-    @Subscribe
-    public void onEdit(EditSessionEvent event) {
-        if (event.getStage() != EditSession.Stage.BEFORE_CHANGE) return;
-
-        Extent original = event.getExtent();
-        Actor actor = event.getActor();
-
-        if (!(actor instanceof BukkitPlayer bukkitPlayer)) return;
-
-        Player player = bukkitPlayer.getPlayer();
-
-        Extent wrappedExtent = new Extent() {
-            @Override
-            public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
-                return false;
-            }
-
-            @Override
-            public BlockVector3 getMinimumPoint() {
-                return null;
-            }
-
-            @Override
-            public BlockVector3 getMaximumPoint() {
-                return null;
-            }
-
-            public boolean setBlock(int x, int y, int z, BlockState block) throws WorldEditException {
-                int chunkX = x >> 4;
-                int chunkZ = z >> 4;
-                Chunk bukkitChunk = player.getWorld().getChunkAt(chunkX, chunkZ);
-
-                String chunkOwner = territoryData.getChunkOwner(bukkitChunk);
-                String playerTerritory = territoryData.getPlayerTerritory(player);
-
-                if (!playerTerritory.equals(chunkOwner) && !main.bypassClaims.contains(player)) {
-                    player.sendMessage(main.prefix + "§4Vous ne pouvez pas utiliser WorldEdit dans un territoire qui ne vous appartient pas !");
-                    return false;
-                }
-
-                return setBlock(x, y, z, block);
-            }
-        };
-
-        event.setExtent(wrappedExtent);
     }
 }

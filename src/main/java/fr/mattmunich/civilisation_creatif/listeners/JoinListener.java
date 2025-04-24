@@ -84,6 +84,7 @@ public class JoinListener implements Listener {
         }
 
         if(!main.modo.contains(p)) {
+            e.setJoinMessage("");
             p.kickPlayer("§cAccès au serveur refusé !\n§eLe serveur est en développement.");
             Bukkit.getConsoleSender().sendMessage(main.makeItSafePrefix + "§a --> §e[§6§lJoin Logger§r§e] §cAccess refused to §4" + p.getName() + "§c because the player didn't have a §ehigh enough rank§c !");
             return;
