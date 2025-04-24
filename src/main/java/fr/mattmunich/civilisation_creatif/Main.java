@@ -7,6 +7,9 @@ import fr.mattmunich.civilisation_creatif.listeners.AntiSpeed;
 import fr.mattmunich.civilisation_creatif.listeners.EventListener;
 import fr.mattmunich.civilisation_creatif.listeners.JoinListener;
 import fr.mattmunich.civilisation_creatif.listeners.WorldEditListener;
+import fr.mattmunich.civilisation_creatif.territories.Command;
+import fr.mattmunich.civilisation_creatif.territories.TerritoryData;
+import fr.mattmunich.civilisation_creatif.territories.Listener;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -15,7 +18,6 @@ import org.bukkit.scoreboard.*;
 
 import java.net.URI;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -157,7 +159,7 @@ public final class Main extends JavaPlugin {
         getCommand("rank").setExecutor(new RankCommand(this));
         getCommand("civilisation").setExecutor(new CivlisationCommand(this));
         getCommand("backup").setExecutor(new BackupCommand(this, backup));
-        getCommand("territoire").setExecutor(new TerritoireCommand(this,territoryData));
+        getCommand("territoire").setExecutor(new Command(this,territoryData));
         getCommand("home").setExecutor(new HomeCommand(this));
         getCommand("sethome").setExecutor(new HomeCommand(this));
         getCommand("delhome").setExecutor(new HomeCommand(this));
@@ -169,7 +171,8 @@ public final class Main extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(this, territoryData, sidebarManager), this);
-        pm.registerEvents(new EventListener(this,this, territoryData), this);
+        pm.registerEvents(new EventListener(this), this);
+        pm.registerEvents(new Listener(this,this, territoryData), this);
         pm.registerEvents(new AntiSpeed(this), this);
         pm.registerEvents(new VanishCommand(this,this), this);
         WorldEdit.getInstance().getEventBus().register(new WorldEditListener(this, territoryData));

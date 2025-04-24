@@ -1,5 +1,6 @@
 package fr.mattmunich.civilisation_creatif.helpers;
 import fr.mattmunich.civilisation_creatif.Main;
+import fr.mattmunich.civilisation_creatif.territories.TerritoryData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

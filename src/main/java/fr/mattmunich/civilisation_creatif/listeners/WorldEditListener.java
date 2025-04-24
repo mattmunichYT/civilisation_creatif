@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import fr.mattmunich.civilisation_creatif.Main;
-import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
+import fr.mattmunich.civilisation_creatif.territories.TerritoryData;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;

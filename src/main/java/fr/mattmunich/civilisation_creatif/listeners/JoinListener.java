@@ -4,7 +4,7 @@ import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import fr.mattmunich.civilisation_creatif.helpers.SidebarManager;
-import fr.mattmunich.civilisation_creatif.helpers.TerritoryData;
+import fr.mattmunich.civilisation_creatif.territories.TerritoryData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

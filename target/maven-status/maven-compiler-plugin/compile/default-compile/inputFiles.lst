@@ -7,7 +7,6 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/NickCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/RankCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/SpawnCommand.java
-/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/TerritoireCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/VanishCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/WarpCommand.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/commands/XPCommand.java
@@ -19,7 +18,6 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/PlayerData.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/SidebarManager.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/SkinManager.java
-/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/TerritoryData.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Utility.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/VersionChecker.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/helpers/Warp.java
@@ -28,3 +26,8 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/EventListener.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/JoinListener.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/WorldEditListener.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Arguments.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Command.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Inventories.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Listener.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/TerritoryData.java
