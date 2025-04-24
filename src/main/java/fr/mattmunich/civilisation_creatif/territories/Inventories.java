@@ -26,7 +26,7 @@ public class Inventories {
         this.territoryData = territoryData;
     }
 
-    public Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
+    private Inventory getTerrListInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p, 54, "§aListe des territoires §7- §ePage §6" + page);
         ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, "");
         for (int i = 0; i < 53; i++) {
@@ -233,7 +233,7 @@ public class Inventories {
         return terrInv;
     }
 
-    public Inventory getTerrMemebersInv_Layout(Player p, int page, int pageNum) {
+    private Inventory getTerrMemebersInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p, 54, "§bGérer les membres §7- §ePage §6" + page);
         ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
         for (int i = 0; i < 53; i++) {
@@ -380,7 +380,7 @@ public class Inventories {
         p.openInventory(terrMembersInv);
     }
 
-    public Inventory getTerrWorkersInv_Layout(Player p, int page, int pageNum) {
+    private Inventory getTerrWorkersInv_Layout(Player p, int page, int pageNum) {
         Inventory terrListInv = Bukkit.createInventory(p, 54, "§bGérer vos villageois §7- §ePage §6" + page);
         ItemStack none = ItemBuilder.getItem(Material.WHITE_STAINED_GLASS_PANE, null, false, false, null, null, null);
         for (int i = 0; i < 53; i++) {

@@ -27,7 +27,9 @@
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/JoinListener.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/listeners/WorldEditListener.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Arguments.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/ClaimsData.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Command.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Inventories.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/Listener.java
 /Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/TerritoryData.java
+/Users/mvernet/IdeaProjects/Civilisation Creatif/src/main/java/fr/mattmunich/civilisation_creatif/territories/WorkersData.java

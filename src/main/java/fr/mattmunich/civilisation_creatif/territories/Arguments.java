@@ -1,5 +1,6 @@
 package fr.mattmunich.civilisation_creatif.territories;
 
+import fr.mattmunich.civilisation_creatif.Main;
 import fr.mattmunich.civilisation_creatif.helpers.Grades;
 import fr.mattmunich.civilisation_creatif.helpers.PlayerData;
 import org.bukkit.Bukkit;
@@ -10,13 +11,16 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class Arguments {
-    private final Command territoireCommand;
+    
+    private Command territoireCommand;
 
     public Arguments(Command territoireCommand) {
         this.territoireCommand = territoireCommand;
     }
 
     boolean arguments(String[] args, Player p, int mapRenderRange, PlayerData playerData) {
+        TerritoryData territoryData = territoireCommand.getTerritoryData();
+
         if (args[0].equalsIgnoreCase("map") || args[0].equalsIgnoreCase("showClaimsMap")) {
             return claimsMapArgument(p, mapRenderRange);
         } else if (args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("showClaims") || args[0].equalsIgnoreCase("showNearbyClaims")) {
@@ -29,31 +33,31 @@ public class Arguments {
             }
             return true;
         } else if (args[0].equalsIgnoreCase("buyWorker")) {
-            if (!territoireCommand.getTerritoryData().isChief(p, territoireCommand.getTerritoryData().getPlayerTerritory(p)) && !territoireCommand.getTerritoryData().isOfficer(p, territoireCommand.getTerritoryData().getPlayerTerritory(p))) {
+            if (!territoryData.isChief(p, territoryData.getPlayerTerritory(p)) && !territoryData.isOfficer(p, territoryData.getPlayerTerritory(p))) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§4Vous devez être le chef/un officier de votre territoire pour faire cela!");
                 return true;
             }
-            territoireCommand.getTerritoryData().showBuyWorkerInv(p);
+            territoryData.showBuyWorkerInv(p);
             return true;
         } else if (args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
-            if (territoireCommand.getTerritoryData().getTerritoryTeamOfPlayer(p) == null) {
-                p.openInventory(territoireCommand.getTerritoryData().getTerritoryInventories().hasNoTerritory_Menu(p));
+            if (territoryData.getTerritoryTeamOfPlayer(p) == null) {
+                p.openInventory(territoryData.getTerritoryInventories().hasNoTerritory_Menu(p));
             } else {
-                p.openInventory(territoireCommand.getTerritoryData().getTerritoryInventories().hasTerritory_Menu(p));
+                p.openInventory(territoryData.getTerritoryInventories().hasTerritory_Menu(p));
             }
         } else if (args[0].equalsIgnoreCase("territory-menu") || args[0].equalsIgnoreCase("terrMenu")) {
-            if (territoireCommand.getTerritoryData().getTerritoryTeamOfPlayer(p) == null) {
+            if (territoryData.getTerritoryTeamOfPlayer(p) == null) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§4Vous n'avez pas de territoire !");
             }
-            p.openInventory(territoireCommand.getTerritoryData().getTerrInv(p, territoireCommand.getTerritoryData().getTerritoryTeamOfPlayer(p)));
+            p.openInventory(territoryData.getTerrInv(p, territoryData.getTerritoryTeamOfPlayer(p)));
             return true;
         } else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("liste")) {
-            p.openInventory(territoireCommand.getTerritoryData().getTerritoryListInventory(p, 1));
+            p.openInventory(territoryData.getTerritoryListInventory(p, 1));
             return true;
 
         } else if (args[0].equalsIgnoreCase("withdrawMoney") || args[0].equalsIgnoreCase("retirerArgent")) {
-            String terr = territoireCommand.getTerritoryData().getPlayerTerritory(p);
-            if (!territoireCommand.getTerritoryData().isOfficer(p, terr) && !territoireCommand.getTerritoryData().isChief(p, terr)) {
+            String terr = territoryData.getPlayerTerritory(p);
+            if (!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§cVous n'avez pas §4la permission §cde §4récupérer de l'argent §cde la banque de votre territoire !");
                 return true;
             }
@@ -68,13 +72,13 @@ public class Arguments {
                 p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire withdrawMoney <moneyAmount>");
                 return true;
             }
-            if (territoireCommand.getTerritoryData().getTerritoryMoney(terr) < amount) {
+            if (territoryData.getTerritoryMoney(terr) < amount) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§4Il n'y a pas assez d'argent dans la banque de votre territoire !");
-                p.sendMessage(territoireCommand.getMain().prefix + "§cIl y a §e" + territoireCommand.getTerritoryData().getTerritoryMoney(terr) + territoireCommand.getMain().moneySign + "§c dans la banque de votre territoire.");
+                p.sendMessage(territoireCommand.getMain().prefix + "§cIl y a §e" + territoryData.getTerritoryMoney(terr) + territoireCommand.getMain().moneySign + "§c dans la banque de votre territoire.");
                 return true;
             }
             try {
-                territoireCommand.getTerritoryData().removeTerritoryMoney(terr, amount);
+                territoryData.removeTerritoryMoney(terr, amount);
                 playerData.addMoney(amount);
                 p.sendMessage(territoireCommand.getMain().prefix + "§a" + amount + territoireCommand.getMain().moneySign + "§2 ont été transféré de la banque de votre territoire à votre compte !");
                 return true;
@@ -84,8 +88,8 @@ public class Arguments {
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("depositMoney") || args[0].equalsIgnoreCase("deposerArgent")) {
-            String terr = territoireCommand.getTerritoryData().getPlayerTerritory(p);
-            if (!territoireCommand.getTerritoryData().isOfficer(p, terr) && !territoireCommand.getTerritoryData().isChief(p, terr)) {
+            String terr = territoryData.getPlayerTerritory(p);
+            if (!territoryData.isOfficer(p, terr) && !territoryData.isChief(p, terr)) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§cVous n'avez pas §4la permission §cde §4déposer de l'argent §cdans la banque de votre territoire !");
                 return true;
             }
@@ -107,7 +111,7 @@ public class Arguments {
                     return true;
                 }
 
-                territoireCommand.getTerritoryData().addTerritoryMoney(terr, amount);
+                territoryData.addTerritoryMoney(terr, amount);
                 playerData.removeMoney(amount);
                 p.sendMessage(territoireCommand.getMain().prefix + "§a" + amount + territoireCommand.getMain().moneySign + "§2 ont été transféré de votre compte à la banque de votre territoire !");
                 return true;
@@ -123,6 +127,8 @@ public class Arguments {
     }
 
     private boolean claimsMapArgument(Player p, int mapRenderRange) {
+        TerritoryData territoryData = territoireCommand.getTerritoryData();
+
         int x = p.getLocation().getChunk().getX();
         int z = p.getLocation().getChunk().getZ();
         int ownerCount = 0;
@@ -133,7 +139,7 @@ public class Arguments {
             for (int chunkZ = z - mapRenderRange; chunkZ < z + mapRenderRange; chunkZ++) {
 //                        p.sendMessage("Checking for chunk " + chunkX + "," + chunkZ);
                 Chunk chunk = p.getWorld().getChunkAt(chunkX, chunkZ);
-                String chunkOwner = territoireCommand.getTerritoryData().getChunkOwner(chunk);
+                String chunkOwner = territoryData.getChunkOwner(chunk);
 //                        p.sendMessage("chunk owner:" + chunkOwner);
                 if (chunkOwner == null) {
                     chunksOwners.add("§r- ");
@@ -144,10 +150,10 @@ public class Arguments {
                     owners.add(chunkOwner);
                     ownerCount += 1;
                     ownerID.put(chunkOwner, ownerCount);
-                    chunksOwners.add("§" + territoireCommand.getTerritoryData().getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
+                    chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
 //                            p.sendMessage("chunk owned by created profile " + chunkOwner + " with id " + ownerCount);
                 } else {
-                    chunksOwners.add("§" + territoireCommand.getTerritoryData().getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
+                    chunksOwners.add("§" + territoryData.getTerritoryTeam(chunkOwner).getColor() + ownerID.get(chunkOwner) + " ");
 //                            p.sendMessage("chunk was added to profile " + chunkOwner + " ; ID : " + ownerID.get(chunkOwner));
                 }
             }
@@ -186,24 +192,27 @@ public class Arguments {
         StringBuilder formattedMap = new StringBuilder(chunksOwners.toString().replace("[", "").replace("\"", "").replace(", ", "").replace("]", "") + "\n\n§aLégende:\n");
         for (String owner : owners) {
             int id = ownerID.get(owner);
-            formattedMap.append("§a- §").append(territoireCommand.getTerritoryData().getTerritoryTeam(owner).getColor()).append(id).append("§2 : ").append(owner).append("\n");
+            formattedMap.append("§a- §").append(territoryData.getTerritoryTeam(owner).getColor()).append(id).append("§2 : ").append(owner).append("\n");
         }
         p.sendMessage(territoireCommand.getMain().prefix + "§6Voici la carte des claims à proximité de vous :\n" + formattedMap);
         return true;
     }
 
     private boolean adminArguments(String[] args, Player p, PlayerData playerData) {
+        if (!Objects.equals(playerData.getRank(), Grades.ADMIN)) {
+            return true;
+        }
+        TerritoryData territoryData = territoireCommand.getTerritoryData();
+        Main main = territoryData.getMain();
+
         if (args.length == 1) {
             p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoires admin <runWorkerCheckup/bypassClaims>");
             return true;
         }
         if (args[1].equalsIgnoreCase("runWorkerCheckup")) {
-            if (!playerData.getRank().equals(Grades.ADMIN)) {
-                return true;
-            }
             if (args.length == 2) {
                 try {
-                    territoireCommand.getTerritoryData().runWorkerCheckup();
+                    territoryData.runWorkerCheckup();
                     p.sendMessage(territoireCommand.getMain().prefix + "§2Success!");
                     return true;
 
@@ -221,7 +230,7 @@ public class Arguments {
                 }
                 try {
                     for (int i = 0; i < nOfRun; i++) {
-                        territoireCommand.getTerritoryData().runWorkerCheckup();
+                        territoryData.runWorkerCheckup();
                     }
                     p.sendMessage(territoireCommand.getMain().prefix + "§2Success §6- §aran WorkerCheckup §6" + nOfRun + "§a times ");
                 } catch (Exception e) {
@@ -230,9 +239,6 @@ public class Arguments {
                 }
             }
         } else if (args[1].equalsIgnoreCase("bypassClaims")) {
-            if (!Objects.equals(playerData.getRank(), Grades.ADMIN)) {
-                return true;
-            }
             if (territoireCommand.getMain().bypassClaims.contains(p)) {
                 territoireCommand.getMain().bypassClaims.remove(p);
                 p.sendTitle("§eBypass Claims : §c§lOFF", "", 20, 60, 20);
@@ -243,11 +249,7 @@ public class Arguments {
                 p.sendMessage(territoireCommand.getMain().prefix + "§aVous ignorez désormais les protections des claims !");
             }
             return true;
-
         } else if (args[1].equalsIgnoreCase("setTerritory")) {
-            if (!Objects.equals(playerData.getRank(), Grades.ADMIN)) {
-                return true;
-            }
             if (args.length != 4) {
                 p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin setTerritory <target> <territory>");
                 return true;
@@ -256,7 +258,7 @@ public class Arguments {
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
 
             String territoryName = "";
-            for (String terr : territoireCommand.getTerritoryData().getTerritoriesList()) {
+            for (String terr : territoryData.getTerritoriesList()) {
                 if (terr.equalsIgnoreCase(args[3])) {
                     territoryName = terr;
                 }
@@ -265,10 +267,10 @@ public class Arguments {
                 p.sendMessage(territoireCommand.getMain().prefix + "§4Territoire non trouvé !");
                 return true;
             }
-            if (territoireCommand.getTerritoryData().getPlayerTerritory(target) != null) {
-                territoireCommand.getTerritoryData().ADMIN_leaveTerritory(target);
+            if (territoryData.getPlayerTerritory(target) != null) {
+                territoryData.ADMIN_leaveTerritory(target);
             }
-            territoireCommand.getTerritoryData().joinTerritory(target, territoryName);
+            territoryData.joinTerritory(target, territoryName);
             if (target.getPlayer() != null && target.getPlayer().equals(p)) {
                 p.sendMessage(territoireCommand.getMain().prefix + "§2Votre territoire a été défini à " + territoryName + "§2 !");
             } else {
@@ -276,28 +278,97 @@ public class Arguments {
             }
             return true;
         } else if (args[1].equalsIgnoreCase("makeOfficer")) {
-            if (!Objects.equals(playerData.getRank(), Grades.ADMIN)) {
-                return true;
-            }
             if (args.length != 3) {
                 p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin makeOfficer <target>");
                 return true;
             }
 
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
-            territoireCommand.getTerritoryData().ADMIN_makeOfficer(target, p);
+            territoryData.ADMIN_makeOfficer(target, p);
             return true;
         } else if (args[1].equalsIgnoreCase("removeOfficer")) {
-            if (!Objects.equals(playerData.getRank(), Grades.ADMIN)) {
-                return true;
-            }
             if (args.length != 3) {
                 p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin removeOfficer <target>");
                 return true;
             }
 
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
-            territoireCommand.getTerritoryData().ADMIN_removeOfficer(target, p);
+            territoryData.ADMIN_removeOfficer(target, p);
+            return true;
+        } else if (args[1].equalsIgnoreCase("setMoney")) {
+            if (args.length != 4) {
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin setMoney <amount> <territoryData>");
+                return true;
+            }
+
+            int amount;
+            try {
+                amount = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                p.sendMessage(main.prefix + "§4Veuillez entrer un nombre valide !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin setMoney <amount> <territoryData>");
+                return true;
+            }
+
+            if(!territoryData.getTerritoriesList().contains(args[3])) {
+                p.sendMessage(main.prefix + "§4Territoire non trouvé !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin setMoney <amount> <territoryData>");
+                return true;
+            }
+
+            String territoryName = args[3];
+            territoryData.setTerritoryMoney(territoryName,amount);
+            p.sendMessage(main.prefix + "§2La somme d'argent dans la banque du territoire §6" + territoryName + "§2 a été définie à §6" + amount + main.moneySign + "§2 !");
+            return true;
+        } else if (args[1].equalsIgnoreCase("addMoney")) {
+            if (args.length != 4) {
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin addMoney <amount> <territoryData>");
+                return true;
+            }
+
+            int amount;
+            try {
+                amount = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                p.sendMessage(main.prefix + "§4Veuillez entrer un nombre valide !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin addMoney <amount> <territoryData>");
+                return true;
+            }
+
+            if(!territoryData.getTerritoriesList().contains(args[3])) {
+                p.sendMessage(main.prefix + "§4Territoire non trouvé !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin addMoney <amount> <territoryData>");
+                return true;
+            }
+
+            String territoryName = args[3];
+            territoryData.addTerritoryMoney(territoryName,amount);
+            p.sendMessage(main.prefix + "§2La somme d'argent dans la banque du territoire §6" + territoryName + "§2 est désormais §6" + territoryData.getTerritoryMoney(territoryName) + main.moneySign + "§2 !");
+            return true;
+        }  else if (args[1].equalsIgnoreCase("removeMoney")) {
+            if (args.length != 4) {
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin removeMoney <amount> <territoryData>");
+                return true;
+            }
+
+            int amount;
+            try {
+                amount = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                p.sendMessage(main.prefix + "§4Veuillez entrer un nombre valide !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin removeMoney <amount> <territoryData>");
+                return true;
+            }
+
+            if(!territoryData.getTerritoriesList().contains(args[3])) {
+                p.sendMessage(main.prefix + "§4Territoire non trouvé !");
+                p.sendMessage(territoireCommand.getMain().wrongUsage + "/territoire admin removeMoney <amount> <territoryData>");
+                return true;
+            }
+
+            String territoryName = args[3];
+            territoryData.removeTerritoryMoney(territoryName,amount);
+            p.sendMessage(main.prefix + "§2La somme d'argent dans la banque du territoire §6" + territoryName + "§2 est désormais §6" + territoryData.getTerritoryMoney(territoryName) + main.moneySign + "§2 !");
             return true;
         }
         return false;

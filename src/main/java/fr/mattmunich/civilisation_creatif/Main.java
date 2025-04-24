@@ -268,8 +268,8 @@ public final class Main extends JavaPlugin {
             all.sendTitle("§4🚀 Redémarrage du serveur...","",20,100,20);
             all.transfer("91.197.6.60", 25599);
         }
-        if (territoryData != null && territoryData.workerCheckupTask!=null) {
-            territoryData.workerCheckupTask.cancel();
+        if (territoryData != null && territoryData.getWorkerCheckupTask()!=null) {
+            territoryData.getWorkerCheckupTask().cancel();
         }
         if(backup != null && backup.backupTask !=null){
             backup.backupTask.cancel();

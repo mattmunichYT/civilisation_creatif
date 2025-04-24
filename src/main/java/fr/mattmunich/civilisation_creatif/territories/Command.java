@@ -136,6 +136,9 @@ public class Command implements CommandExecutor, TabCompleter {
                         tabComplete.add("setTerritory");
                         tabComplete.add("makeOfficer");
                         tabComplete.add("removeOfficer");
+                        tabComplete.add("setMoney");
+                        tabComplete.add("addMoney");
+                        tabComplete.add("removeMoney");
                     }
                 }
             }
@@ -144,7 +147,11 @@ public class Command implements CommandExecutor, TabCompleter {
             if(s instanceof Player p) {
                 PlayerData playerData = new PlayerData(p);
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
-                    if(args[0].equalsIgnoreCase("admin") && (args[1].equalsIgnoreCase("setTerritory") || args[1].equalsIgnoreCase("makeOfficer") || args[1].equalsIgnoreCase("removeOfficer"))) {
+                    if(args[0].equalsIgnoreCase("admin") && (
+                            args[1].equalsIgnoreCase("setTerritory")
+                            || args[1].equalsIgnoreCase("makeOfficer")
+                            || args[1].equalsIgnoreCase("removeOfficer")
+                    )) {
                         for (Player online : Bukkit.getOnlinePlayers()) {
                             tabComplete.add(online.getName());
                         }
@@ -154,6 +161,19 @@ public class Command implements CommandExecutor, TabCompleter {
                             }
                         }
                     }
+                    if(args[0].equalsIgnoreCase("admin") && (
+                            args[1].equalsIgnoreCase("setMoney")
+                            || args[1].equalsIgnoreCase("addMoney")
+                            || args[1].equalsIgnoreCase("removeMoney")
+                    )) {
+                        tabComplete.add("1");
+                        tabComplete.add("10");
+                        tabComplete.add("100");
+                        tabComplete.add("1000");
+                        tabComplete.add("10000");
+                        tabComplete.add("100000");
+                        tabComplete.add("1000000");
+                    }
                 }
             }
         }
@@ -161,7 +181,12 @@ public class Command implements CommandExecutor, TabCompleter {
             if(s instanceof Player p) {
                 PlayerData playerData = new PlayerData(p);
                 if(playerData.getRank() != null && playerData.getRank().equals(Grades.ADMIN)){
-                    if(args[0].equalsIgnoreCase("admin") && (args[1].equalsIgnoreCase("setTerritory"))) {
+                    if(args[0].equalsIgnoreCase("admin") && (
+                            args[1].equalsIgnoreCase("setTerritory")
+                            || args[1].equalsIgnoreCase("setMoney")
+                            || args[1].equalsIgnoreCase("addMoney")
+                            || args[1].equalsIgnoreCase("removeMoney")
+                    )) {
                         tabComplete.addAll(territoryData.getTerritoriesList());
                     }
                 }

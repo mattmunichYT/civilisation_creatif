@@ -42,8 +42,6 @@ public class Listener implements org.bukkit.event.Listener {
 
     private final ArrayList<Player> defTerritoryBanner = new ArrayList<>();
 
-    private final ArrayList<Player> enterNewTerritoryName = new ArrayList<>();
-
     private final ArrayList<Player> enterNewTerritoryDescription = new ArrayList<>();
 
     private final Main main;
@@ -131,34 +129,6 @@ public class Listener implements org.bukkit.event.Listener {
             defTerritoryBanner.remove(p);
             return;
         }
-        if (enterNewTerritoryName.contains(p)) {
-            enterNewTerritoryName.remove(p);
-            e.setCancelled(true);
-            if (territoryData.getPlayerTerritory(p) == null || !territoryData.isChief(p, territoryData.getPlayerTerritory(p))) {
-                p.sendMessage(main.prefix + "§4Vous ne pouvez pas faire cela.");
-                return;
-            }
-            if (e.getMessage().equals("&")) {
-                p.sendMessage(main.prefix + "§eOpération annulée.");
-                return;
-            }
-            if (e.getMessage().length() > 20) {
-                p.sendMessage(main.prefix + "§4Le nom du territroire doit faire au maximum §c20 caractères §4!");
-                return;
-            }
-            if (!e.getMessage().matches("[a-zA-Z0-9éèê]+")) {
-                p.sendMessage(main.prefix + "§4Le nom du territroire ne doit pas contenir de §ccaractères spéciaux §8§o(seulement a-Z et 0-9) §4!");
-                return;
-            }
-            ChatColor territoryColor = territoryData.getTerritoryTeam(territoryData.getPlayerTerritory(p)).getColor();
-            try {
-                territoryData.renameTerritory(territoryData.getPlayerTerritory(p), e.getMessage());
-            } catch (NullPointerException ex) {
-                p.sendMessage(main.prefix + "§4Une erreur s'est produite");
-            }
-            p.sendMessage(main.prefix + "§2Votre territoire a été renommé à " + territoryColor + e.getMessage() + "§2 !");
-            return;
-        }
 
         if (enterNewTerritoryDescription.contains(p)) {
             enterNewTerritoryDescription.remove(p);
@@ -178,7 +148,6 @@ public class Listener implements org.bukkit.event.Listener {
             territoryData.setTerritoryDescription(territoryData.getPlayerTerritory(p), main.hex(e.getMessage()));
             p.sendMessage(main.prefix + "§2La description de votre territoire a été définie à :");
             p.sendMessage("§a" + main.hex(e.getMessage()));
-            return;
         }
     }
 
@@ -243,25 +212,6 @@ public class Listener implements org.bukkit.event.Listener {
                     case SPYGLASS:
 
 
-//                        int pageNum = territoryData.getTerritoriesList().size()/28;
-//                        Inventory terrListInv_Layout = getTerrListInv_Layout(p,1,pageNum);
-//                        for(String terr : territoryData.getTerritoriesList()) {
-//                            Team territory = territoryData.getTerritoryTeam(terr);
-//                            Player chief = Bukkit.getPlayer(territoryData.getTerritoryChiefUUID(terr));
-//                            String chiefName = "";
-//                            if(chief==null){
-//                                chiefName = "§c§oNon trouvé";
-//                            } else {
-//                                chiefName = chief.getName();
-//                            }
-//                            ItemStack banner = territoryData.getTerritoryBanner(terr);
-//                            ItemMeta bannerMeta = banner.getItemMeta();
-//                            int xp = territoryData.getTerritoryXP(terr);
-//                            int money = territoryData.getTerritoryMoney(terr);
-//                            assert bannerMeta != null;
-//                            bannerMeta.setItemName(territory.getColor() + territory.getName());
-//                            bannerMeta.setLore(Arrays.asList("§2Chef: §a" + chiefName,"§2XP:§a" + xp,"§2Argent:§a" + money));
-//                        }
                         Inventory terrListInv = territoryData.getTerritoryListInventory(p, 1);
                         p.openInventory(terrListInv);
                         break;
@@ -420,6 +370,7 @@ public class Listener implements org.bukkit.event.Listener {
                             }
                             ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
                             SkullMeta skullMeta = (SkullMeta) playerSkull.getItemMeta();
+                            assert skullMeta != null;
                             skullMeta.setOwnerProfile(all.getPlayerProfile());
                             skullMeta.setLore(Collections.singletonList("§bCliquez pour inviter le joueur §5"));
                             skullMeta.setDisplayName(all.getName());
@@ -526,15 +477,6 @@ public class Listener implements org.bukkit.event.Listener {
                         p.sendTitle("§2Envoyez la description", "§2§ldans le tchat", 20, 100, 20);
                         enterNewTerritoryDescription.add(p);
                         break;
-                    case OAK_SIGN:
-                        p.sendMessage(main.prefix + "§cFonctionnalité désactivée.");
-                        break;
-//                        p.closeInventory();
-//                        p.sendMessage(main.prefix + "§2Envoyez le §ofutur §r§5nom§2 de votre territoire dans le tchat. §e(§6§o& §r§epour annuler)");
-//                        p.sendMessage(main.prefix + "§a§oℹ Vous pouvez entrer au maximum 20 caractères");
-//                        p.sendTitle("§2Envoyez le nom","§2§ldans le tchat",20,100,20);
-//                        enterNewTerritoryName.add(p);
-//                        break;
                     case BARRIER:
                         invView.close();
                         break;
@@ -697,23 +639,18 @@ public class Listener implements org.bukkit.event.Listener {
                     return;
                 }
                 switch (it.getType()) {
-                    case BARRIER -> {
-                        invView.close();
-                        break;
-                    }
+                    case BARRIER -> invView.close();
                     case RED_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory terrListInv = territoryData.getTerritoryListInventory(p, page - 1);
                         p.openInventory(terrListInv);
-                        break;
                     }
                     case LIME_STAINED_GLASS -> {
                         invView.close();
                         int page = territoryData.extractInventoryPageNumber(invView.getTitle());
                         Inventory terrListInv = territoryData.getTerritoryListInventory(p, page + 1);
                         p.openInventory(terrListInv);
-                        break;
                     }
                     case WHITE_BANNER, BLACK_BANNER, RED_BANNER, BLUE_BANNER, LIGHT_BLUE_BANNER, BROWN_BANNER,
                          CYAN_BANNER, GRAY_BANNER, GREEN_BANNER, LIGHT_GRAY_BANNER, LIME_BANNER, MAGENTA_BANNER,
@@ -723,13 +660,11 @@ public class Listener implements org.bukkit.event.Listener {
                             Bukkit.getScheduler().runTask(main, p::closeInventory);
                             Inventory terrInv = territoryData.getTerrInv(p, territory);
                             Bukkit.getScheduler().runTask(main, () -> p.openInventory(terrInv));
-                            break;
                         } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite - territoire non trouvé !");
                         }
                     }
                     default -> {
-                        break;
                     }
                 }
             } else if (invView.getTitle().contains("§6Acheter un villegeois")) {
@@ -739,7 +674,6 @@ public class Listener implements org.bukkit.event.Listener {
                 }
                 if (it.getType() == Material.BARRIER) {
                     invView.close();
-                    return;
                 } else {
                     WorkerType workerType = null;
                     for (WorkerType checkWorkerType : WorkerType.values()) {
@@ -753,7 +687,6 @@ public class Listener implements org.bukkit.event.Listener {
                     }
                     invView.close();
                     territoryData.openChooseTierInv(p, workerType);
-                    return;
                 }
             } else if (invView.getTitle().contains("§6Choisir le tier du villageois")) {
                 e.setCancelled(true);
@@ -764,8 +697,8 @@ public class Listener implements org.bukkit.event.Listener {
                     p.sendMessage(main.prefix + "§4Une erreur s'est produite !");
                     return;
                 }
-                WorkerType type = null;
-                String parsedType = invView.getItem(13).getItemMeta().getDisplayName().replace("§aℹ Choisissez le tier de votre villageois ", "").replace(" ", "_").toUpperCase();
+                WorkerType type;
+                String parsedType = Objects.requireNonNull(Objects.requireNonNull(invView.getItem(13)).getItemMeta()).getDisplayName().replace("§aℹ Choisissez le tier de votre villageois ", "").replace(" ", "_").toUpperCase();
                 try {
                     type = WorkerType.valueOf(parsedType);
                 } catch (IllegalArgumentException ex) {
@@ -774,39 +707,30 @@ public class Listener implements org.bukkit.event.Listener {
                     return;
                 }
                 switch (it.getType()) {
-                    case BARRIER -> {
-                        invView.close();
-                        break;
-                    }
+                    case BARRIER -> invView.close();
                     case COAL_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 0);
-                        break;
                     }
                     case IRON_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 1);
-                        break;
                     }
                     case GOLD_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 2);
-                        break;
                     }
                     case EMERALD_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 3);
-                        break;
                     }
                     case DIAMOND_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 4);
-                        break;
                     }
                     case NETHERITE_BLOCK -> {
                         invView.close();
                         territoryData.buyWorker(p, type, 5);
-                        break;
                     }
                 }
             } else if (invView.getTitle().contains("§bGérer vos villageois §7- §ePage §6")) {
@@ -859,10 +783,8 @@ public class Listener implements org.bukkit.event.Listener {
                             } else {
                                 p.sendMessage(main.prefix + "§cLe villegois est déjà en vie/activité !");
                             }
-                            return;
                         } else {
                             p.sendMessage(main.prefix + "§4Une erreur s'est produite.");
-                            return;
                         }
                     }
                     case IRON_SWORD -> {
@@ -979,7 +901,6 @@ public class Listener implements org.bukkit.event.Listener {
                         territoryData.removeOfficer(t, p);
                         p.closeInventory();
                         territoryData.showTerritoryMembersInventory(p, territoryName, 1);
-                        return;
                     }
                 } else if (it.getType().equals(Material.END_CRYSTAL)) {
                     Inventory preInviteInv = Bukkit.createInventory(p, 54, "§bInviter un joueur au territoire");
@@ -994,6 +915,7 @@ public class Listener implements org.bukkit.event.Listener {
                         }
                         ItemStack playerSkull = new ItemStack(Material.PLAYER_HEAD);
                         SkullMeta skullMeta = (SkullMeta) playerSkull.getItemMeta();
+                        assert skullMeta != null;
                         skullMeta.setOwnerProfile(all.getPlayerProfile());
                         skullMeta.setLore(Collections.singletonList("§bCliquez pour inviter le joueur §5"));
                         skullMeta.setDisplayName(all.getName());
@@ -1016,10 +938,8 @@ public class Listener implements org.bukkit.event.Listener {
                     }
                     p.closeInventory();
                     p.openInventory(inviteInv);
-                    return;
                 } else if (it.getType().equals(Material.BARRIER)) {
                     p.closeInventory();
-                    return;
                 }
             }
         }
@@ -1209,9 +1129,9 @@ public class Listener implements org.bukkit.event.Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getMaterial().equals(Material.VILLAGER_SPAWN_EGG)) {
             e.setCancelled(true);
             try {
+                assert e.getItem() != null;
                 SpawnEggMeta meta = (SpawnEggMeta) e.getItem().getItemMeta();
                 territoryData.spawnWorker(p, meta, e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : p.getLocation(), e.getItem());
-                return;
             } catch (ClassCastException ignored) {
             }
         }
@@ -1225,7 +1145,6 @@ public class Listener implements org.bukkit.event.Listener {
         if (!main.bypassClaims.contains(p) && chunkOwner != null && !chunkOwner.equals(territoryName)) {
             e.setCancelled(true);
             p.sendMessage(main.prefix + "§4Vous ne pouvez pas casser de blocs ici !");
-            return;
         }
     }
 
@@ -1293,8 +1212,8 @@ public class Listener implements org.bukkit.event.Listener {
                         } else {
                             territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué par un/une §c" + damager.getType() + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué par un/une §c" + damager.getType() + " §4!");
                         }
-                        return;
-                    } else if (e.getDamageSource().getDamageType() != null) {
+                    } else {
+                        e.getDamageSource().getDamageType();
                         String damageTypeMessage = getDamageType(e);
                         if (damageTypeMessage == null) {
                             territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
@@ -1305,19 +1224,13 @@ public class Listener implements org.bukkit.event.Listener {
                             return;
                         }
                         territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé est mort §c" + damageTypeMessage + "§4 !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4est mort §c" + damageTypeMessage + " §4!");
-                        return;
-                    } else {
-                        territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
-                        return;
                     }
                 } catch (Exception ex) {
                     main.logError("Couldn't find out worker's death reason", ex);
                     territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
-                    return;
                 }
             } else {
                 territoryData.sendAnouncementToTerritory(territoryName, workerType == null ? "§4Un employé a été tué !" : "§4Un employé de type §e" + territoryData.formatType(workerType) + " §4a été tué !");
-                return;
             }
         }
     }

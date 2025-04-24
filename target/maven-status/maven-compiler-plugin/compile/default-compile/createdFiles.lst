@@ -1,7 +1,17 @@
+fr/mattmunich/civilisation_creatif/territories/ClaimsData$1.class
 fr/mattmunich/civilisation_creatif/commands/XPCommand.class
+fr/mattmunich/civilisation_creatif/territories/Listener.class
+fr/mattmunich/civilisation_creatif/territories/Command.class
+fr/mattmunich/civilisation_creatif/territories/Listener$2.class
+fr/mattmunich/civilisation_creatif/territories/WorkersData.class
 fr/mattmunich/civilisation_creatif/helpers/VersionChecker.class
 fr/mattmunich/civilisation_creatif/helpers/ItemBuilder.class
+fr/mattmunich/civilisation_creatif/territories/Listener$1.class
+fr/mattmunich/civilisation_creatif/territories/ClaimsData.class
+fr/mattmunich/civilisation_creatif/territories/Arguments.class
+fr/mattmunich/civilisation_creatif/territories/Inventories.class
 fr/mattmunich/civilisation_creatif/listeners/EventListener.class
 fr/mattmunich/civilisation_creatif/helpers/SkinManager.class
 fr/mattmunich/civilisation_creatif/listeners/WorldEditListener.class
 fr/mattmunich/civilisation_creatif/Main.class
+fr/mattmunich/civilisation_creatif/territories/TerritoryData.class
